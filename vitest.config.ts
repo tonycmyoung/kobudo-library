@@ -13,6 +13,7 @@ export default defineConfig({
     },
     setupFiles: ["./tests/setup.ts"],
     globals: true,
+    maxWorkers: 4,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
