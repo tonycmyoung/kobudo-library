@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Info } from "lucide-react"
 
 interface AboutModalProps {
@@ -35,6 +35,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <Info className="h-5 w-5 text-red-500" />
             About
           </DialogTitle>
+          <DialogDescription className="sr-only">Information about the Okinawa Kobudo Library application.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">

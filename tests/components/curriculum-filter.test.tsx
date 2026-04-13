@@ -23,19 +23,19 @@ describe("CurriculumFilter", () => {
   it("should render all curriculums sorted by display_order", () => {
     render(<CurriculumFilter {...defaultProps} />)
 
-    expect(screen.getByText("10.Kyu")).toBeTruthy()
-    expect(screen.getByText("9.Kyu")).toBeTruthy()
-    expect(screen.getByText("8.Kyu")).toBeTruthy()
+    expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("9.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("8.Kyu")).toBeInTheDocument()
   })
 
   it("should render CURRICULUM label", () => {
     render(<CurriculumFilter {...defaultProps} />)
 
-    expect(screen.getByText("CURRICULUM")).toBeTruthy()
+    expect(screen.getByText("CURRICULUM")).toBeInTheDocument()
   })
 
   it("should call onCurriculumToggle when curriculum is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onCurriculumToggle = vi.fn()
     render(<CurriculumFilter {...defaultProps} onCurriculumToggle={onCurriculumToggle} />)
 
@@ -63,14 +63,14 @@ describe("CurriculumFilter", () => {
     render(<CurriculumFilter {...defaultProps} />)
 
     // Tooltips are rendered but descriptions are in TooltipContent which needs hover to show
-    expect(screen.getByText("10.Kyu")).toBeTruthy()
-    expect(screen.getByText("9.Kyu")).toBeTruthy()
+    expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("9.Kyu")).toBeInTheDocument()
   })
 
   it("should handle curriculums without descriptions", () => {
     render(<CurriculumFilter {...defaultProps} />)
 
-    expect(screen.getByText("8.Kyu")).toBeTruthy()
+    expect(screen.getByText("8.Kyu")).toBeInTheDocument()
   })
 
   it("should apply correct colors to badges", () => {
@@ -85,17 +85,17 @@ describe("CurriculumFilter", () => {
       render(<CurriculumFilter {...defaultProps} groupBySet={true} />)
 
       // Should show set names as labels
-      expect(screen.getByText("Okinawa Kobudo:")).toBeTruthy()
-      expect(screen.getByText("Matayoshi:")).toBeTruthy()
+      expect(screen.getByText("Okinawa Kobudo:")).toBeInTheDocument()
+      expect(screen.getByText("Matayoshi:")).toBeInTheDocument()
     })
 
     it("should render curriculums within their respective sets", () => {
       render(<CurriculumFilter {...defaultProps} groupBySet={true} />)
 
       // All curriculum badges should still be present
-      expect(screen.getByText("10.Kyu")).toBeTruthy()
-      expect(screen.getByText("9.Kyu")).toBeTruthy()
-      expect(screen.getByText("8.Kyu")).toBeTruthy()
+      expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+      expect(screen.getByText("9.Kyu")).toBeInTheDocument()
+      expect(screen.getByText("8.Kyu")).toBeInTheDocument()
     })
 
     it("should not show set labels when groupBySet is false", () => {
@@ -106,7 +106,7 @@ describe("CurriculumFilter", () => {
     })
 
     it("should still allow toggling curriculums when grouped", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       const onCurriculumToggle = vi.fn()
       render(<CurriculumFilter {...defaultProps} onCurriculumToggle={onCurriculumToggle} groupBySet={true} />)
 

@@ -2,13 +2,22 @@
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
 import "@testing-library/jest-dom"
-import { afterEach, vi } from "vitest"
+import { afterEach, beforeEach, vi } from "vitest"
 import { cleanup } from "@testing-library/react"
 
-// Cleanup after each test
+// Suppress console.error output globally — intentional error-path tests should not pollute output.
+// Tests that need to assert on console.error can still do so: vi.spyOn in the test body wraps
+// this global spy, and toHaveBeenCalledWith assertions on that inner spy work correctly.
+beforeEach(() => {
+  vi.spyOn(console, "error").mockImplementation(() => {})
+})
+
+// Cleanup after each test — restoreAllMocks cleans up the global console.error spy above
+// as well as any additional spies created within individual tests.
 afterEach(() => {
   cleanup()
   localStorage.clear()
+  vi.restoreAllMocks()
 })
 
 // Mock Next.js modules

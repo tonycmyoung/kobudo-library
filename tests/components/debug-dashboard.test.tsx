@@ -40,9 +40,9 @@ describe("DebugDashboard", () => {
 
     render(<DebugDashboard />)
 
-    expect(screen.getByText("Loading debug logs...")).toBeTruthy()
+    expect(screen.getByText("Loading debug logs...")).toBeInTheDocument()
     const spinner = document.querySelector(".animate-spin")
-    expect(spinner).toBeTruthy()
+    expect(spinner).toBeInTheDocument()
   })
 
   it("should display debug logs after successful fetch", async () => {
@@ -51,12 +51,12 @@ describe("DebugDashboard", () => {
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("user1@example.com")).toBeTruthy()
+      expect(screen.getByText("user1@example.com")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("user2@example.com")).toBeTruthy()
-    expect(screen.getByText("Email already exists")).toBeTruthy()
-    expect(screen.getByText("2 logs total")).toBeTruthy()
+    expect(screen.getByText("user2@example.com")).toBeInTheDocument()
+    expect(screen.getByText("Email already exists")).toBeInTheDocument()
+    expect(screen.getByText("2 logs total")).toBeInTheDocument()
   })
 
   it("should display empty state when no logs exist", async () => {
@@ -65,10 +65,10 @@ describe("DebugDashboard", () => {
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No debug logs found")).toBeTruthy()
+      expect(screen.getByText("No debug logs found")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Logs will appear here when users attempt to sign in or sign up")).toBeTruthy()
+    expect(screen.getByText("Logs will appear here when users attempt to sign in or sign up")).toBeInTheDocument()
   })
 
   it("should handle fetch errors gracefully", async () => {
@@ -88,11 +88,11 @@ describe("DebugDashboard", () => {
   it("should refresh logs when refresh button is clicked", async () => {
     vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(mockLogs)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("user1@example.com")).toBeTruthy()
+      expect(screen.getByText("user1@example.com")).toBeInTheDocument()
     })
 
     const refreshButton = screen.getByRole("button", { name: /refresh/i })
@@ -105,18 +105,18 @@ describe("DebugDashboard", () => {
     vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(mockLogs)
     vi.mocked(actions.clearAuthDebugLogs).mockResolvedValue(undefined)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("user1@example.com")).toBeTruthy()
+      expect(screen.getByText("user1@example.com")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })
     await user.click(clearButton)
 
     await waitFor(() => {
-      expect(screen.getByText("No debug logs found")).toBeTruthy()
+      expect(screen.getByText("No debug logs found")).toBeInTheDocument()
     })
 
     expect(actions.clearAuthDebugLogs).toHaveBeenCalledTimes(1)
@@ -128,7 +128,7 @@ describe("DebugDashboard", () => {
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No debug logs found")).toBeTruthy()
+      expect(screen.getByText("No debug logs found")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })
@@ -138,20 +138,20 @@ describe("DebugDashboard", () => {
   it("should expand and collapse log rows when clicked", async () => {
     vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(mockLogs)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("user1@example.com")).toBeTruthy()
+      expect(screen.getByText("user1@example.com")).toBeInTheDocument()
     })
 
     const logRow = screen.getByText("user1@example.com").closest("tr")
-    expect(logRow).toBeTruthy()
+    expect(logRow).toBeInTheDocument()
 
     await user.click(logRow!)
 
     await waitFor(() => {
-      expect(screen.getByText("Additional Data")).toBeTruthy()
+      expect(screen.getByText("Additional Data")).toBeInTheDocument()
     })
 
     await user.click(logRow!)
@@ -179,13 +179,13 @@ describe("DebugDashboard", () => {
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Login")).toBeTruthy()
+      expect(screen.getByText("Login")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Signup")).toBeTruthy()
+    expect(screen.getByText("Signup")).toBeInTheDocument()
     const emailBadges = screen.getAllByText("Email")
     expect(emailBadges.some((badge) => badge.getAttribute("data-slot") === "badge")).toBe(true)
-    expect(screen.getByText("Approval")).toBeTruthy()
+    expect(screen.getByText("Approval")).toBeInTheDocument()
   })
 
   it("should display success and error indicators correctly", async () => {
@@ -195,13 +195,13 @@ describe("DebugDashboard", () => {
 
     await waitFor(() => {
       const user1Row = screen.getByText("user1@example.com").closest("tr")
-      expect(user1Row).toBeTruthy()
-      expect(within(user1Row!).getByText("Success")).toBeTruthy()
+      expect(user1Row).toBeInTheDocument()
+      expect(within(user1Row!).getByText("Success")).toBeInTheDocument()
     })
 
     const user2Row = screen.getByText("user2@example.com").closest("tr")
-    expect(user2Row).toBeTruthy()
-    expect(within(user2Row!).getByText("Error")).toBeTruthy()
+    expect(user2Row).toBeInTheDocument()
+    expect(within(user2Row!).getByText("Error")).toBeInTheDocument()
   })
 
   it("should handle clear logs errors gracefully", async () => {
@@ -210,11 +210,11 @@ describe("DebugDashboard", () => {
     vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(mockLogs)
     vi.mocked(actions.clearAuthDebugLogs).mockRejectedValue(new Error("Clear failed"))
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<DebugDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("user1@example.com")).toBeTruthy()
+      expect(screen.getByText("user1@example.com")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })

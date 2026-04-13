@@ -11,11 +11,11 @@ describe("AdminRefreshButton", () => {
   it("should render button with correct initial text", () => {
     render(<AdminRefreshButton />)
 
-    expect(screen.getByRole("button", { name: /refresh all/i })).toBeTruthy()
+    expect(screen.getByRole("button", { name: /refresh all/i })).toBeInTheDocument()
   })
 
   it("should dispatch three custom events when clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const eventSpy = vi.fn()
 
     globalThis.addEventListener("admin-refresh-pending-users", eventSpy)
@@ -37,7 +37,7 @@ describe("AdminRefreshButton", () => {
   })
 
   it("should show refreshing state with spinning icon", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     render(<AdminRefreshButton />)
 
@@ -45,7 +45,7 @@ describe("AdminRefreshButton", () => {
     await user.click(button)
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /refreshing/i })).toBeTruthy()
+      expect(screen.getByRole("button", { name: /refreshing/i })).toBeInTheDocument()
     })
 
     const refreshingButton = screen.getByRole("button", { name: /refreshing/i })
@@ -54,7 +54,7 @@ describe("AdminRefreshButton", () => {
   })
 
   it("should disable button while refreshing", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     render(<AdminRefreshButton />)
 
@@ -67,7 +67,7 @@ describe("AdminRefreshButton", () => {
   })
 
   it("should re-enable button after refresh completes", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     render(<AdminRefreshButton />)
 
@@ -81,14 +81,14 @@ describe("AdminRefreshButton", () => {
     await waitFor(
       () => {
         expect(button).not.toBeDisabled()
-        expect(screen.getByRole("button", { name: /refresh all/i })).toBeTruthy()
+        expect(screen.getByRole("button", { name: /refresh all/i })).toBeInTheDocument()
       },
       { timeout: 2000 },
     )
   })
 
   it("should handle errors gracefully and still re-enable button", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
     let callCount = 0

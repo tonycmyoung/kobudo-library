@@ -8,8 +8,8 @@ describe("UserSortControl", () => {
     const onSortChange = vi.fn()
     render(<UserSortControl sortBy="full_name" sortOrder="asc" onSortChange={onSortChange} />)
 
-    expect(screen.getByText("Sort by:")).toBeTruthy()
-    expect(screen.getByRole("combobox")).toBeTruthy()
+    expect(screen.getByText("Sort by:")).toBeInTheDocument()
+    expect(screen.getByRole("combobox")).toBeInTheDocument()
   })
 
   it("should display current sort option", () => {
@@ -22,7 +22,7 @@ describe("UserSortControl", () => {
   // The dropdown interaction doesn't work in test environment and triggers uncaught exceptions
 
   it("should toggle sort order when arrow button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onSortChange = vi.fn()
     render(<UserSortControl sortBy="full_name" sortOrder="asc" onSortChange={onSortChange} />)
 
@@ -36,9 +36,9 @@ describe("UserSortControl", () => {
     const onSortChange = vi.fn()
     const { rerender } = render(<UserSortControl sortBy="full_name" sortOrder="asc" onSortChange={onSortChange} />)
 
-    expect(screen.getByTitle("Sort descending")).toBeTruthy()
+    expect(screen.getByTitle("Sort descending")).toBeInTheDocument()
 
     rerender(<UserSortControl sortBy="full_name" sortOrder="desc" onSortChange={onSortChange} />)
-    expect(screen.getByTitle("Sort ascending")).toBeTruthy()
+    expect(screen.getByTitle("Sort ascending")).toBeInTheDocument()
   })
 })

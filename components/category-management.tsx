@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Plus, Pencil, Trash2, Tags, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { formatShortDate } from "@/lib/utils/date"
@@ -191,6 +191,9 @@ export default function CategoryManagement() {
               <DialogContent className="bg-gray-900 border-gray-700 text-white">
                 <DialogHeader>
                   <DialogTitle>{editingCategory ? "Edit Category" : "Add New Category"}</DialogTitle>
+                  <DialogDescription className="sr-only">
+                    {editingCategory ? "Update the name and color of this category." : "Add a new category for organising videos."}
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>

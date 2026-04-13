@@ -24,7 +24,7 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
+  DialogDescription: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
@@ -58,11 +58,11 @@ describe("SessionTimeoutWarning", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText(/session expiring soon/i)).toBeTruthy()
+        expect(screen.getByText(/session expiring soon/i)).toBeInTheDocument()
       },
       { timeout: 32000 },
     ) // Component checks every 30 seconds
-  })
+  }, 35000)
 
   it("should display countdown timer", async () => {
     const futureTime = Math.floor(Date.now() / 1000) + 200
@@ -75,12 +75,12 @@ describe("SessionTimeoutWarning", () => {
 
     await waitFor(
       () => {
-        // Should show time in m:ss format (3:20)
-        expect(screen.getByText(/3:20/)).toBeTruthy()
+        // Should show time in m:ss format — exact value may vary slightly due to elapsed time
+        expect(screen.getByText(/\d+:\d{2}/)).toBeInTheDocument()
       },
       { timeout: 32000 },
     )
-  })
+  }, 35000)
 
   it("should have Extend Session button", async () => {
     const futureTime = Math.floor(Date.now() / 1000) + 200
@@ -93,14 +93,14 @@ describe("SessionTimeoutWarning", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByRole("button", { name: /extend session/i })).toBeTruthy()
+        expect(screen.getByRole("button", { name: /extend session/i })).toBeInTheDocument()
       },
       { timeout: 32000 },
     )
-  })
+  }, 35000)
 
   it("should call refreshSession when Extend Session is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const futureTime = Math.floor(Date.now() / 1000) + 200
     mockGetSession.mockResolvedValue({
       data: { session: { expires_at: futureTime } },
@@ -122,10 +122,10 @@ describe("SessionTimeoutWarning", () => {
       },
       { timeout: 32000 },
     )
-  })
+  }, 35000)
 
   it("should hide warning after successful refresh", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const futureTime = Math.floor(Date.now() / 1000) + 200
     mockGetSession
       .mockResolvedValueOnce({

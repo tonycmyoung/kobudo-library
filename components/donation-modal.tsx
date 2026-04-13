@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Heart, ExternalLink, CreditCard, Copy, Check } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -547,6 +547,7 @@ export default function DonationModal({ isOpen, onClose }: DonationModalProps) {
             <Heart className="h-5 w-5 text-red-500" />
             Support the Okinawa Kobudo Library
           </DialogTitle>
+          <DialogDescription className="sr-only">Support the library with a donation.</DialogDescription>
         </DialogHeader>
 
         {/* Scrollable content area */}

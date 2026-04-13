@@ -29,7 +29,7 @@ import {
   Key,
   EyeOff,
 } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { createClient } from "@/lib/supabase/client"
 import { deleteUserCompletely, updateUserFields, adminResetUserPassword } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
@@ -334,6 +334,7 @@ const PasswordResetDialog = ({
       <DialogContent className="bg-gray-900 border-gray-700 text-white">
         <DialogHeader>
           <DialogTitle className="text-white">Reset Password for {user.full_name}</DialogTitle>
+          <DialogDescription className="sr-only">Enter a new password for this user account.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -1375,6 +1376,7 @@ export default function UserManagement() {
                 <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-sm max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="text-white">Filter Users</DialogTitle>
+                    <DialogDescription className="sr-only">Filter users by role, school, or belt level.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <UserFilter

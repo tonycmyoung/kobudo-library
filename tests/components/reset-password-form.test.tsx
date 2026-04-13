@@ -115,7 +115,7 @@ describe("ResetPasswordForm", () => {
       unmount = result.unmount
     })
 
-    expect(screen.getByText(/verifying password reset link/i)).toBeTruthy()
+    expect(screen.getByText(/verifying password reset link/i)).toBeInTheDocument()
     unmount!()
   })
 
@@ -132,8 +132,8 @@ describe("ResetPasswordForm", () => {
         const titleElement = document.querySelector('[data-slot="card-title"]')
         expect(titleElement?.textContent).toMatch(/reset your password/i)
         // Verify both password inputs exist by their specific labels
-        expect(screen.getByLabelText("New Password")).toBeTruthy()
-        expect(screen.getByLabelText("Confirm New Password")).toBeTruthy()
+        expect(screen.getByLabelText("New Password")).toBeInTheDocument()
+        expect(screen.getByLabelText("Confirm New Password")).toBeInTheDocument()
       },
       { timeout: 2000 },
     )
@@ -146,15 +146,15 @@ describe("ResetPasswordForm", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText(/auth session missing/i)).toBeTruthy()
-        expect(screen.getByText(/unable to verify password reset link/i)).toBeTruthy()
+        expect(screen.getByText(/auth session missing/i)).toBeInTheDocument()
+        expect(screen.getByText(/unable to verify password reset link/i)).toBeInTheDocument()
       },
       { timeout: 7000 },
     )
   }, 10000) // Add test timeout as parameter to it() function
 
   it("should toggle password visibility", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: "user-123" } } },
       error: null,
@@ -188,13 +188,13 @@ describe("ResetPasswordForm", () => {
       const passwordsMatchText = screen.getByText(/passwords match/i)
 
       // Verify they exist in the validation section
-      expect(minLengthText).toBeTruthy()
-      expect(passwordsMatchText).toBeTruthy()
+      expect(minLengthText).toBeInTheDocument()
+      expect(passwordsMatchText).toBeInTheDocument()
     })
   })
 
   it("should update validation when password is entered", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: "user-123" } } },
       error: null,
@@ -220,7 +220,7 @@ describe("ResetPasswordForm", () => {
     await waitFor(
       () => {
         const returnButton = screen.getByRole("button", { name: /return to login/i })
-        expect(returnButton).toBeTruthy()
+        expect(returnButton).toBeInTheDocument()
       },
       { timeout: 7000 },
     )

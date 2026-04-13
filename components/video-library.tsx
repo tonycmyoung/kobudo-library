@@ -594,7 +594,6 @@ export default function VideoLibrary({
         if (!mounted) return
 
         if (videosResult.error) {
-          recordCircuitBreakerFailure()
           throw videosResult.error
         }
 

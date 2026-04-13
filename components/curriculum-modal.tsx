@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, FileText, Award } from "lucide-react"
 
@@ -22,6 +22,7 @@ export default function CurriculumModal({ isOpen, onClose }: CurriculumModalProp
             <Award className="w-6 h-6 text-red-400" />
             Curriculum Resources
           </DialogTitle>
+          <DialogDescription className="sr-only">Access curriculum documents and training materials.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-gray-300 text-sm">Access important curriculum documents and training materials.</p>

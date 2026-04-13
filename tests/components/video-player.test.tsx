@@ -64,18 +64,18 @@ describe("VideoPlayer", () => {
   it("should render video title and description", async () => {
     const { unmount } = render(<VideoPlayer video={mockVideo} />)
 
-    expect(screen.getByText("Test Video")).toBeTruthy()
-    expect(screen.getByText("Test description for video")).toBeTruthy()
+    expect(screen.getByText("Test Video")).toBeInTheDocument()
+    expect(screen.getByText("Test description for video")).toBeInTheDocument()
     unmount()
   })
 
   it("should render video information badges", async () => {
     const { unmount } = render(<VideoPlayer video={mockVideo} />)
 
-    expect(screen.getByText("White Belt")).toBeTruthy()
-    expect(screen.getByText("Bo")).toBeTruthy()
-    expect(screen.getByText("John Doe")).toBeTruthy()
-    expect(screen.getByText("Recorded 2023")).toBeTruthy()
+    expect(screen.getByText("White Belt")).toBeInTheDocument()
+    expect(screen.getByText("Bo")).toBeInTheDocument()
+    expect(screen.getByText("John Doe")).toBeInTheDocument()
+    expect(screen.getByText("Recorded 2023")).toBeInTheDocument()
     unmount()
   })
 
@@ -83,7 +83,7 @@ describe("VideoPlayer", () => {
     render(<VideoPlayer video={mockVideo} />)
 
     await waitFor(() => {
-      expect(screen.getByText(/101 views/i)).toBeTruthy()
+      expect(screen.getByText(/101 views/i)).toBeInTheDocument()
     })
   })
 
@@ -107,12 +107,12 @@ describe("VideoPlayer", () => {
     const { unmount } = render(<VideoPlayer video={mockVideo} />)
 
     const backButton = screen.getByText("Back to Library")
-    expect(backButton).toBeTruthy()
+    expect(backButton).toBeInTheDocument()
     unmount()
   })
 
   it("should call window.history.back when Back button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoPlayer video={mockVideo} />)
 
     const backButton = screen.getByText("Back to Library")
@@ -122,17 +122,17 @@ describe("VideoPlayer", () => {
   })
 
   it("should toggle fullscreen mode when Fullscreen View button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoPlayer video={mockVideo} />)
 
     const fullscreenButton = screen.getByText("Fullscreen View")
     await user.click(fullscreenButton)
 
-    expect(screen.getByLabelText("Exit fullscreen")).toBeTruthy()
+    expect(screen.getByLabelText("Exit fullscreen")).toBeInTheDocument()
   })
 
   it("should exit fullscreen mode when close button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoPlayer video={mockVideo} />)
 
     const fullscreenButton = screen.getByText("Fullscreen View")
@@ -141,11 +141,11 @@ describe("VideoPlayer", () => {
     const exitButton = screen.getByLabelText("Exit fullscreen")
     await user.click(exitButton)
 
-    expect(screen.getByText("Fullscreen View")).toBeTruthy()
+    expect(screen.getByText("Fullscreen View")).toBeInTheDocument()
   })
 
   it("should toggle favorite when heart button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: { id: "user-1", email: "test@example.com" } },
       error: null,
@@ -173,14 +173,14 @@ describe("VideoPlayer", () => {
     const videoWithoutUrl = { ...mockVideo, video_url: "" }
     const { unmount } = render(<VideoPlayer video={videoWithoutUrl} />)
 
-    expect(screen.getByText("No Video Available")).toBeTruthy()
+    expect(screen.getByText("No Video Available")).toBeInTheDocument()
     unmount()
   })
 
   it("should render legal notice", async () => {
     const { unmount } = render(<VideoPlayer video={mockVideo} />)
 
-    expect(screen.getByText(/Videos are for personal study only/i)).toBeTruthy()
+    expect(screen.getByText(/Videos are for personal study only/i)).toBeInTheDocument()
     unmount()
   })
 

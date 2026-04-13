@@ -53,7 +53,7 @@ const mockNotifications = [
 ]
 
 describe("NotificationBell", () => {
-  const user = userEvent.setup()
+  const user = userEvent.setup({ delay: null })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -81,7 +81,7 @@ describe("NotificationBell", () => {
 
   it("should render notification bell button", async () => {
     const { unmount } = render(<NotificationBell userId="user-123" />)
-    expect(screen.getByRole("button")).toBeTruthy()
+    expect(screen.getByRole("button")).toBeInTheDocument()
     unmount()
   })
 
@@ -89,7 +89,7 @@ describe("NotificationBell", () => {
     render(<NotificationBell userId="user-123" />)
 
     await waitFor(() => {
-      expect(screen.getByText("1")).toBeTruthy()
+      expect(screen.getByText("1")).toBeInTheDocument()
     })
   })
 
@@ -114,7 +114,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Notifications")).toBeTruthy()
+      expect(screen.getByText("Notifications")).toBeInTheDocument()
     })
   })
 
@@ -124,8 +124,8 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
-      expect(screen.getByText("Test notification 2")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
+      expect(screen.getByText("Test notification 2")).toBeInTheDocument()
     })
   })
 
@@ -135,8 +135,8 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
-      expect(screen.getByText("Jane Smith")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
+      expect(screen.getByText("Jane Smith")).toBeInTheDocument()
     })
   })
 
@@ -146,7 +146,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
     })
 
     const checkButtons = screen.getAllByTitle("Mark as read")
@@ -164,7 +164,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
     })
 
     const deleteButtons = screen.getAllByTitle("Delete notification")
@@ -181,7 +181,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText(/1 unread/)).toBeTruthy()
+      expect(screen.getByText(/1 unread/)).toBeInTheDocument()
     })
 
     await user.click(screen.getByText(/all read/i))
@@ -198,7 +198,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
     })
 
     await user.click(screen.getByText(/clear all/i))
@@ -209,8 +209,9 @@ describe("NotificationBell", () => {
     })
   })
 
-  it("should not use returned data from delete all operation", async () => {
-    // This test verifies that the delete response data is not used (SonarQube fix)
+  it("should clear notifications from UI after delete all, even when response contains data", async () => {
+    // Verifies the component handles delete responses that unexpectedly include data
+    // (SonarQube: returned value of delete chain must not be silently ignored)
     const mockSelectWithData = vi.fn().mockResolvedValue({
       data: [{ id: "notif-1" }, { id: "notif-2" }],
       error: null,
@@ -222,15 +223,16 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
     })
 
     await user.click(screen.getByText(/clear all/i))
 
     await waitFor(() => {
-      // Verify the delete operation completes and updates local state
       expect(mockDelete).toHaveBeenCalled()
       expect(mockSelectWithData).toHaveBeenCalled()
+      // Notifications should be cleared from the UI regardless of response data shape
+      expect(screen.queryByText("Test notification 1")).toBeNull()
     })
   })
 
@@ -245,7 +247,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("No notifications yet")).toBeTruthy()
+      expect(screen.getByText("No notifications yet")).toBeInTheDocument()
     })
   })
 
@@ -255,7 +257,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
     })
 
     const replyButtons = screen.getAllByTitle("Reply")
@@ -270,7 +272,7 @@ describe("NotificationBell", () => {
     await user.click(screen.getByRole("button"))
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification 1")).toBeTruthy()
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
     })
 
     const replyButtons = screen.getAllByTitle("Reply")

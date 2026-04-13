@@ -35,7 +35,7 @@ const mockCategories = [
 ]
 
 describe("CategoryManagement", () => {
-  const user = userEvent.setup()
+  const user = userEvent.setup({ delay: null })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -74,7 +74,7 @@ describe("CategoryManagement", () => {
 
   it("should render loading state initially", async () => {
     const { unmount } = render(<CategoryManagement />)
-    expect(screen.getByText("Loading categories...")).toBeTruthy()
+    expect(screen.getByText("Loading categories...")).toBeInTheDocument()
     // Unmount to prevent act() warnings from pending async operations
     unmount()
   })
@@ -83,8 +83,8 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
-      expect(screen.getByText("Advanced")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
+      expect(screen.getByText("Advanced")).toBeInTheDocument()
     })
   })
 
@@ -92,8 +92,8 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
-      expect(screen.getByText("Advanced")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
+      expect(screen.getByText("Advanced")).toBeInTheDocument()
     })
 
     await waitFor(() => {
@@ -106,7 +106,7 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic techniques")).toBeTruthy()
+      expect(screen.getByText("Basic techniques")).toBeInTheDocument()
     })
   })
 
@@ -123,14 +123,14 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add category/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Add New Category")).toBeTruthy()
+      expect(screen.getByText("Add New Category")).toBeInTheDocument()
     })
   })
 
@@ -138,14 +138,14 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add category/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/name/i)).toBeTruthy()
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
     })
 
     const nameInput = screen.getByLabelText(/name/i)
@@ -162,14 +162,14 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add category/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/name/i)).toBeTruthy()
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
     })
 
     await user.type(screen.getByLabelText(/name/i), "Test Category")
@@ -188,7 +188,7 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const editButtons = screen.getAllByRole("button", { name: "" })
@@ -196,7 +196,7 @@ describe("CategoryManagement", () => {
     await user.click(editButton!)
 
     await waitFor(() => {
-      expect(screen.getByText("Edit Category")).toBeTruthy()
+      expect(screen.getByText("Edit Category")).toBeInTheDocument()
       expect(screen.getByLabelText(/name/i)).toHaveValue("Basics")
     })
   })
@@ -205,7 +205,7 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const editButtons = screen.getAllByRole("button", { name: "" })
@@ -213,7 +213,7 @@ describe("CategoryManagement", () => {
     await user.click(editButton!)
 
     await waitFor(() => {
-      expect(screen.getByText("Edit Category")).toBeTruthy()
+      expect(screen.getByText("Edit Category")).toBeInTheDocument()
     })
 
     const nameInput = screen.getByLabelText(/name/i)
@@ -233,7 +233,7 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const _allButtons = screen.getAllByRole("button")
@@ -244,7 +244,7 @@ describe("CategoryManagement", () => {
     const buttonsInCard = basicsCard ? Array.from(basicsCard.querySelectorAll("button")) : []
     const deleteButton = buttonsInCard.find((btn) => btn.className.includes("border-red-600"))
 
-    expect(deleteButton).toBeTruthy()
+    expect(deleteButton).toBeInTheDocument()
     await user.click(deleteButton as HTMLElement)
 
     await waitFor(() => {
@@ -259,7 +259,7 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const _allButtons = screen.getAllByRole("button")
@@ -270,7 +270,7 @@ describe("CategoryManagement", () => {
     const buttonsInCard = basicsCard ? Array.from(basicsCard.querySelectorAll("button")) : []
     const deleteButton = buttonsInCard.find((btn) => btn.className.includes("border-red-600"))
 
-    expect(deleteButton).toBeTruthy()
+    expect(deleteButton).toBeInTheDocument()
     await user.click(deleteButton as HTMLElement)
 
     await waitFor(() => {
@@ -284,14 +284,14 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add category/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/name/i)).toBeTruthy()
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
     })
 
     const colorButtons = screen.getAllByRole("button").filter((btn) => btn.style.backgroundColor)
@@ -302,14 +302,14 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basics")).toBeTruthy()
+      expect(screen.getByText("Basics")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add category/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Add New Category")).toBeTruthy()
+      expect(screen.getByText("Add New Category")).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole("button", { name: /cancel/i }))
@@ -325,7 +325,7 @@ describe("CategoryManagement", () => {
     render(<CategoryManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText(/No categories found/i)).toBeTruthy()
+      expect(screen.getByText(/No categories found/i)).toBeInTheDocument()
     })
   })
 })

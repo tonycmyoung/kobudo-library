@@ -82,7 +82,7 @@ vi.mock("@/lib/actions", () => ({
 }))
 
 describe("AdminNotificationManagement", () => {
-  const user = userEvent.setup()
+  const user = userEvent.setup({ delay: null })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -95,20 +95,20 @@ describe("AdminNotificationManagement", () => {
     await waitFor(() => {
       const cardTitle = document.querySelector('[data-slot="card-title"]')
       expect(cardTitle).toHaveTextContent("Send Message")
-      expect(screen.getByText("Individual")).toBeTruthy()
+      expect(screen.getByText("Individual")).toBeInTheDocument()
     })
 
     const broadcastButton = screen.getByRole("button", { name: /broadcast/i })
-    expect(broadcastButton).toBeTruthy()
+    expect(broadcastButton).toBeInTheDocument()
   })
 
   it("should render All Notifications list", async () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText(/All Notifications/)).toBeTruthy()
-      expect(screen.getByText("Test notification message")).toBeTruthy()
-      expect(screen.getByText("Broadcast message to all")).toBeTruthy()
+      expect(screen.getByText(/All Notifications/)).toBeInTheDocument()
+      expect(screen.getByText("Test notification message")).toBeInTheDocument()
+      expect(screen.getByText("Broadcast message to all")).toBeInTheDocument()
     })
   })
 
@@ -116,14 +116,14 @@ describe("AdminNotificationManagement", () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Individual")).toBeTruthy()
+      expect(screen.getByText("Individual")).toBeInTheDocument()
     })
 
     const broadcastButton = screen.getByRole("button", { name: /broadcast/i })
     await user.click(broadcastButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Select Recipients")).toBeTruthy()
+      expect(screen.getByText("Select Recipients")).toBeInTheDocument()
     })
   })
 
@@ -131,14 +131,14 @@ describe("AdminNotificationManagement", () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Individual")).toBeTruthy()
+      expect(screen.getByText("Individual")).toBeInTheDocument()
     })
 
     const messageInput = screen.getByPlaceholderText(/type your message here/i)
     await user.type(messageInput, "Personal message")
 
     const sendButton = screen.getByRole("button", { name: /send message/i })
-    expect(sendButton).toBeTruthy()
+    expect(sendButton).toBeInTheDocument()
   })
 
   it("should send broadcast message", async () => {
@@ -146,7 +146,7 @@ describe("AdminNotificationManagement", () => {
 
     await waitFor(() => {
       const broadcastButton = screen.getByRole("button", { name: /broadcast/i })
-      expect(broadcastButton).toBeTruthy()
+      expect(broadcastButton).toBeInTheDocument()
     })
 
     const broadcastButton = screen.getByRole("button", { name: /broadcast/i })
@@ -175,7 +175,7 @@ describe("AdminNotificationManagement", () => {
 
     await waitFor(() => {
       const messageInput = screen.getByPlaceholderText(/type your message here/i)
-      expect(messageInput).toBeTruthy()
+      expect(messageInput).toBeInTheDocument()
     })
 
     const messageInput = screen.getByPlaceholderText(/type your message here/i)
@@ -192,7 +192,7 @@ describe("AdminNotificationManagement", () => {
 
     await waitFor(() => {
       const broadcastButton = screen.getByRole("button", { name: /broadcast/i })
-      expect(broadcastButton).toBeTruthy()
+      expect(broadcastButton).toBeInTheDocument()
     })
 
     const broadcastButton = screen.getByRole("button", { name: /broadcast/i })
@@ -205,7 +205,7 @@ describe("AdminNotificationManagement", () => {
     await user.click(sendButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/failed to send message/i)).toBeTruthy()
+      expect(screen.getByText(/failed to send message/i)).toBeInTheDocument()
     })
   })
 
@@ -213,13 +213,13 @@ describe("AdminNotificationManagement", () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification message")).toBeTruthy()
+      expect(screen.getByText("Test notification message")).toBeInTheDocument()
     })
 
     const notificationText = screen.getByText("Test notification message")
     const notificationContainer = notificationText.closest("div[class*='p-4']")
 
-    expect(notificationContainer).toBeTruthy()
+    expect(notificationContainer).toBeInTheDocument()
 
     // Verify John Doe appears as the recipient within this specific notification
     const johnDoeInNotification = notificationContainer?.textContent?.includes("John Doe")
@@ -230,7 +230,7 @@ describe("AdminNotificationManagement", () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Broadcast message to all")).toBeTruthy()
+      expect(screen.getByText("Broadcast message to all")).toBeInTheDocument()
     })
 
     const broadcastNotification = screen.getByText("Broadcast message to all")
@@ -245,19 +245,19 @@ describe("AdminNotificationManagement", () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test notification message")).toBeTruthy()
-      expect(screen.getByText("Broadcast message to all")).toBeTruthy()
+      expect(screen.getByText("Test notification message")).toBeInTheDocument()
+      expect(screen.getByText("Broadcast message to all")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText(/search notifications/i)
     await user.type(searchInput, "Broadcast")
 
-    expect(screen.getByText("Broadcast message to all")).toBeTruthy()
+    expect(screen.getByText("Broadcast message to all")).toBeInTheDocument()
   })
 
   it("should show loading state initially", async () => {
     const { unmount } = render(<AdminNotificationManagement />)
-    expect(screen.getByText("Loading notifications...")).toBeTruthy()
+    expect(screen.getByText("Loading notifications...")).toBeInTheDocument()
     // Unmount to prevent act() warnings from pending async operations
     unmount()
   })
@@ -266,14 +266,14 @@ describe("AdminNotificationManagement", () => {
     render(<AdminNotificationManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("0/500 characters")).toBeTruthy()
+      expect(screen.getByText("0/500 characters")).toBeInTheDocument()
     })
 
     const messageInput = screen.getByPlaceholderText(/type your message here/i)
     await user.type(messageInput, "Test message")
 
     await waitFor(() => {
-      expect(screen.getByText("12/500 characters")).toBeTruthy()
+      expect(screen.getByText("12/500 characters")).toBeInTheDocument()
     })
   })
 })

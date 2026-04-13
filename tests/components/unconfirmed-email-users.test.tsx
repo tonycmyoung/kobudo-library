@@ -41,7 +41,7 @@ describe("UnconfirmedEmailUsers", () => {
 
   it("should render loading state initially", async () => {
     const { unmount } = render(<UnconfirmedEmailUsers />)
-    expect(screen.getByText("Loading unconfirmed users...")).toBeTruthy()
+    expect(screen.getByText("Loading unconfirmed users...")).toBeInTheDocument()
     unmount()
   })
 
@@ -49,9 +49,9 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
-      expect(screen.getByText("john@example.com")).toBeTruthy()
-      expect(screen.getByText("jane@example.com")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
+      expect(screen.getByText("john@example.com")).toBeInTheDocument()
+      expect(screen.getByText("jane@example.com")).toBeInTheDocument()
     })
   })
 
@@ -59,7 +59,7 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("2 unconfirmed")).toBeTruthy()
+      expect(screen.getByText("2 unconfirmed")).toBeInTheDocument()
     })
   })
 
@@ -72,7 +72,7 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("No users with unconfirmed emails")).toBeTruthy()
+      expect(screen.getByText("No users with unconfirmed emails")).toBeInTheDocument()
     })
   })
 
@@ -104,12 +104,12 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText(/Not specified/)).toBeTruthy()
+      expect(screen.getByText(/Not specified/)).toBeInTheDocument()
     })
   })
 
   it("should allow resending confirmation email", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.resendConfirmationEmail).mockResolvedValue({
       success: true,
       error: null,
@@ -118,7 +118,7 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resendButtons = screen.getAllByRole("button", { name: /resend/i })
@@ -130,7 +130,7 @@ describe("UnconfirmedEmailUsers", () => {
   })
 
   it("should show success message after resending email", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.resendConfirmationEmail).mockResolvedValue({
       success: true,
       error: null,
@@ -139,19 +139,19 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resendButtons = screen.getAllByRole("button", { name: /resend/i })
     await user.click(resendButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByText("Confirmation email sent!")).toBeTruthy()
+      expect(screen.getByText("Confirmation email sent!")).toBeInTheDocument()
     })
   })
 
   it("should show error message when resend fails", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.resendConfirmationEmail).mockResolvedValue({
       success: false,
       error: "Failed to send email",
@@ -160,14 +160,14 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resendButtons = screen.getAllByRole("button", { name: /resend/i })
     await user.click(resendButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByText("Failed to send email")).toBeTruthy()
+      expect(screen.getByText("Failed to send email")).toBeInTheDocument()
     })
   })
 
@@ -175,7 +175,7 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getAllByText(/Last sent:/)).toBeTruthy()
+      expect(screen.getAllByText(/Last sent:/)[0]).toBeInTheDocument()
     })
   })
 
@@ -190,21 +190,21 @@ describe("UnconfirmedEmailUsers", () => {
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("No users with unconfirmed emails")).toBeTruthy()
+      expect(screen.getByText("No users with unconfirmed emails")).toBeInTheDocument()
     })
 
     consoleSpy.mockRestore()
   })
 
   it("should log error when resend throws exception", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(actions.resendConfirmationEmail).mockRejectedValue(new Error("Network error"))
 
     render(<UnconfirmedEmailUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resendButtons = screen.getAllByRole("button", { name: /resend/i })
@@ -215,7 +215,7 @@ describe("UnconfirmedEmailUsers", () => {
         "Error resending confirmation email:",
         expect.any(Error)
       )
-      expect(screen.getByText("Failed to send email")).toBeTruthy()
+      expect(screen.getByText("Failed to send email")).toBeInTheDocument()
     })
 
     consoleSpy.mockRestore()

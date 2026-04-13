@@ -48,8 +48,8 @@ describe("VideoCardList", () => {
       render(<VideoCardList video={mockVideo} />)
     })
 
-    expect(screen.getByText("Test Video")).toBeTruthy()
-    expect(screen.getByText("Test Description")).toBeTruthy()
+    expect(screen.getByText("Test Video")).toBeInTheDocument()
+    expect(screen.getByText("Test Description")).toBeInTheDocument()
   })
 
   it("should render thumbnail image", async () => {
@@ -66,7 +66,7 @@ describe("VideoCardList", () => {
       render(<VideoCardList video={mockVideo} />)
     })
 
-    expect(screen.getByText("5:00")).toBeTruthy()
+    expect(screen.getByText("5:00")).toBeInTheDocument()
   })
 
   it("should render categories and performers", async () => {
@@ -74,8 +74,8 @@ describe("VideoCardList", () => {
       render(<VideoCardList video={mockVideo} />)
     })
 
-    expect(screen.getByText("Category 1")).toBeTruthy()
-    expect(screen.getByText("Performer 1")).toBeTruthy()
+    expect(screen.getByText("Category 1")).toBeInTheDocument()
+    expect(screen.getByText("Performer 1")).toBeInTheDocument()
   })
 
   it("should render recorded date when not Unset", async () => {
@@ -83,7 +83,7 @@ describe("VideoCardList", () => {
       render(<VideoCardList video={mockVideo} />)
     })
 
-    expect(screen.getByText("2024-01-01")).toBeTruthy()
+    expect(screen.getByText("2024-01-01")).toBeInTheDocument()
   })
 
   it("should not render recorded badge when Unset", async () => {
@@ -101,7 +101,7 @@ describe("VideoCardList", () => {
       render(<VideoCardList video={mockVideo} viewCount={150} />)
     })
 
-    expect(screen.getByText("150 views")).toBeTruthy()
+    expect(screen.getByText("150 views")).toBeInTheDocument()
   })
 
   it("should use video.views when viewCount not provided", async () => {
@@ -109,7 +109,7 @@ describe("VideoCardList", () => {
       render(<VideoCardList video={mockVideo} />)
     })
 
-    expect(screen.getByText("100 views")).toBeTruthy()
+    expect(screen.getByText("100 views")).toBeInTheDocument()
   })
 
   it("should render favorite button", async () => {
@@ -118,7 +118,7 @@ describe("VideoCardList", () => {
     })
 
     const favoriteButton = screen.getByRole("button")
-    expect(favoriteButton).toBeTruthy()
+    expect(favoriteButton).toBeInTheDocument()
   })
 
   it("should show filled heart when favorited", async () => {
@@ -131,7 +131,7 @@ describe("VideoCardList", () => {
   })
 
   it("should toggle favorite when button clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onFavoriteToggle = vi.fn()
     await act(async () => {
       render(<VideoCardList video={mockVideo} isFavorited={false} onFavoriteToggle={onFavoriteToggle} />)

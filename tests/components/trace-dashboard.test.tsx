@@ -125,20 +125,20 @@ describe("TraceDashboard", () => {
 
     render(<TraceDashboard />)
 
-    expect(screen.getByText("Loading trace logs...")).toBeTruthy()
+    expect(screen.getByText("Loading trace logs...")).toBeInTheDocument()
   })
 
   it("should display trace logs after successful fetch", async () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Authentication failed")).toBeTruthy()
-    expect(screen.getByText("Video playback started")).toBeTruthy()
-    expect(screen.getByText("Rate limit approaching")).toBeTruthy()
-    expect(screen.getByText("4 logs total")).toBeTruthy()
+    expect(screen.getByText("Authentication failed")).toBeInTheDocument()
+    expect(screen.getByText("Video playback started")).toBeInTheDocument()
+    expect(screen.getByText("Rate limit approaching")).toBeInTheDocument()
+    expect(screen.getByText("4 logs total")).toBeInTheDocument()
   })
 
   it("should display empty state when no logs exist", async () => {
@@ -147,54 +147,54 @@ describe("TraceDashboard", () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No trace logs found")).toBeTruthy()
+      expect(screen.getByText("No trace logs found")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Use trace.info(), trace.debug(), etc. in your code to add logs")).toBeTruthy()
+    expect(screen.getByText("Use trace.info(), trace.debug(), etc. in your code to add logs")).toBeInTheDocument()
   })
 
   it("should display correct level badges", async () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     // Level badges render lowercase text with CSS uppercase class
-    expect(screen.getByText("info")).toBeTruthy()
-    expect(screen.getByText("error")).toBeTruthy()
-    expect(screen.getByText("debug")).toBeTruthy()
-    expect(screen.getByText("warn")).toBeTruthy()
+    expect(screen.getByText("info")).toBeInTheDocument()
+    expect(screen.getByText("error")).toBeInTheDocument()
+    expect(screen.getByText("debug")).toBeInTheDocument()
+    expect(screen.getByText("warn")).toBeInTheDocument()
   })
 
   it("should display source file and line information", async () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("components/test.tsx")).toBeTruthy()
+      expect(screen.getByText("components/test.tsx")).toBeInTheDocument()
     })
 
-    expect(screen.getByText(":42")).toBeTruthy()
-    expect(screen.getByText("handleClick()")).toBeTruthy()
+    expect(screen.getByText(":42")).toBeInTheDocument()
+    expect(screen.getByText("handleClick()")).toBeInTheDocument()
   })
 
   it("should display category badges", async () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     const authBadges = screen.getAllByText("auth")
     expect(authBadges.length).toBeGreaterThan(0)
-    expect(screen.getByText("video")).toBeTruthy()
+    expect(screen.getByText("video")).toBeInTheDocument()
   })
 
   it("should display Client/Server badges based on is_client field", async () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     // Should show Client badges for client-side logs (log-1, log-3)
@@ -207,11 +207,11 @@ describe("TraceDashboard", () => {
   })
 
   it("should refresh logs when refresh button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     const refreshButton = screen.getByRole("button", { name: /refresh/i })
@@ -223,11 +223,11 @@ describe("TraceDashboard", () => {
   it("should purge logs when purge button is clicked", async () => {
     vi.mocked(traceActions.clearTraceLogs).mockResolvedValue(undefined)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     const purgeButton = screen.getByRole("button", { name: /purge all/i })
@@ -247,11 +247,11 @@ describe("TraceDashboard", () => {
       configurable: true,
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     const copyButton = screen.getByRole("button", { name: /copy to clipboard/i })
@@ -278,18 +278,18 @@ describe("TraceDashboard", () => {
       configurable: true,
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     const copyButton = screen.getByRole("button", { name: /copy to clipboard/i })
     await user.click(copyButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Copied!")).toBeTruthy()
+      expect(screen.getByText("Copied!")).toBeInTheDocument()
     })
 
     // Restore original clipboard
@@ -301,22 +301,22 @@ describe("TraceDashboard", () => {
   })
 
   it("should expand and collapse log rows when clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     // Find and click the first log row
     const logRow = screen.getByText("User logged in successfully").closest("tr")
-    expect(logRow).toBeTruthy()
+    expect(logRow).toBeInTheDocument()
 
     await user.click(logRow!)
 
     // Should show expanded details
     await waitFor(() => {
-      expect(screen.getByText("Payload")).toBeTruthy()
+      expect(screen.getByText("Payload")).toBeInTheDocument()
     })
 
     // Click again to collapse
@@ -328,11 +328,11 @@ describe("TraceDashboard", () => {
   })
 
   it("should toggle settings panel when clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Trace Settings")).toBeTruthy()
+      expect(screen.getByText("Trace Settings")).toBeInTheDocument()
     })
 
     // Settings should be collapsed by default
@@ -343,18 +343,18 @@ describe("TraceDashboard", () => {
     await user.click(settingsHeader!)
 
     await waitFor(() => {
-      expect(screen.getByText("Tracing Enabled")).toBeTruthy()
+      expect(screen.getByText("Tracing Enabled")).toBeInTheDocument()
     })
   })
 
   it("should update enabled setting when switch is toggled", async () => {
     vi.mocked(traceActions.updateTraceSettings).mockResolvedValue(undefined)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Trace Settings")).toBeTruthy()
+      expect(screen.getByText("Trace Settings")).toBeInTheDocument()
     })
 
     // Expand settings
@@ -362,7 +362,7 @@ describe("TraceDashboard", () => {
     await user.click(settingsHeader!)
 
     await waitFor(() => {
-      expect(screen.getByText("Tracing Enabled")).toBeTruthy()
+      expect(screen.getByText("Tracing Enabled")).toBeInTheDocument()
     })
 
     // Toggle the switch
@@ -383,7 +383,7 @@ describe("TraceDashboard", () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("(Tracing disabled)")).toBeTruthy()
+      expect(screen.getByText("(Tracing disabled)")).toBeInTheDocument()
     })
   })
 
@@ -404,11 +404,11 @@ describe("TraceDashboard", () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(traceActions.clearTraceLogs).mockRejectedValue(new Error("Clear failed"))
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     const purgeButton = screen.getByRole("button", { name: /purge all/i })
@@ -427,7 +427,7 @@ describe("TraceDashboard", () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No trace logs found")).toBeTruthy()
+      expect(screen.getByText("No trace logs found")).toBeInTheDocument()
     })
 
     const purgeButton = screen.getByRole("button", { name: /purge all/i })
@@ -440,7 +440,7 @@ describe("TraceDashboard", () => {
     render(<TraceDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No trace logs found")).toBeTruthy()
+      expect(screen.getByText("No trace logs found")).toBeInTheDocument()
     })
 
     const copyButton = screen.getByRole("button", { name: /copy to clipboard/i })
@@ -455,7 +455,7 @@ describe("TraceDashboard", () => {
 
     // Wait for initial load using RTL's waitFor (not vi.waitFor)
     await waitFor(() => {
-      expect(screen.getByText("User logged in successfully")).toBeTruthy()
+      expect(screen.getByText("User logged in successfully")).toBeInTheDocument()
     })
 
     // Initial fetch

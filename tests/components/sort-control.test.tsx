@@ -17,9 +17,9 @@ describe("SortControl", () => {
   it("should render sort control with current selection", () => {
     render(<SortControl {...defaultProps} sortBy="curriculum" />)
 
-    expect(screen.getByText("Sort by:")).toBeTruthy()
+    expect(screen.getByText("Sort by:")).toBeInTheDocument()
     const combobox = screen.getByRole("combobox")
-    expect(combobox).toBeTruthy()
+    expect(combobox).toBeInTheDocument()
     expect(combobox).toHaveTextContent("Curriculum")
   })
 
@@ -34,14 +34,14 @@ describe("SortControl", () => {
     render(<SortControl {...defaultProps} sortOrder="asc" />)
 
     const sortOrderButton = screen.getByTitle("Sort descending")
-    expect(sortOrderButton).toBeTruthy()
+    expect(sortOrderButton).toBeInTheDocument()
 
     const icon = sortOrderButton.querySelector("svg")
     expect(icon).not.toHaveClass("rotate-180")
   })
 
   it("should call onSortChange when sort order button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onSortChange = vi.fn()
     render(<SortControl {...defaultProps} sortOrder="asc" onSortChange={onSortChange} />)
 
@@ -52,7 +52,7 @@ describe("SortControl", () => {
   })
 
   it("should toggle sort order from desc to asc", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onSortChange = vi.fn()
     render(<SortControl {...defaultProps} sortOrder="desc" onSortChange={onSortChange} />)
 
@@ -77,7 +77,7 @@ describe("SortControl", () => {
   })
 
   it("should render sort control with selectable options", async () => {
-    const _user = userEvent.setup()
+    const _user = userEvent.setup({ delay: null })
     const onSortChange = vi.fn()
     render(<SortControl {...defaultProps} sortBy="title" onSortChange={onSortChange} />)
 

@@ -353,9 +353,9 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
-        expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
-        expect(screen.getByTestId("video-card-video-3")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
+        expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
+        expect(screen.getByTestId("video-card-video-3")).toBeInTheDocument()
       })
     })
 
@@ -395,18 +395,18 @@ describe("VideoLibrary", () => {
 
       await waitFor(() => {
         const categoryFilter = screen.getByTestId("category-filter")
-        expect(categoryFilter).toBeTruthy()
+        expect(categoryFilter).toBeInTheDocument()
         expect(screen.getByTestId("video-count")).toHaveTextContent("Videos: 3")
         expect(screen.getByTestId("selected-filters")).toHaveTextContent("Filters: 0")
       })
     })
 
     it("should handle category toggle and update URL", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       const toggleButton = screen.getByText("Toggle Category")
@@ -433,7 +433,7 @@ describe("VideoLibrary", () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
         expect(screen.queryByTestId("video-card-video-3")).toBeNull()
       })
@@ -448,7 +448,7 @@ describe("VideoLibrary", () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
         expect(screen.queryByTestId("video-card-video-3")).toBeNull()
       })
@@ -464,7 +464,7 @@ describe("VideoLibrary", () => {
 
       await waitFor(() => {
         const categoryFilter = screen.getByTestId("category-filter")
-        expect(categoryFilter).toBeTruthy()
+        expect(categoryFilter).toBeInTheDocument()
       })
 
       await waitFor(
@@ -475,7 +475,7 @@ describe("VideoLibrary", () => {
       )
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
       })
     })
@@ -494,7 +494,7 @@ describe("VideoLibrary", () => {
     })
 
     it("should handle sort change", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary />)
 
       await waitFor(() => {
@@ -512,7 +512,7 @@ describe("VideoLibrary", () => {
     })
 
     it("should handle sort order change", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary />)
 
       await waitFor(() => {
@@ -553,14 +553,14 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getAllByText("Show")[0]).toBeTruthy()
-        expect(screen.getAllByText("per page")[0]).toBeTruthy()
+        expect(screen.getAllByText("Show")[0]).toBeInTheDocument()
+        expect(screen.getAllByText("per page")[0]).toBeInTheDocument()
       })
 
       // Verify all videos are shown on first page with default 12 items per page
-      expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
-      expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
-      expect(screen.getByTestId("video-card-video-3")).toBeTruthy()
+      expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
+      expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
+      expect(screen.getByTestId("video-card-video-3")).toBeInTheDocument()
     })
 
     it("should sync current page from URL and display correct videos", async () => {
@@ -577,13 +577,13 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getAllByText("Show")[0]).toBeTruthy()
+        expect(screen.getAllByText("Show")[0]).toBeInTheDocument()
       })
 
       await waitFor(
         () => {
           // On page 2 with 1 item per page, should show video-2
-          expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
+          expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
           expect(screen.queryByTestId("video-card-video-1")).toBeNull()
           expect(screen.queryByTestId("video-card-video-3")).toBeNull()
         },
@@ -601,8 +601,8 @@ describe("VideoLibrary", () => {
 
       await waitFor(() => {
         expect(localStorage.getItem).toHaveBeenCalledWith("videoLibraryItemsPerPage")
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
-        expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
+        expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-3")).toBeNull()
       })
     })
@@ -613,24 +613,24 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("view-toggle")).toBeTruthy()
-        expect(screen.getByText("Current: grid")).toBeTruthy()
+        expect(screen.getByTestId("view-toggle")).toBeInTheDocument()
+        expect(screen.getByText("Current: grid")).toBeInTheDocument()
       })
     })
 
     it("should handle view change to list", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("view-toggle")).toBeTruthy()
+        expect(screen.getByTestId("view-toggle")).toBeInTheDocument()
       })
 
       const listButton = screen.getAllByText("List")[0]
       await user.click(listButton)
 
       await waitFor(() => {
-        expect(screen.getByText("Current: list")).toBeTruthy()
+        expect(screen.getByText("Current: list")).toBeInTheDocument()
         const videoLists = screen.getAllByTestId("video-list")
         expect(videoLists.length).toBeGreaterThan(0)
       })
@@ -649,7 +649,7 @@ describe("VideoLibrary", () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByText("Current: list")).toBeTruthy()
+        expect(screen.getByText("Current: list")).toBeInTheDocument()
       })
 
       await waitFor(() => {
@@ -665,7 +665,7 @@ describe("VideoLibrary", () => {
 
       await waitFor(() => {
         const searchInput = screen.getByPlaceholderText(/Search videos/i) as HTMLInputElement
-        expect(searchInput).toBeTruthy()
+        expect(searchInput).toBeInTheDocument()
         expect(searchInput.value).toBe("")
       })
     })
@@ -685,7 +685,7 @@ describe("VideoLibrary", () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId("video-card-video-1")).toBeNull()
-        expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-3")).toBeNull()
       })
     })
@@ -701,7 +701,7 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       // Should fall back to empty filters when JSON is invalid
@@ -719,7 +719,7 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
       })
 
       // Should default to page 1 when page number is invalid
@@ -738,7 +738,7 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
       })
 
       // Should show available videos even when page number exceeds total pages
@@ -757,7 +757,7 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
       })
 
       // Should show all videos when search is empty
@@ -778,7 +778,7 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary userProfile={{ curriculum_set_id: "set-1" }} />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       // Verify both filters are displayed as selected
@@ -788,7 +788,7 @@ describe("VideoLibrary", () => {
     })
 
     it("should include curriculum filters when toggling category filter", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       // Start with curriculum filter in URL
       mockSearchParams.get.mockImplementation((key: string) => {
         if (key === "filters") return JSON.stringify(["curr-1"])
@@ -823,7 +823,7 @@ describe("VideoLibrary", () => {
     })
 
     it("should include category filters when toggling curriculum filter", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       // Start with category filter in URL
       mockSearchParams.get.mockImplementation((key: string) => {
         if (key === "filters") return JSON.stringify(["cat-1"])
@@ -861,11 +861,11 @@ describe("VideoLibrary", () => {
 
   describe("Custom Storage Prefix", () => {
     it("should use custom storage prefix when provided", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary storagePrefix="customLibrary" />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("view-toggle")).toBeTruthy()
+        expect(screen.getByTestId("view-toggle")).toBeInTheDocument()
       })
 
       const listButton = screen.getAllByText("List")[0]
@@ -877,11 +877,11 @@ describe("VideoLibrary", () => {
     })
 
     it("should use favoritesLibrary prefix when favoritesOnly is true", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary favoritesOnly={true} />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("view-toggle")).toBeTruthy()
+        expect(screen.getByTestId("view-toggle")).toBeInTheDocument()
       })
 
       const listButton = screen.getAllByText("List")[0]
@@ -895,7 +895,7 @@ describe("VideoLibrary", () => {
 
   describe("View Change Handling", () => {
     it("should handle view change to list view", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary />)
 
       await waitFor(() => {
@@ -1045,18 +1045,18 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       // With OR mode, videos with either cat-1 OR cat-2 should show
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
-        expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
+        expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
       })
     })
 
     it("should handle filter mode change from AND to OR", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       // Start with AND mode and multiple filters
       mockSearchParams.get.mockImplementation((key: string) => {
         if (key === "filters") return JSON.stringify(["cat-1"])
@@ -1067,7 +1067,7 @@ describe("VideoLibrary", () => {
 
       // Wait for initial filter to be applied from URL params
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
         expect(screen.getByTestId("selected-filters")).toHaveTextContent("Filters: 1")
       })
 
@@ -1091,13 +1091,13 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       // Videos recorded in 2024 should be shown (video-1 and video-3)
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
-        expect(screen.getByTestId("video-card-video-3")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
+        expect(screen.getByTestId("video-card-video-3")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
       })
     })
@@ -1113,12 +1113,12 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       // Only video-1 has performer perf-1
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
       })
     })
@@ -1134,12 +1134,12 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       // Only video-2 has 25 views (>= 20)
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-1")).toBeNull() // 10 views
         expect(screen.queryByTestId("video-card-video-3")).toBeNull() // 5 views
       })
@@ -1162,7 +1162,7 @@ describe("VideoLibrary", () => {
 
       // Should find video-1 which has performer "John Doe"
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
       })
     })
@@ -1182,7 +1182,7 @@ describe("VideoLibrary", () => {
 
       // Should find video-1 which has "Beginner" in description
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
         expect(screen.queryByTestId("video-card-video-2")).toBeNull()
       })
     })
@@ -1229,20 +1229,20 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary favoritesOnly={true} />)
 
       await waitFor(() => {
-        expect(screen.getByText("No favorites yet")).toBeTruthy()
-        expect(screen.getByText("Start adding videos to your favorites to see them here.")).toBeTruthy()
-        expect(screen.getByText("Browse Videos")).toBeTruthy()
+        expect(screen.getByText("No favorites yet")).toBeInTheDocument()
+        expect(screen.getByText("Start adding videos to your favorites to see them here.")).toBeInTheDocument()
+        expect(screen.getByText("Browse Videos")).toBeInTheDocument()
       })
     })
   })
 
   describe("Curriculum Toggle", () => {
     it("should handle curriculum toggle and update selected curriculums", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoLibrary userProfile={{ curriculum_set_id: "set-1" }} />)
 
       await waitFor(() => {
-        expect(screen.getByTestId("category-filter")).toBeTruthy()
+        expect(screen.getByTestId("category-filter")).toBeInTheDocument()
       })
 
       const toggleButton = screen.getByText("Toggle Curriculum")
@@ -1283,12 +1283,12 @@ describe("VideoLibrary", () => {
       render(<VideoLibrary />)
 
       await waitFor(() => {
-        expect(screen.getAllByText("Show")[0]).toBeTruthy()
+        expect(screen.getAllByText("Show")[0]).toBeInTheDocument()
       })
 
       // The component should have saved initial items per page
       await waitFor(() => {
-        expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+        expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
       })
     })
   })

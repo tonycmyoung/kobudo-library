@@ -70,38 +70,38 @@ describe("VideoCard", () => {
   it("should render video card with all information", () => {
     render(<VideoCard video={mockVideo} />)
 
-    expect(screen.getByText("Test Video")).toBeTruthy()
-    expect(screen.getByText("Test description")).toBeTruthy()
-    expect(screen.getByText("2:05")).toBeTruthy() // 125 seconds
-    expect(screen.getByText("100 views")).toBeTruthy()
+    expect(screen.getByText("Test Video")).toBeInTheDocument()
+    expect(screen.getByText("Test description")).toBeInTheDocument()
+    expect(screen.getByText("2:05")).toBeInTheDocument() // 125 seconds
+    expect(screen.getByText("100 views")).toBeInTheDocument()
   })
 
   it("should render categories and curriculums", () => {
     render(<VideoCard video={mockVideo} />)
 
-    expect(screen.getByText("Bo")).toBeTruthy()
-    expect(screen.getByText("Sai")).toBeTruthy()
-    expect(screen.getByText("10.Kyu")).toBeTruthy()
-    expect(screen.getByText("9.Kyu")).toBeTruthy()
+    expect(screen.getByText("Bo")).toBeInTheDocument()
+    expect(screen.getByText("Sai")).toBeInTheDocument()
+    expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("9.Kyu")).toBeInTheDocument()
   })
 
   it("should render performer badge", () => {
     render(<VideoCard video={mockVideo} />)
 
-    expect(screen.getByText("John Doe")).toBeTruthy()
+    expect(screen.getByText("John Doe")).toBeInTheDocument()
   })
 
   it("should render recorded year", () => {
     render(<VideoCard video={mockVideo} />)
 
-    expect(screen.getByText("2023")).toBeTruthy()
+    expect(screen.getByText("2023")).toBeInTheDocument()
   })
 
   it("should format duration correctly", () => {
     const videoWithDuration = { ...mockVideo, duration_seconds: 3665 } // 1 hour, 1 minute, 5 seconds
     render(<VideoCard video={videoWithDuration} />)
 
-    expect(screen.getByText("61:05")).toBeTruthy()
+    expect(screen.getByText("61:05")).toBeInTheDocument()
   })
 
   it("should not show duration badge when duration is null", () => {
@@ -122,11 +122,11 @@ describe("VideoCard", () => {
 
     // Should render gradient background with Play icon
     const card = screen.getByText("Test Video").closest(".group")
-    expect(card).toBeTruthy()
+    expect(card).toBeInTheDocument()
   })
 
   it("should toggle favorite when heart button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: { id: "user-1", email: "test@example.com" } },
       error: null,
@@ -153,7 +153,7 @@ describe("VideoCard", () => {
   })
 
   it("should remove favorite when already favorited", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: { id: "user-1", email: "test@example.com" } },
       error: null,
@@ -179,7 +179,7 @@ describe("VideoCard", () => {
   })
 
   it("should not toggle favorite when user is not logged in", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: null },
       error: null,
@@ -202,7 +202,7 @@ describe("VideoCard", () => {
   it("should display custom view count", () => {
     render(<VideoCard video={mockVideo} viewCount={250} />)
 
-    expect(screen.getByText("250 views")).toBeTruthy()
+    expect(screen.getByText("250 views")).toBeInTheDocument()
   })
 
   it("should filter out invalid categories", () => {
@@ -215,7 +215,7 @@ describe("VideoCard", () => {
     }
     render(<VideoCard video={videoWithInvalidCategories as unknown as Video} />)
 
-    expect(screen.getByText("Bo")).toBeTruthy()
+    expect(screen.getByText("Bo")).toBeInTheDocument()
     expect(screen.queryByText("null")).toBeNull()
   })
 
@@ -252,8 +252,8 @@ describe("VideoCard", () => {
     }
     render(<VideoCard video={videoWithMultipleSets} userCurriculumSetId="set-1" />)
 
-    expect(screen.getByText("10.Kyu")).toBeTruthy()
-    expect(screen.getByText("8.Kyu")).toBeTruthy()
+    expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("8.Kyu")).toBeInTheDocument()
     expect(screen.queryByText("9.Kyu")).toBeNull()
   })
 
@@ -267,8 +267,8 @@ describe("VideoCard", () => {
     }
     render(<VideoCard video={videoWithMultipleSets} />)
 
-    expect(screen.getByText("10.Kyu")).toBeTruthy()
-    expect(screen.getByText("9.Kyu")).toBeTruthy()
+    expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("9.Kyu")).toBeInTheDocument()
   })
 
   it("should show no curriculums when none match user set", () => {
