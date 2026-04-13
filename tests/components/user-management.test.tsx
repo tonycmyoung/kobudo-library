@@ -110,6 +110,8 @@ describe("UserManagement", () => {
   let mockUpdate: MockInstance
   let mockEq: MockInstance
 
+  const user = userEvent.setup({ delay: null })
+
   afterEach(() => {
     localStorage.clear()
   })
@@ -230,7 +232,6 @@ describe("UserManagement", () => {
   })
 
   it("should filter users by search query", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -250,7 +251,6 @@ describe("UserManagement", () => {
   })
 
   it("should toggle user approval when approve/revoke button is clicked", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -267,7 +267,6 @@ describe("UserManagement", () => {
   })
 
   it("should update user role when role select is changed", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -287,7 +286,6 @@ describe("UserManagement", () => {
   })
 
   it("should enter edit mode when edit button is clicked", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -304,7 +302,6 @@ describe("UserManagement", () => {
   })
 
   it("should update user fields when save button is clicked in edit mode", async () => {
-    const user = userEvent.setup({ delay: null })
     vi.mocked(updateUserFields).mockResolvedValue({ success: true })
 
     render(<UserManagement />)
@@ -333,7 +330,6 @@ describe("UserManagement", () => {
   })
 
   it("should cancel edit mode when cancel button is clicked", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -356,7 +352,6 @@ describe("UserManagement", () => {
   })
 
   it("should open reset password dialog when key button is clicked", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -373,7 +368,6 @@ describe("UserManagement", () => {
   })
 
   it("should generate random password when generate button is clicked", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -395,7 +389,6 @@ describe("UserManagement", () => {
   })
 
   it("should show error when password is too short", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -421,7 +414,6 @@ describe("UserManagement", () => {
   })
 
   it("should reset password successfully with valid password", async () => {
-    const user = userEvent.setup({ delay: null })
     vi.mocked(adminResetUserPassword).mockResolvedValue({ success: true })
 
     render(<UserManagement />)
@@ -452,7 +444,6 @@ describe("UserManagement", () => {
   })
 
   it("should prompt for confirmation before deleting user", async () => {
-    const user = userEvent.setup({ delay: null })
     vi.mocked(global.confirm).mockReturnValue(false)
 
     render(<UserManagement />)
@@ -469,7 +460,6 @@ describe("UserManagement", () => {
   })
 
   it("should delete user when confirmed", async () => {
-    const user = userEvent.setup({ delay: null })
     vi.mocked(global.confirm).mockReturnValue(true)
     vi.mocked(deleteUserCompletely).mockResolvedValue({ success: true })
 
@@ -539,7 +529,6 @@ describe("UserManagement", () => {
   })
 
   it("should display no users message when filtered list is empty", async () => {
-    const user = userEvent.setup({ delay: null })
     render(<UserManagement />)
 
     await waitFor(() => {
@@ -559,7 +548,6 @@ describe("UserManagement", () => {
 
   describe("Curriculum Set Management", () => {
     it("should update curriculum set and clear belt when set is cleared", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -591,7 +579,6 @@ describe("UserManagement", () => {
     })
 
     it("should update curriculum set without clearing belt when set is assigned", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -717,7 +704,6 @@ describe("UserManagement", () => {
     })
 
     it("should keep dropdowns editable when in edit mode", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -852,7 +838,6 @@ describe("UserManagement", () => {
 
   describe("Delete User Error Handling", () => {
     it("should show error alert when delete fails", async () => {
-      const user = userEvent.setup({ delay: null })
       vi.mocked(global.confirm).mockReturnValue(true)
       vi.mocked(deleteUserCompletely).mockResolvedValue({ success: false, error: "Delete failed" })
 
@@ -873,7 +858,6 @@ describe("UserManagement", () => {
 
   describe("Reset Password Error Handling", () => {
     it("should show error message when reset password API fails", async () => {
-      const user = userEvent.setup({ delay: null })
       vi.mocked(adminResetUserPassword).mockResolvedValue({ success: false, error: "API error occurred" })
 
       render(<UserManagement />)
@@ -901,7 +885,6 @@ describe("UserManagement", () => {
     })
 
     it("should toggle password visibility", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -929,7 +912,6 @@ describe("UserManagement", () => {
 
   describe("Update User Belt", () => {
     it("should update user belt when belt select is changed", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -955,7 +937,6 @@ describe("UserManagement", () => {
     })
 
     it("should handle error when updating user fields fails", async () => {
-      const user = userEvent.setup({ delay: null })
       vi.mocked(updateUserFields).mockResolvedValue({ success: false, error: "Update failed" })
 
       render(<UserManagement />)
@@ -982,7 +963,6 @@ describe("UserManagement", () => {
 
   describe("Search by Multiple Fields", () => {
     it("should search users by teacher name", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -1002,7 +982,6 @@ describe("UserManagement", () => {
     })
 
     it("should search users by school name", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -1031,7 +1010,6 @@ describe("UserManagement", () => {
     })
 
     it("should search users by belt name", async () => {
-      const user = userEvent.setup({ delay: null })
       render(<UserManagement />)
 
       await waitFor(() => {
@@ -1053,7 +1031,6 @@ describe("UserManagement", () => {
 
   describe("Update User Role Error", () => {
     it("should show error alert when role update fails", async () => {
-      const user = userEvent.setup({ delay: null })
       
       mockUpdate.mockReturnValue({
         eq: vi.fn().mockResolvedValue({ error: { message: "Role update failed" } }),
@@ -1082,7 +1059,6 @@ describe("UserManagement", () => {
 
   describe("Toggle Approval Error", () => {
     it("should handle error when toggling approval fails", async () => {
-      const user = userEvent.setup({ delay: null })
 
       render(<UserManagement />)
 

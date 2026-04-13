@@ -1,4 +1,3 @@
-import type React from "react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -13,14 +12,6 @@ vi.mock("@/lib/supabase/client", () => ({
 
 vi.mock("@/hooks/use-mobile", () => ({
   useIsMobile: vi.fn(),
-}))
-
-vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
 }))
 
 describe("VideoCard", () => {
