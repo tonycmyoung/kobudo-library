@@ -13,6 +13,12 @@ afterEach(() => {
 // Mock Next.js modules
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 vi.mock("next/navigation", () => require("./mocks/next-navigation"))
+// Prevent jsdom navigation errors when tests click <Link> elements.
+// Per-file vi.mock("next/link", ...) calls override this where needed.
+vi.mock("next/link", async () => {
+  const { default: MockLink } = await import("./mocks/next-link")
+  return { default: MockLink }
+})
 
 // Mock Supabase - will be customized per test
 vi.mock("@/lib/supabase/client", () => ({
