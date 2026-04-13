@@ -24,17 +24,7 @@ export default function ViewLogDashboard() {
   const [logs, setLogs] = useState<VideoViewLog[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery)
-      setCurrentPage(1) // Reset to first page on search
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [searchQuery])
 
   const loadLogs = async () => {
     setLoading(true)
@@ -56,16 +46,16 @@ export default function ViewLogDashboard() {
 
   // Client-side filtering
   const filteredLogs = useMemo(() => {
-    if (!debouncedSearch) return logs
+    if (!searchQuery) return logs
 
-    const searchLower = debouncedSearch.toLowerCase()
+    const searchLower = searchQuery.toLowerCase()
     return logs.filter(
       (log) =>
         log.video_title.toLowerCase().includes(searchLower) ||
         log.user_name?.toLowerCase().includes(searchLower) ||
         log.user_email?.toLowerCase().includes(searchLower)
     )
-  }, [logs, debouncedSearch])
+  }, [logs, searchQuery])
 
   // Client-side pagination
   const totalPages = Math.ceil(filteredLogs.length / ITEMS_PER_PAGE)
@@ -80,7 +70,7 @@ export default function ViewLogDashboard() {
   // Reset page when search changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [debouncedSearch])
+  }, [searchQuery])
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(Math.max(1, Math.min(newPage, totalPages || 1)))
@@ -138,7 +128,7 @@ export default function ViewLogDashboard() {
           <span className="text-sm text-gray-400">
             Showing {filteredLogs.length === 0 ? 0 : (validCurrentPage - 1) * ITEMS_PER_PAGE + 1}-
             {Math.min(validCurrentPage * ITEMS_PER_PAGE, filteredLogs.length)} of {filteredLogs.length} views
-            {debouncedSearch && ` matching "${debouncedSearch}"`}
+            {searchQuery && ` matching "${searchQuery}"`}
           </span>
         </div>
         {totalPages > 1 && (
@@ -174,10 +164,10 @@ export default function ViewLogDashboard() {
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-8 h-8 mx-auto mb-4 text-gray-500" />
             <p className="text-gray-400">
-              {debouncedSearch ? "No view logs match your search" : "No video views recorded yet"}
+              {searchQuery ? "No view logs match your search" : "No video views recorded yet"}
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              {debouncedSearch
+              {searchQuery
                 ? "Try a different search term"
                 : "View logs will appear here when users watch videos"}
             </p>
