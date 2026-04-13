@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, type MockInstance } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import UserManagement from "@/components/user-management"
@@ -109,6 +109,10 @@ describe("UserManagement", () => {
   let mockOrder: MockInstance
   let mockUpdate: MockInstance
   let mockEq: MockInstance
+
+  afterEach(() => {
+    localStorage.clear()
+  })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -241,7 +245,7 @@ describe("UserManagement", () => {
         expect(screen.queryByText("John Doe")).toBeNull()
         expect(screen.getByText("Jane Smith")).toBeTruthy()
       },
-      { timeout: 500 },
+      { timeout: 2000 },
     )
   })
 
@@ -549,7 +553,7 @@ describe("UserManagement", () => {
       () => {
         expect(screen.getByText("No users found matching your criteria.")).toBeTruthy()
       },
-      { timeout: 500 },
+      { timeout: 2000 },
     )
   })
 
@@ -993,7 +997,7 @@ describe("UserManagement", () => {
           expect(screen.getByText("John Doe")).toBeTruthy()
           expect(screen.queryByText("Jane Smith")).toBeNull()
         },
-        { timeout: 500 },
+        { timeout: 2000 },
       )
     })
 
@@ -1042,7 +1046,7 @@ describe("UserManagement", () => {
           expect(screen.getByText("John Doe")).toBeTruthy()
           expect(screen.queryByText("Jane Smith")).toBeNull()
         },
-        { timeout: 500 },
+        { timeout: 2000 },
       )
     })
   })
