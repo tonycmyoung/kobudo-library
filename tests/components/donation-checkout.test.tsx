@@ -63,11 +63,11 @@ describe("DonationCheckout", () => {
       />
     )
 
-    expect(screen.getByText("Choose One-off Amount")).toBeTruthy()
-    expect(screen.getByText("$5")).toBeTruthy()
-    expect(screen.getByText("$10")).toBeTruthy()
-    expect(screen.getByText("$25")).toBeTruthy()
-    expect(screen.getByText("$50")).toBeTruthy()
+    expect(screen.getByText("Choose One-off Amount")).toBeInTheDocument()
+    expect(screen.getByText("$5")).toBeInTheDocument()
+    expect(screen.getByText("$10")).toBeInTheDocument()
+    expect(screen.getByText("$25")).toBeInTheDocument()
+    expect(screen.getByText("$50")).toBeInTheDocument()
   })
 
   it("should render custom amount option", () => {
@@ -79,7 +79,7 @@ describe("DonationCheckout", () => {
       />
     )
 
-    expect(screen.getByText("Custom One-off Amount")).toBeTruthy()
+    expect(screen.getByText("Custom One-off Amount")).toBeInTheDocument()
   })
 
   it("should select a preset amount", async () => {
@@ -111,7 +111,7 @@ describe("DonationCheckout", () => {
     fireEvent.click(customRadio)
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Enter amount in AUD")).toBeTruthy()
+      expect(screen.getByPlaceholderText("Enter amount in AUD")).toBeInTheDocument()
     })
   })
 
@@ -137,7 +137,7 @@ describe("DonationCheckout", () => {
     fireEvent.click(proceedButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Please enter a valid amount of at least $1")).toBeTruthy()
+      expect(screen.getByText("Please enter a valid amount of at least $1")).toBeInTheDocument()
     })
   })
 
@@ -231,7 +231,7 @@ describe("DonationCheckout", () => {
     fireEvent.click(proceedButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("embedded-checkout")).toBeTruthy()
+      expect(screen.getByTestId("embedded-checkout")).toBeInTheDocument()
     })
   })
 
@@ -253,7 +253,7 @@ describe("DonationCheckout", () => {
     fireEvent.click(proceedButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Payment processing failed")).toBeTruthy()
+      expect(screen.getByText("Payment processing failed")).toBeInTheDocument()
     })
   })
 
@@ -287,7 +287,7 @@ describe("DonationCheckout", () => {
     fireEvent.click(proceedButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Network error")).toBeTruthy()
+      expect(screen.getByText("Network error")).toBeInTheDocument()
     })
   })
 })

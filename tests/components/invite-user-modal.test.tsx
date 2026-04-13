@@ -16,7 +16,7 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
+  DialogDescription: () => null,
   DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
@@ -34,9 +34,9 @@ describe("InviteUserModal", () => {
   it("should render when isOpen is true", () => {
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
 
-    expect(screen.getByTestId("dialog")).toBeTruthy()
+    expect(screen.getByTestId("dialog")).toBeInTheDocument()
     const heading = screen.getByRole("heading", { name: /invite user/i })
-    expect(heading).toBeTruthy()
+    expect(heading).toBeInTheDocument()
   })
 
   it("should not render when isOpen is false", () => {
@@ -65,7 +65,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should update email input value on change", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
 
     const emailInput = screen.getByLabelText(/email address/i) as HTMLInputElement
@@ -82,7 +82,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should call inviteUser action on form submit", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockResolvedValue({ success: "Invitation sent!" })
 
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
@@ -99,7 +99,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should show success message on successful invite", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockResolvedValue({ success: "Invitation sent successfully!" })
 
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
@@ -119,7 +119,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should show error message on failed invite", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockResolvedValue({ error: "User already exists" })
 
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
@@ -139,7 +139,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should clear email and auto-close modal after successful invite", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockResolvedValue({ success: "Invitation sent!" })
 
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
@@ -167,7 +167,7 @@ describe("InviteUserModal", () => {
   }, 5000)
 
   it("should show loading state during invite", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve({ success: "Done" }), 100)),
     )
@@ -186,7 +186,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should call onClose when Cancel button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i })
@@ -196,7 +196,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should clear form when modal is closed", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
 
     const emailInput = screen.getByLabelText(/email address/i) as HTMLInputElement
@@ -209,7 +209,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should handle unexpected errors gracefully", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockRejectedValue(new Error("Network error"))
 
     render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)

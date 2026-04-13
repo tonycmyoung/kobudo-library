@@ -22,6 +22,7 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogDescription: () => null,
 }))
 
 describe("VideoModal", () => {
@@ -60,7 +61,7 @@ describe("VideoModal", () => {
       />,
     )
 
-    expect(screen.getByText("Add New Video")).toBeTruthy()
+    expect(screen.getByText("Add New Video")).toBeInTheDocument()
   })
 
   it("should render modal with title for editing video", () => {
@@ -90,7 +91,7 @@ describe("VideoModal", () => {
       />,
     )
 
-    expect(screen.getByText("Edit Video: Test Video")).toBeTruthy()
+    expect(screen.getByText("Edit Video: Test Video")).toBeInTheDocument()
   })
 
   it("should render all form fields", () => {
@@ -106,11 +107,11 @@ describe("VideoModal", () => {
       />,
     )
 
-    expect(screen.getByLabelText("Title *")).toBeTruthy()
-    expect(screen.getByLabelText("Description")).toBeTruthy()
-    expect(screen.getByLabelText("Video URL *")).toBeTruthy()
-    expect(screen.getByLabelText("Thumbnail URL")).toBeTruthy()
-    expect(screen.getByLabelText("Recorded")).toBeTruthy()
+    expect(screen.getByLabelText("Title *")).toBeInTheDocument()
+    expect(screen.getByLabelText("Description")).toBeInTheDocument()
+    expect(screen.getByLabelText("Video URL *")).toBeInTheDocument()
+    expect(screen.getByLabelText("Thumbnail URL")).toBeInTheDocument()
+    expect(screen.getByLabelText("Recorded")).toBeInTheDocument()
   })
 
   it("should render curriculum checkboxes grouped by set", () => {
@@ -127,10 +128,10 @@ describe("VideoModal", () => {
     )
 
     // Should show set name as a header
-    expect(screen.getByText("Okinawa Kobudo")).toBeTruthy()
+    expect(screen.getByText("Okinawa Kobudo")).toBeInTheDocument()
     // Should still show curriculum levels
-    expect(screen.getByText("10.Kyu")).toBeTruthy()
-    expect(screen.getByText("9.Kyu")).toBeTruthy()
+    expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+    expect(screen.getByText("9.Kyu")).toBeInTheDocument()
   })
 
   it("should render category checkboxes", () => {
@@ -146,8 +147,8 @@ describe("VideoModal", () => {
       />,
     )
 
-    expect(screen.getByText("Bo")).toBeTruthy()
-    expect(screen.getByText("Sai")).toBeTruthy()
+    expect(screen.getByText("Bo")).toBeInTheDocument()
+    expect(screen.getByText("Sai")).toBeInTheDocument()
   })
 
   it("should render performer checkboxes", () => {
@@ -163,12 +164,12 @@ describe("VideoModal", () => {
       />,
     )
 
-    expect(screen.getByText("John Doe")).toBeTruthy()
-    expect(screen.getByText("Jane Smith")).toBeTruthy()
+    expect(screen.getByText("John Doe")).toBeInTheDocument()
+    expect(screen.getByText("Jane Smith")).toBeInTheDocument()
   })
 
   it("should update form data when inputs change", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(
       <VideoModal
         isOpen={true}
@@ -195,7 +196,7 @@ describe("VideoModal", () => {
   })
 
   it("should toggle curriculum checkboxes", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(
       <VideoModal
         isOpen={true}
@@ -219,7 +220,7 @@ describe("VideoModal", () => {
   })
 
   it("should auto-fill metadata when auto-fill button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(extractVideoMetadata).mockResolvedValue({
       thumbnail: "https://example.com/auto-thumb.jpg",
       duration: 130,
@@ -254,7 +255,7 @@ describe("VideoModal", () => {
   })
 
   it("should show error when auto-fill fails", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(extractVideoMetadata).mockRejectedValue(new Error("Failed to extract metadata"))
 
     render(
@@ -276,12 +277,12 @@ describe("VideoModal", () => {
     await user.click(autoFillButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Could not extract video metadata. Please fill in manually.")).toBeTruthy()
+      expect(screen.getByText("Could not extract video metadata. Please fill in manually.")).toBeInTheDocument()
     })
   })
 
   it("should call saveVideo when form is submitted", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(saveVideo).mockResolvedValue({ success: true })
 
     render(
@@ -312,7 +313,7 @@ describe("VideoModal", () => {
   })
 
   it("should call onClose when Cancel button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(
       <VideoModal
         isOpen={true}

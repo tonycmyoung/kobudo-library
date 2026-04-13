@@ -27,6 +27,7 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogDescription: () => null,
 }))
 
 // Mock DonationCheckout and SubscriptionCheckout
@@ -98,16 +99,16 @@ describe("DonationModal", () => {
     await act(async () => {
       render(<DonationModal isOpen={true} onClose={mockOnClose} />)
     })
-    expect(screen.getByText(/Support the Okinawa Kobudo Library/i)).toBeTruthy()
+    expect(screen.getByText(/Support the Okinawa Kobudo Library/i)).toBeInTheDocument()
   })
 
   it("should display donation message content", async () => {
     await act(async () => {
       render(<DonationModal isOpen={true} onClose={mockOnClose} />)
     })
-    expect(screen.getByText(/Thanks for considering to donate!/i)).toBeTruthy()
-    expect(screen.getByText(/yearly costs for domains, maintenance and hosting/i)).toBeTruthy()
-    expect(screen.getByText(/Thanks - Tony/i)).toBeTruthy()
+    expect(screen.getByText(/Thanks for considering to donate!/i)).toBeInTheDocument()
+    expect(screen.getByText(/yearly costs for domains, maintenance and hosting/i)).toBeInTheDocument()
+    expect(screen.getByText(/Thanks - Tony/i)).toBeInTheDocument()
   })
 
   it("should have PayPal donate button", async () => {
@@ -115,7 +116,7 @@ describe("DonationModal", () => {
       render(<DonationModal isOpen={true} onClose={mockOnClose} />)
     })
     const paypalButton = screen.getByRole("button", { name: /donate once-off via paypal/i })
-    expect(paypalButton).toBeTruthy()
+    expect(paypalButton).toBeInTheDocument()
   })
 
   it("should open PayPal link in new tab when donate button is clicked", async () => {
@@ -134,7 +135,7 @@ describe("DonationModal", () => {
       render(<DonationModal isOpen={true} onClose={mockOnClose} />)
     })
     const emailElement = screen.getByText(testPayId)
-    expect(emailElement).toBeTruthy()
+    expect(emailElement).toBeInTheDocument()
     // Verify it has the font-mono class
     expect(emailElement.className).toContain("font-mono")
   })
@@ -161,7 +162,7 @@ describe("DonationModal", () => {
     fireEvent.click(copyButton)
 
     await waitFor(() => {
-      expect(screen.getByTitle("Copied!")).toBeTruthy()
+      expect(screen.getByTitle("Copied!")).toBeInTheDocument()
     })
   })
 
@@ -185,7 +186,7 @@ describe("DonationModal", () => {
     fireEvent.click(stripeButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("donation-checkout")).toBeTruthy()
+      expect(screen.getByTestId("donation-checkout")).toBeInTheDocument()
     })
   })
 
@@ -198,14 +199,14 @@ describe("DonationModal", () => {
     fireEvent.click(stripeButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("donation-checkout")).toBeTruthy()
+      expect(screen.getByTestId("donation-checkout")).toBeInTheDocument()
     })
 
     const completeDonationButton = screen.getByText("Complete Donation")
     fireEvent.click(completeDonationButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Thank You!")).toBeTruthy()
+      expect(screen.getByText("Thank You!")).toBeInTheDocument()
     })
   })
 
@@ -223,7 +224,7 @@ describe("DonationModal", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("subscription-checkout")).toBeTruthy()
+      expect(screen.getByTestId("subscription-checkout")).toBeInTheDocument()
     })
   })
 
@@ -241,8 +242,8 @@ describe("DonationModal", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/You Already Have a Regular Donation/i)).toBeTruthy()
-      expect(screen.getByText(/1 active regular donation/i)).toBeTruthy()
+      expect(screen.getByText(/You Already Have a Regular Donation/i)).toBeInTheDocument()
+      expect(screen.getByText(/1 active regular donation/i)).toBeInTheDocument()
     })
   })
 
@@ -260,14 +261,14 @@ describe("DonationModal", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /You Already Have a Regular Donation/i })).toBeTruthy()
+      expect(screen.getByRole("heading", { name: /You Already Have a Regular Donation/i })).toBeInTheDocument()
     })
 
     const confirmButton = screen.getByRole("button", { name: /Yes, Set Up Additional Donation/i })
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("subscription-checkout")).toBeTruthy()
+      expect(screen.getByTestId("subscription-checkout")).toBeInTheDocument()
     })
   })
 
@@ -285,7 +286,7 @@ describe("DonationModal", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /You Already Have a Regular Donation/i })).toBeTruthy()
+      expect(screen.getByRole("heading", { name: /You Already Have a Regular Donation/i })).toBeInTheDocument()
     })
 
     const cancelButton = screen.getByRole("button", { name: /No, Go Back/i })
@@ -293,7 +294,7 @@ describe("DonationModal", () => {
 
     await waitFor(() => {
       // Should be back to main view
-      expect(screen.getByText(/Thanks for considering to donate!/i)).toBeTruthy()
+      expect(screen.getByText(/Thanks for considering to donate!/i)).toBeInTheDocument()
     })
   })
 
@@ -307,7 +308,7 @@ describe("DonationModal", () => {
 
     await waitFor(() => {
       // Use getByRole to specifically target the heading element
-      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeTruthy()
+      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeInTheDocument()
     })
   })
 
@@ -326,7 +327,7 @@ describe("DonationModal", () => {
     fireEvent.click(manageButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeTruthy()
+      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeInTheDocument()
     })
 
     const portalButton = screen.getByRole("button", { name: /Access Subscription Portal/i })
@@ -352,7 +353,7 @@ describe("DonationModal", () => {
     fireEvent.click(manageButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeTruthy()
+      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeInTheDocument()
     })
 
     const portalButton = screen.getByRole("button", { name: /Access Subscription Portal/i })
@@ -366,7 +367,7 @@ describe("DonationModal", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText(/No active subscription found/i)).toBeTruthy()
+      expect(screen.getByText(/No active subscription found/i)).toBeInTheDocument()
     })
   })
 
@@ -379,14 +380,14 @@ describe("DonationModal", () => {
     fireEvent.click(manageButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeTruthy()
+      expect(screen.getByRole("heading", { name: /Manage Your Subscription/i })).toBeInTheDocument()
     })
 
     const backButton = screen.getByRole("button", { name: /^Back$/i })
     fireEvent.click(backButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/Thanks for considering to donate!/i)).toBeTruthy()
+      expect(screen.getByText(/Thanks for considering to donate!/i)).toBeInTheDocument()
     })
   })
 
@@ -404,15 +405,15 @@ describe("DonationModal", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("subscription-checkout")).toBeTruthy()
+      expect(screen.getByTestId("subscription-checkout")).toBeInTheDocument()
     })
 
     const completeButton = screen.getByText("Complete Subscription")
     fireEvent.click(completeButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Thank You!")).toBeTruthy()
-      expect(screen.getByText(/subscription has been set up successfully/i)).toBeTruthy()
+      expect(screen.getByText("Thank You!")).toBeInTheDocument()
+      expect(screen.getByText(/subscription has been set up successfully/i)).toBeInTheDocument()
     })
   })
 })

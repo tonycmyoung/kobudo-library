@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Filter } from "lucide-react"
 import FilterSection from "@/components/filter-section"
 import FilterModeToggle from "@/components/filter-mode-toggle"
@@ -66,6 +66,7 @@ export default function MobileFilterDialog({
       <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-sm max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-white">Filter Videos</DialogTitle>
+          <DialogDescription className="sr-only">Filter the video library by category, curriculum, performer, or recorded year.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <FilterSection

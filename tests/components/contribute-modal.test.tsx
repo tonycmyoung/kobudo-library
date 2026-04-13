@@ -7,10 +7,11 @@ import ContributeModal from "@/components/contribute-modal"
 
 describe("ContributeModal", () => {
   const mockOnClose = vi.fn()
-  const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => null)
+  let windowOpenSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     vi.clearAllMocks()
+    windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => null)
   })
 
   it("should not render when isOpen is false", () => {
@@ -22,7 +23,7 @@ describe("ContributeModal", () => {
   it("should render when isOpen is true", () => {
     render(<ContributeModal isOpen={true} onClose={mockOnClose} />)
 
-    expect(screen.getByText(/contribute your videos/i)).toBeTruthy()
+    expect(screen.getByText(/contribute your videos/i)).toBeInTheDocument()
   })
 
   it("should display title with Upload icon", () => {
@@ -31,26 +32,26 @@ describe("ContributeModal", () => {
     const title = screen.getByText(/contribute your videos/i)
     const titleContainer = title.parentElement
 
-    expect(titleContainer?.querySelector("svg")).toBeTruthy()
+    expect(titleContainer?.querySelector("svg")).toBeInTheDocument()
   })
 
   it("should display explanatory text about Google Drive", () => {
     render(<ContributeModal isOpen={true} onClose={mockOnClose} />)
 
-    expect(screen.getByText(/secure Google Drive folder/i)).toBeTruthy()
-    expect(screen.getByText(/Send a message to the admin/i)).toBeTruthy()
-    expect(screen.getByText(/If you already have permission/i)).toBeTruthy()
+    expect(screen.getByText(/secure Google Drive folder/i)).toBeInTheDocument()
+    expect(screen.getByText(/Send a message to the admin/i)).toBeInTheDocument()
+    expect(screen.getByText(/If you already have permission/i)).toBeInTheDocument()
   })
 
   it("should render button with correct text", () => {
     render(<ContributeModal isOpen={true} onClose={mockOnClose} />)
 
-    expect(screen.getByRole("button", { name: /access google drive folder/i })).toBeTruthy()
-    expect(screen.getByText(/share your training videos/i)).toBeTruthy()
+    expect(screen.getByRole("button", { name: /access google drive folder/i })).toBeInTheDocument()
+    expect(screen.getByText(/share your training videos/i)).toBeInTheDocument()
   })
 
   it("should open Google Drive URL in new tab when button clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     render(<ContributeModal isOpen={true} onClose={mockOnClose} />)
 
@@ -64,7 +65,7 @@ describe("ContributeModal", () => {
   })
 
   it("should call onClose when dialog is closed", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     render(<ContributeModal isOpen={true} onClose={mockOnClose} />)
 

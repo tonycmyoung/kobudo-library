@@ -70,7 +70,7 @@ describe("CurriculumSetsManagement", () => {
     vi.mocked(getCurriculumSets).mockReturnValue(new Promise(() => {}))
     
     const { unmount } = render(<CurriculumSetsManagement />)
-    expect(screen.getByText(/loading/i)).toBeTruthy()
+    expect(screen.getByText(/loading/i)).toBeInTheDocument()
     unmount()
   })
 
@@ -95,13 +95,13 @@ describe("CurriculumSetsManagement", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText("First Level")).toBeTruthy()
-      expect(screen.getByText("Second Level")).toBeTruthy()
+      expect(screen.getByText("First Level")).toBeInTheDocument()
+      expect(screen.getByText("Second Level")).toBeInTheDocument()
     })
   })
 
   it("should call createCurriculumSet when create button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<CurriculumSetsManagement />)
 
     await waitFor(() => {
@@ -113,7 +113,7 @@ describe("CurriculumSetsManagement", () => {
 
     // Find the name input by its id
     const nameInput = document.getElementById("set-name") as HTMLInputElement
-    expect(nameInput).toBeTruthy()
+    expect(nameInput).toBeInTheDocument()
     await user.type(nameInput, "New Curriculum Set")
 
     // Find create button within the dialog form
@@ -130,7 +130,7 @@ describe("CurriculumSetsManagement", () => {
 
   it("should show toast on create error", async () => {
     vi.mocked(createCurriculumSet).mockResolvedValue({ error: "Failed to create" })
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<CurriculumSetsManagement />)
 
     await waitFor(() => {
@@ -166,7 +166,7 @@ describe("CurriculumSetsManagement", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText(/no curriculum sets/i)).toBeTruthy()
+      expect(screen.getByText(/no curriculum sets/i)).toBeInTheDocument()
     })
   })
 
@@ -185,7 +185,7 @@ describe("CurriculumSetsManagement", () => {
   })
 
   it("should call addLevelToCurriculumSet when add level is submitted", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<CurriculumSetsManagement />)
 
     await waitFor(() => {
@@ -193,7 +193,7 @@ describe("CurriculumSetsManagement", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText("First Level")).toBeTruthy()
+      expect(screen.getByText("First Level")).toBeInTheDocument()
     })
 
     const addLevelButton = screen.getByRole("button", { name: /add level/i })
@@ -201,7 +201,7 @@ describe("CurriculumSetsManagement", () => {
 
     // Find the level name input by its id
     const nameInput = document.getElementById("level-name") as HTMLInputElement
-    expect(nameInput).toBeTruthy()
+    expect(nameInput).toBeInTheDocument()
     await user.type(nameInput, "Yellow Belt")
 
     // The Add Level dialog has an "Add" button, not "Save"
@@ -226,8 +226,8 @@ describe("CurriculumSetsManagement", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText("First Level")).toBeTruthy()
-      expect(screen.getByText("Second Level")).toBeTruthy()
+      expect(screen.getByText("First Level")).toBeInTheDocument()
+      expect(screen.getByText("Second Level")).toBeInTheDocument()
     })
   })
 

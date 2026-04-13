@@ -13,6 +13,7 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogDescription: () => null,
 }))
 
 describe("AboutModal", () => {
@@ -29,30 +30,30 @@ describe("AboutModal", () => {
 
   it("should render when isOpen is true", () => {
     render(<AboutModal isOpen={true} onClose={mockOnClose} />)
-    expect(screen.getByText(/About/i)).toBeTruthy()
+    expect(screen.getByText(/About/i)).toBeInTheDocument()
   })
 
   it("should display site name", () => {
     render(<AboutModal isOpen={true} onClose={mockOnClose} />)
-    expect(screen.getByText(/Okinawa Kobudo/i)).toBeTruthy()
-    expect(screen.getByText(/Training Video Library/i)).toBeTruthy()
+    expect(screen.getByText(/Okinawa Kobudo/i)).toBeInTheDocument()
+    expect(screen.getByText(/Training Video Library/i)).toBeInTheDocument()
   })
 
   it("should display creator information", () => {
     render(<AboutModal isOpen={true} onClose={mockOnClose} />)
-    expect(screen.getByText(/Tony Young/i)).toBeTruthy()
-    expect(screen.getByText(/Copyright 2025-2026/i)).toBeTruthy()
+    expect(screen.getByText(/Tony Young/i)).toBeInTheDocument()
+    expect(screen.getByText(/Copyright 2025-2026/i)).toBeInTheDocument()
   })
 
   it("should display deployment date", () => {
     render(<AboutModal isOpen={true} onClose={mockOnClose} />)
-    expect(screen.getByText(/Deployed:/i)).toBeTruthy()
+    expect(screen.getByText(/Deployed:/i)).toBeInTheDocument()
   })
 
 
 
   it("should display development build text when no timestamp is set", () => {
     render(<AboutModal isOpen={true} onClose={mockOnClose} />)
-    expect(screen.getByText(/Development Build/i)).toBeTruthy()
+    expect(screen.getByText(/Development Build/i)).toBeInTheDocument()
   })
 })

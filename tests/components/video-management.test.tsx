@@ -103,7 +103,7 @@ describe("VideoManagement", () => {
 
     render(<VideoManagement />)
     const loadingContainer = document.querySelector(".flex.items-center.justify-center.min-h-screen")
-    expect(loadingContainer).toBeTruthy()
+    expect(loadingContainer).toBeInTheDocument()
   })
 
   it("should load and display videos", async () => {
@@ -119,8 +119,8 @@ describe("VideoManagement", () => {
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
-      expect(screen.getByText("Test Video 2")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
+      expect(screen.getByText("Test Video 2")).toBeInTheDocument()
     })
   })
 
@@ -137,9 +137,9 @@ describe("VideoManagement", () => {
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       // Note: Description is not displayed in the list view card, only in the modal
-      expect(screen.getByText("100 views")).toBeTruthy()
+      expect(screen.getByText("100 views")).toBeInTheDocument()
     })
   })
 
@@ -153,18 +153,18 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText("Search videos...")
     await user.type(searchInput, "Test Video 1")
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       expect(screen.queryByText("Test Video 2")).toBeNull()
     })
   })
@@ -179,11 +179,11 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText("Search videos...")
@@ -191,7 +191,7 @@ describe("VideoManagement", () => {
 
     // Find the clear button (X icon) inside the search input container
     const clearButton = document.querySelector("svg.lucide-x")?.closest("button")
-    expect(clearButton).toBeTruthy()
+    expect(clearButton).toBeInTheDocument()
     await user.click(clearButton!)
 
     expect(searchInput).toHaveValue("")
@@ -202,17 +202,17 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Video Management")).toBeTruthy()
+      expect(screen.getByText("Video Management")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add video/i })
     await user.click(addButton)
 
-    expect(screen.getByTestId("video-modal")).toBeTruthy()
+    expect(screen.getByTestId("video-modal")).toBeInTheDocument()
   })
 
   it("should open edit video modal", async () => {
@@ -225,21 +225,21 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
     })
 
     const videoCard = screen.getByText("Test Video 1").closest(".bg-gray-800\\/50")
     const buttons = videoCard ? Array.from(videoCard.querySelectorAll("button")) : []
     const editButton = buttons.find((btn) => btn.querySelector("svg.lucide-pencil"))
 
-    expect(editButton).toBeTruthy()
+    expect(editButton).toBeInTheDocument()
     await user.click(editButton!)
 
-    expect(screen.getByTestId("video-modal")).toBeTruthy()
+    expect(screen.getByTestId("video-modal")).toBeInTheDocument()
   })
 
   it("should delete video with confirmation", async () => {
@@ -253,11 +253,11 @@ describe("VideoManagement", () => {
     })
 
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
     })
 
     const videoCard = screen.getByText("Test Video 1").closest(".bg-gray-800\\/50")
@@ -267,7 +267,7 @@ describe("VideoManagement", () => {
       btn.className.includes("bg-red-600") || btn.querySelector("svg.lucide-trash-2")
     )
 
-    expect(deleteButton).toBeTruthy()
+    expect(deleteButton).toBeInTheDocument()
     await user.click(deleteButton!)
 
     expect(confirmSpy).toHaveBeenCalled()
@@ -288,16 +288,16 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 1")).toBeTruthy()
+      expect(screen.getByText("Test Video 1")).toBeInTheDocument()
     })
 
     // Find the sort order toggle button (arrow-up-down icon)
     const sortOrderButton = document.querySelector("svg.lucide-arrow-up-down")?.closest("button")
-    expect(sortOrderButton).toBeTruthy()
+    expect(sortOrderButton).toBeInTheDocument()
 
     await user.click(sortOrderButton!)
 
@@ -312,7 +312,7 @@ describe("VideoManagement", () => {
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText(/no videos found matching your criteria/i)).toBeTruthy()
+      expect(screen.getByText(/no videos found matching your criteria/i)).toBeInTheDocument()
     })
   })
 
@@ -321,17 +321,17 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Filters")).toBeTruthy()
+      expect(screen.getByText("Filters")).toBeInTheDocument()
     })
 
     const filtersButton = screen.getByText("Filters")
     await user.click(filtersButton)
 
-    expect(screen.getByTestId("category-filter")).toBeTruthy()
+    expect(screen.getByTestId("category-filter")).toBeInTheDocument()
   })
 
   it("should clear all filters", async () => {
@@ -350,21 +350,21 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Test Video 0")).toBeTruthy()
+      expect(screen.getByText("Test Video 0")).toBeInTheDocument()
     })
 
     // Should show pagination controls
-    expect(screen.getByText(/page 1 of/i)).toBeTruthy()
+    expect(screen.getByText(/page 1 of/i)).toBeInTheDocument()
 
     const nextButton = screen.getByRole("button", { name: /next/i })
     await user.click(nextButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/page 2 of/i)).toBeTruthy()
+      expect(screen.getByText(/page 2 of/i)).toBeInTheDocument()
     })
   })
 
@@ -413,17 +413,17 @@ describe("VideoManagement", () => {
       })
 
       localStorage.setItem("adminVideoManagement_sortBy", "recorded")
-      const _user = userEvent.setup()
+      const _user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
-        expect(screen.getByText("Beta Video")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
+        expect(screen.getByText("Beta Video")).toBeInTheDocument()
       })
 
       // Videos should be rendered (sorting happens internally)
       const sortSelect = screen.getByRole("combobox")
-      expect(sortSelect).toBeTruthy()
+      expect(sortSelect).toBeInTheDocument()
     })
 
     it("should sort videos by curriculum display order", async () => {
@@ -440,9 +440,9 @@ describe("VideoManagement", () => {
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
-        expect(screen.getByText("Beta Video")).toBeTruthy()
-        expect(screen.getByText("Charlie Video")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
+        expect(screen.getByText("Beta Video")).toBeInTheDocument()
+        expect(screen.getByText("Charlie Video")).toBeInTheDocument()
       })
     })
 
@@ -460,7 +460,7 @@ describe("VideoManagement", () => {
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
       })
     })
 
@@ -480,9 +480,9 @@ describe("VideoManagement", () => {
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
-        expect(screen.getByText("50 views")).toBeTruthy()
-        expect(screen.getByText("100 views")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
+        expect(screen.getByText("50 views")).toBeInTheDocument()
+        expect(screen.getByText("100 views")).toBeInTheDocument()
       })
     })
 
@@ -506,7 +506,7 @@ describe("VideoManagement", () => {
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
       })
     })
 
@@ -523,12 +523,12 @@ describe("VideoManagement", () => {
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
       })
 
       // Verify the sort select is rendered and functional
       const sortSelect = screen.getByRole("combobox")
-      expect(sortSelect).toBeTruthy()
+      expect(sortSelect).toBeInTheDocument()
 
       // Verify initial sort from localStorage is used
       localStorage.setItem("adminVideoManagement_sortBy", "views")
@@ -553,9 +553,9 @@ describe("VideoManagement", () => {
 
       await waitFor(() => {
         // Videos should still be sorted alphabetically by title (default behavior)
-        expect(screen.getByText("Alpha Video")).toBeTruthy()
-        expect(screen.getByText("Beta Video")).toBeTruthy()
-        expect(screen.getByText("Charlie Video")).toBeTruthy()
+        expect(screen.getByText("Alpha Video")).toBeInTheDocument()
+        expect(screen.getByText("Beta Video")).toBeInTheDocument()
+        expect(screen.getByText("Charlie Video")).toBeInTheDocument()
       })
     })
   })
@@ -571,11 +571,11 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       })
 
       // Open filters collapsible
@@ -607,11 +607,11 @@ describe("VideoManagement", () => {
 
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       })
 
       const videoCard = screen.getByText("Test Video 1").closest(".bg-gray-800\\/50")
@@ -641,11 +641,11 @@ describe("VideoManagement", () => {
       })
 
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       })
 
       const videoCard = screen.getByText("Test Video 1").closest(".bg-gray-800\\/50")
@@ -674,18 +674,18 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       })
 
       // Open add modal
       const addButton = screen.getByRole("button", { name: /add video/i })
       await user.click(addButton)
 
-      expect(screen.getByTestId("video-modal")).toBeTruthy()
+      expect(screen.getByTestId("video-modal")).toBeInTheDocument()
 
       // Click save in modal
       const saveButton = screen.getByText("Save")
@@ -707,18 +707,18 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       })
 
       // Open add modal
       const addButton = screen.getByRole("button", { name: /add video/i })
       await user.click(addButton)
 
-      expect(screen.getByTestId("video-modal")).toBeTruthy()
+      expect(screen.getByTestId("video-modal")).toBeInTheDocument()
 
       // Click close in modal
       const closeButton = screen.getByText("Close")
@@ -742,19 +742,19 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
-        expect(screen.getByText("Test Video 2")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
+        expect(screen.getByText("Test Video 2")).toBeInTheDocument()
       })
 
       const searchInput = screen.getByPlaceholderText("Search videos...")
       await user.type(searchInput, "Description 1")
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
         expect(screen.queryByText("Test Video 2")).toBeNull()
       })
     })
@@ -769,19 +769,19 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
-        expect(screen.getByText("Test Video 2")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
+        expect(screen.getByText("Test Video 2")).toBeInTheDocument()
       })
 
       const searchInput = screen.getByPlaceholderText("Search videos...")
       await user.type(searchInput, "John Doe")
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
         expect(screen.queryByText("Test Video 2")).toBeNull()
       })
     })
@@ -798,11 +798,11 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Test Video 1")).toBeTruthy()
+        expect(screen.getByText("Test Video 1")).toBeInTheDocument()
       })
 
       // Add search query
@@ -818,7 +818,7 @@ describe("VideoManagement", () => {
 
       // Clear all should appear
       await waitFor(() => {
-        expect(screen.getByText("Clear all")).toBeTruthy()
+        expect(screen.getByText("Clear all")).toBeInTheDocument()
       })
 
       const clearButton = screen.getByText("Clear all")

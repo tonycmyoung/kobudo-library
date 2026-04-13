@@ -159,7 +159,7 @@ describe("Curriculum Set Filtering", () => {
       const filterSection = screen.queryByTestId("curriculum-filter")
       if (filterSection) {
         // Curriculum filter should only show curriculums from set-1
-        expect(filterSection).toBeTruthy()
+        expect(filterSection).toBeInTheDocument()
       }
     })
   })
@@ -169,7 +169,7 @@ describe("Curriculum Set Filtering", () => {
 
     await waitFor(() => {
       // The component should still render but curriculum section should be empty/hidden
-      expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+      expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
     })
   })
 
@@ -178,8 +178,8 @@ describe("Curriculum Set Filtering", () => {
 
     await waitFor(() => {
       // Both videos should display even though only one matches the curriculum set
-      expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
-      expect(screen.getByTestId("video-card-video-2")).toBeTruthy()
+      expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
+      expect(screen.getByTestId("video-card-video-2")).toBeInTheDocument()
     })
   })
 
@@ -188,7 +188,7 @@ describe("Curriculum Set Filtering", () => {
 
     // Videos should be rendered (filtering happens inside VideoCard component)
     await waitFor(() => {
-      expect(screen.getByTestId("video-card-video-1")).toBeTruthy()
+      expect(screen.getByTestId("video-card-video-1")).toBeInTheDocument()
     })
   })
 })

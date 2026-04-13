@@ -42,7 +42,7 @@ describe("CurriculumManagement", () => {
 
   it("should render loading state initially", async () => {
     const { unmount } = render(<CurriculumManagement />)
-    expect(screen.getByText("Loading curriculums...")).toBeTruthy()
+    expect(screen.getByText("Loading curriculums...")).toBeInTheDocument()
     // Unmount to prevent act() warnings from pending async operations
     unmount()
   })
@@ -51,8 +51,8 @@ describe("CurriculumManagement", () => {
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
-      expect(screen.getByText("Yellow Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
+      expect(screen.getByText("Yellow Belt")).toBeInTheDocument()
     })
   })
 
@@ -60,7 +60,7 @@ describe("CurriculumManagement", () => {
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText(/2 items/)).toBeTruthy()
+      expect(screen.getByText(/2 items/)).toBeInTheDocument()
     })
   })
 
@@ -68,37 +68,37 @@ describe("CurriculumManagement", () => {
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const whiteBeltCard = screen.getByText("White Belt").closest("div[class*='rounded']")
     const yellowBeltCard = screen.getByText("Yellow Belt").closest("div[class*='rounded']")
 
-    expect(whiteBeltCard).toBeTruthy()
-    expect(yellowBeltCard).toBeTruthy()
+    expect(whiteBeltCard).toBeInTheDocument()
+    expect(yellowBeltCard).toBeInTheDocument()
 
-    expect(within(whiteBeltCard!).getByText("5 videos")).toBeTruthy()
-    expect(within(yellowBeltCard!).getByText("8 videos")).toBeTruthy()
+    expect(within(whiteBeltCard!).getByText("5 videos")).toBeInTheDocument()
+    expect(within(yellowBeltCard!).getByText("8 videos")).toBeInTheDocument()
   })
 
   it("should open add curriculum dialog when Add button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add curriculum/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Add New Curriculum")).toBeTruthy()
+      expect(screen.getByText("Add New Curriculum")).toBeInTheDocument()
     })
   })
 
   it("should add new curriculum when form is submitted", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(curriculumActions.addCurriculum).mockResolvedValue({
       id: "curr-3",
       name: "Green Belt",
@@ -111,14 +111,14 @@ describe("CurriculumManagement", () => {
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add curriculum/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Add New Curriculum")).toBeTruthy()
+      expect(screen.getByText("Add New Curriculum")).toBeInTheDocument()
     })
 
     const nameInput = screen.getByLabelText(/name/i)
@@ -141,54 +141,54 @@ describe("CurriculumManagement", () => {
   })
 
   it("should open edit dialog when edit button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const whiteBeltCard = screen.getByText("White Belt").closest("div[class*='rounded']")
-    expect(whiteBeltCard).toBeTruthy()
+    expect(whiteBeltCard).toBeInTheDocument()
 
     const pencilIcon = whiteBeltCard?.querySelector("svg.lucide-pencil")
     const editButton = pencilIcon?.closest("button")
-    expect(editButton).toBeTruthy()
+    expect(editButton).toBeInTheDocument()
 
     await user.click(editButton!)
 
     await waitFor(
       () => {
-        expect(screen.getByText("Edit Curriculum")).toBeTruthy()
-        expect(screen.getByDisplayValue("White Belt")).toBeTruthy()
-        expect(screen.getByDisplayValue("Beginner curriculum")).toBeTruthy()
+        expect(screen.getByText("Edit Curriculum")).toBeInTheDocument()
+        expect(screen.getByDisplayValue("White Belt")).toBeInTheDocument()
+        expect(screen.getByDisplayValue("Beginner curriculum")).toBeInTheDocument()
       },
       { timeout: 2000 },
     )
   })
 
   it("should update curriculum when edit form is submitted", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(curriculumActions.updateCurriculum).mockResolvedValue(undefined)
 
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const whiteBeltCard = screen.getByText("White Belt").closest("div[class*='rounded']")
-    expect(whiteBeltCard).toBeTruthy()
+    expect(whiteBeltCard).toBeInTheDocument()
 
     const pencilIcon = whiteBeltCard?.querySelector("svg.lucide-pencil")
     const editButton = pencilIcon?.closest("button")
-    expect(editButton).toBeTruthy()
+    expect(editButton).toBeInTheDocument()
 
     await user.click(editButton!)
 
     await waitFor(
       () => {
-        expect(screen.getByText("Edit Curriculum")).toBeTruthy()
+        expect(screen.getByText("Edit Curriculum")).toBeInTheDocument()
       },
       { timeout: 2000 },
     )
@@ -210,7 +210,7 @@ describe("CurriculumManagement", () => {
   })
 
   it("should delete curriculum when delete button is clicked and confirmed", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const confirmSpy = vi.fn(() => true)
     globalThis.confirm = confirmSpy
     vi.mocked(curriculumActions.deleteCurriculum).mockResolvedValue(undefined)
@@ -218,7 +218,7 @@ describe("CurriculumManagement", () => {
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const whiteBeltText = screen.getByText("White Belt")
@@ -226,7 +226,7 @@ describe("CurriculumManagement", () => {
     const buttonsInCard = whiteBeltCard ? Array.from(whiteBeltCard.querySelectorAll("button")) : []
     const deleteButton = buttonsInCard.find((btn) => btn.className.includes("text-red-400"))
 
-    expect(deleteButton).toBeTruthy()
+    expect(deleteButton).toBeInTheDocument()
     await user.click(deleteButton!)
 
     await waitFor(() => {
@@ -236,14 +236,14 @@ describe("CurriculumManagement", () => {
   })
 
   it("should not delete curriculum when deletion is cancelled", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const confirmSpy = vi.fn(() => false)
     globalThis.confirm = confirmSpy
 
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const whiteBeltText = screen.getByText("White Belt")
@@ -251,7 +251,7 @@ describe("CurriculumManagement", () => {
     const buttonsInCard = whiteBeltCard ? Array.from(whiteBeltCard.querySelectorAll("button")) : []
     const deleteButton = buttonsInCard.find((btn) => btn.className.includes("text-red-400"))
 
-    expect(deleteButton).toBeTruthy()
+    expect(deleteButton).toBeInTheDocument()
     await user.click(deleteButton!)
 
     await waitFor(() => {
@@ -261,13 +261,13 @@ describe("CurriculumManagement", () => {
   })
 
   it("should move curriculum up when move up is selected", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(curriculumActions.reorderCurriculums).mockResolvedValue(undefined)
 
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Yellow Belt")).toBeTruthy()
+      expect(screen.getByText("Yellow Belt")).toBeInTheDocument()
     })
 
     const yellowBeltText = screen.getByText("Yellow Belt")
@@ -275,12 +275,12 @@ describe("CurriculumManagement", () => {
     const buttonsInCard = yellowBeltCard ? Array.from(yellowBeltCard.querySelectorAll("button")) : []
     const moreButton = buttonsInCard[0] // First button in card is the MoreVertical dropdown
 
-    expect(moreButton).toBeTruthy()
+    expect(moreButton).toBeInTheDocument()
     await user.click(moreButton!)
 
     await waitFor(() => {
       const moveUpOption = screen.getByText("Move Up")
-      expect(moveUpOption).toBeTruthy()
+      expect(moveUpOption).toBeInTheDocument()
     })
 
     const moveUpOption = screen.getByText("Move Up")
@@ -297,30 +297,29 @@ describe("CurriculumManagement", () => {
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText(/no curriculums found/i)).toBeTruthy()
+      expect(screen.getByText(/no curriculums found/i)).toBeInTheDocument()
     })
   })
 
   it("should allow selecting different colors", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<CurriculumManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
     })
 
     const addButton = screen.getByRole("button", { name: /add curriculum/i })
     await user.click(addButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Add New Curriculum")).toBeTruthy()
+      expect(screen.getByText("Add New Curriculum")).toBeInTheDocument()
     })
 
     const colorPicker = document.querySelector("#curriculum-color-picker")
-    expect(colorPicker).toBeTruthy()
+    expect(colorPicker).toBeInTheDocument()
 
     const colorButtons = colorPicker?.querySelectorAll("button")
-    expect(colorButtons).toBeTruthy()
     expect(colorButtons!.length).toBeGreaterThan(1)
 
     // Click the second color button

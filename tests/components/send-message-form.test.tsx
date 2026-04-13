@@ -48,14 +48,14 @@ describe("SendMessageForm", () => {
   })
 
   it("should update character counter when typing", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
 
     const textarea = screen.getByPlaceholderText(/type your message here/i)
     await user.type(textarea, "Hello!")
 
     const counter = screen.getByText(/6\/500 characters/i)
-    expect(counter).toBeTruthy()
+    expect(counter).toBeInTheDocument()
   })
 
   it("should disable send button when message is empty", () => {
@@ -66,7 +66,7 @@ describe("SendMessageForm", () => {
   })
 
   it("should enable send button when message has content", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
 
     const textarea = screen.getByPlaceholderText(/type your message here/i)
@@ -84,7 +84,7 @@ describe("SendMessageForm", () => {
   })
 
   it("should call sendNotificationWithEmail on submit", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: true })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
@@ -105,7 +105,7 @@ describe("SendMessageForm", () => {
   })
 
   it("should show success message after sending", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: true })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
@@ -124,7 +124,7 @@ describe("SendMessageForm", () => {
   })
 
   it("should clear form after successful send", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: true })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
@@ -141,7 +141,7 @@ describe("SendMessageForm", () => {
   })
 
   it("should show error message on failure", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(sendNotificationWithEmail).mockResolvedValue({ error: "Failed to send" })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)

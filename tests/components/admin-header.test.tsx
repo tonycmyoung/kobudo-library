@@ -53,38 +53,38 @@ describe("AdminHeader", () => {
   it("should render admin header with user information", () => {
     render(<AdminHeader user={mockUser} />)
 
-    expect(screen.getByText("Admin")).toBeTruthy()
-    expect(screen.getByText("OKL")).toBeTruthy()
-    expect(screen.getByText("JD")).toBeTruthy()
+    expect(screen.getByText("Admin")).toBeInTheDocument()
+    expect(screen.getByText("OKL")).toBeInTheDocument()
+    expect(screen.getByText("JD")).toBeInTheDocument()
   })
 
   it("should render navigation links for desktop", () => {
     render(<AdminHeader user={mockUser} />)
 
-    expect(screen.getByText("Users")).toBeTruthy()
-    expect(screen.getByText("Videos")).toBeTruthy()
-    expect(screen.getAllByText("Metadata")[0]).toBeTruthy()
-    expect(screen.getByText("Notifications")).toBeTruthy()
+    expect(screen.getByText("Users")).toBeInTheDocument()
+    expect(screen.getByText("Videos")).toBeInTheDocument()
+    expect(screen.getAllByText("Metadata")[0]).toBeInTheDocument()
+    expect(screen.getByText("Notifications")).toBeInTheDocument()
   })
 
   it("should render notification bell", () => {
     render(<AdminHeader user={mockUser} />)
 
-    expect(screen.getByTestId("notification-bell")).toBeTruthy()
+    expect(screen.getByTestId("notification-bell")).toBeInTheDocument()
   })
 
   it("should show user avatar with initials fallback", () => {
     render(<AdminHeader user={mockUser} />)
 
     const fallback = screen.getByText("JD")
-    expect(fallback).toBeTruthy()
+    expect(fallback).toBeInTheDocument()
   })
 
   it("should generate initials from full name", () => {
     render(<AdminHeader user={mockUser} />)
 
     const fallback = screen.getByText("JD")
-    expect(fallback).toBeTruthy()
+    expect(fallback).toBeInTheDocument()
   })
 
   it("should use default initials when name is missing", () => {
@@ -92,11 +92,11 @@ describe("AdminHeader", () => {
     render(<AdminHeader user={userWithoutName} />)
 
     const fallback = screen.getByText("A")
-    expect(fallback).toBeTruthy()
+    expect(fallback).toBeInTheDocument()
   })
 
   it("should open invite modal when invite menu item is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminHeader user={mockUser} />)
 
     const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
@@ -112,7 +112,7 @@ describe("AdminHeader", () => {
   })
 
   it("should close invite modal when onClose is called", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminHeader user={mockUser} />)
 
     const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
@@ -130,7 +130,7 @@ describe("AdminHeader", () => {
   })
 
   it("should navigate to signout when sign out is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminHeader user={mockUser} />)
 
     const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
@@ -145,24 +145,24 @@ describe("AdminHeader", () => {
   })
 
   it("should toggle mobile menu when menu button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminHeader user={mockUser} />)
 
     const buttons = screen.getAllByRole("button")
     const menuButton = buttons.find((btn) => btn.className.includes("lg:hidden"))
-    expect(menuButton).toBeTruthy()
+    expect(menuButton).toBeInTheDocument()
     await user.click(menuButton!)
 
-    expect(screen.getByText("Student View")).toBeTruthy()
+    expect(screen.getByText("Student View")).toBeInTheDocument()
   })
 
   it("should close mobile menu when a link is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminHeader user={mockUser} />)
 
     const buttons = screen.getAllByRole("button")
     const menuButton = buttons.find((btn) => btn.className.includes("lg:hidden"))
-    expect(menuButton).toBeTruthy()
+    expect(menuButton).toBeInTheDocument()
     await user.click(menuButton!)
 
     const studentViewLink = screen.getByText("Student View")
@@ -173,27 +173,27 @@ describe("AdminHeader", () => {
   })
 
   it("should render all dropdown menu items", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminHeader user={mockUser} />)
 
     const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
     if (avatarButton) {
       await user.click(avatarButton)
 
-      expect(screen.getByText("Library")).toBeTruthy()
-      expect(screen.getAllByText("Metadata")[0]).toBeTruthy()
-      expect(screen.getByText("Performers")).toBeTruthy()
-      expect(screen.getByText("Debug")).toBeTruthy()
-      expect(screen.getByText("Audit")).toBeTruthy()
-      expect(screen.getByText("View Log")).toBeTruthy()
-      expect(screen.getByText("Trace")).toBeTruthy()
-      expect(screen.getByText("Profile")).toBeTruthy()
+      expect(screen.getByText("Library")).toBeInTheDocument()
+      expect(screen.getAllByText("Metadata")[0]).toBeInTheDocument()
+      expect(screen.getByText("Performers")).toBeInTheDocument()
+      expect(screen.getByText("Debug")).toBeInTheDocument()
+      expect(screen.getByText("Audit")).toBeInTheDocument()
+      expect(screen.getByText("View Log")).toBeInTheDocument()
+      expect(screen.getByText("Trace")).toBeInTheDocument()
+      expect(screen.getByText("Profile")).toBeInTheDocument()
     }
   })
 
   describe("About Modal", () => {
     it("should open about modal when About is clicked in dropdown", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
@@ -209,7 +209,7 @@ describe("AdminHeader", () => {
     })
 
     it("should close about modal when onClose is called", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
@@ -233,7 +233,7 @@ describe("AdminHeader", () => {
       render(<AdminHeader user={threeNameUser} />)
 
       const fallback = screen.getByText("JPS")
-      expect(fallback).toBeTruthy()
+      expect(fallback).toBeInTheDocument()
     })
 
     it("should handle single name correctly", () => {
@@ -241,13 +241,13 @@ describe("AdminHeader", () => {
       render(<AdminHeader user={singleNameUser} />)
 
       const fallback = screen.getByText("J")
-      expect(fallback).toBeTruthy()
+      expect(fallback).toBeInTheDocument()
     })
   })
 
   describe("Mobile Menu Navigation", () => {
     it("should close mobile menu when Users link is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -267,7 +267,7 @@ describe("AdminHeader", () => {
     })
 
     it("should close mobile menu when Videos link is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -284,7 +284,7 @@ describe("AdminHeader", () => {
     })
 
     it("should close mobile menu when Metadata link is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -301,7 +301,7 @@ describe("AdminHeader", () => {
     })
 
     it("should close mobile menu when Notifications link is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -318,7 +318,7 @@ describe("AdminHeader", () => {
     })
 
     it("should open invite modal and close mobile menu when Invite User is clicked in mobile menu", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -342,7 +342,7 @@ describe("AdminHeader", () => {
     })
 
     it("should navigate to signout and close mobile menu when Sign Out is clicked in mobile menu", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -365,34 +365,34 @@ describe("AdminHeader", () => {
 
   describe("Dropdown Menu Additional Items", () => {
     it("should display user full name in dropdown header", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
       if (avatarButton) {
         await user.click(avatarButton)
 
-        expect(screen.getByText("John Doe")).toBeTruthy()
-        expect(screen.getByText("Administrator")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
+        expect(screen.getByText("Administrator")).toBeInTheDocument()
       }
     })
 
     it("should show About menu item in dropdown", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const avatarButton = screen.getAllByRole("button").find((btn) => btn.querySelector('[class*="Avatar"]'))
       if (avatarButton) {
         await user.click(avatarButton)
 
-        expect(screen.getByText("About")).toBeTruthy()
+        expect(screen.getByText("About")).toBeInTheDocument()
       }
     })
   })
 
   describe("Mobile Menu Toggle", () => {
     it("should show X icon when mobile menu is open", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<AdminHeader user={mockUser} />)
 
       const buttons = screen.getAllByRole("button")
@@ -402,7 +402,7 @@ describe("AdminHeader", () => {
       await user.click(menuButton!)
 
       // After click, menu should be open and show Student View
-      expect(screen.getByText("Student View")).toBeTruthy()
+      expect(screen.getByText("Student View")).toBeInTheDocument()
 
       // Click again to close
       await user.click(menuButton!)

@@ -50,18 +50,18 @@ describe("ViewLogDashboard", () => {
     render(<ViewLogDashboard />)
 
     const spinner = document.querySelector(".animate-spin")
-    expect(spinner).toBeTruthy()
+    expect(spinner).toBeInTheDocument()
   })
 
   it("should display view logs after successful fetch", async () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Advanced Sai Forms")).toBeTruthy()
-    expect(screen.getByText("Tonfa Combinations")).toBeTruthy()
+    expect(screen.getByText("Advanced Sai Forms")).toBeInTheDocument()
+    expect(screen.getByText("Tonfa Combinations")).toBeInTheDocument()
   })
 
   it("should display empty state when no logs exist", async () => {
@@ -70,27 +70,27 @@ describe("ViewLogDashboard", () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No video views recorded yet")).toBeTruthy()
+      expect(screen.getByText("No video views recorded yet")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("View logs will appear here when users watch videos")).toBeTruthy()
+    expect(screen.getByText("View logs will appear here when users watch videos")).toBeInTheDocument()
   })
 
   it("should display user information for authenticated views", async () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("john@example.com")).toBeTruthy()
+    expect(screen.getByText("john@example.com")).toBeInTheDocument()
   })
 
   it("should display Anonymous for unauthenticated views", async () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Anonymous")).toBeTruthy()
+      expect(screen.getByText("Anonymous")).toBeInTheDocument()
     })
   })
 
@@ -99,16 +99,16 @@ describe("ViewLogDashboard", () => {
 
     await waitFor(() => {
       // User 2 has no name but has email - should show email prefix as name
-      expect(screen.getByText("jane")).toBeTruthy()
+      expect(screen.getByText("jane")).toBeInTheDocument()
     })
   })
 
   it("should refresh logs when refresh button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
     })
 
     const refreshButton = screen.getByRole("button", { name: /refresh/i })
@@ -133,60 +133,60 @@ describe("ViewLogDashboard", () => {
   })
 
   it("should filter logs client-side when search query is entered", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
     })
 
     // All three videos should be visible initially
-    expect(screen.getByText("Advanced Sai Forms")).toBeTruthy()
-    expect(screen.getByText("Tonfa Combinations")).toBeTruthy()
+    expect(screen.getByText("Advanced Sai Forms")).toBeInTheDocument()
+    expect(screen.getByText("Tonfa Combinations")).toBeInTheDocument()
 
     const searchInput = screen.getByPlaceholderText("Search video or user...")
     await user.type(searchInput, "Bo")
 
     // After search, only Bo video should be visible
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
       expect(screen.queryByText("Advanced Sai Forms")).toBeNull()
       expect(screen.queryByText("Tonfa Combinations")).toBeNull()
     })
   })
 
   it("should show search term in results count", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText("Search video or user...")
     await user.type(searchInput, "Bo")
 
     await waitFor(() => {
-      expect(screen.getByText(/matching "Bo"/)).toBeTruthy()
+      expect(screen.getByText(/matching "Bo"/)).toBeInTheDocument()
     })
   })
 
   it("should display no results message when search returns empty", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText("Search video or user...")
     await user.type(searchInput, "nonexistent")
 
     await waitFor(() => {
-      expect(screen.getByText("No view logs match your search")).toBeTruthy()
+      expect(screen.getByText("No view logs match your search")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Try a different search term")).toBeTruthy()
+    expect(screen.getByText("Try a different search term")).toBeInTheDocument()
   })
 
   it("should display pagination controls when there are multiple pages", async () => {
@@ -206,11 +206,11 @@ describe("ViewLogDashboard", () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Page 1 of 2")).toBeTruthy()
+      expect(screen.getByText("Page 1 of 2")).toBeInTheDocument()
     })
 
-    expect(screen.getByRole("button", { name: /previous/i })).toBeTruthy()
-    expect(screen.getByRole("button", { name: /next/i })).toBeTruthy()
+    expect(screen.getByRole("button", { name: /previous/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /next/i })).toBeInTheDocument()
   })
 
   it("should disable previous button on first page", async () => {
@@ -229,7 +229,7 @@ describe("ViewLogDashboard", () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Page 1 of 2")).toBeTruthy()
+      expect(screen.getByText("Page 1 of 2")).toBeInTheDocument()
     })
 
     const prevButton = screen.getByRole("button", { name: /previous/i })
@@ -249,18 +249,18 @@ describe("ViewLogDashboard", () => {
 
     vi.mocked(actions.fetchVideoViewLogs).mockResolvedValue(manyLogs)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Page 1 of 2")).toBeTruthy()
+      expect(screen.getByText("Page 1 of 2")).toBeInTheDocument()
     })
 
     const nextButton = screen.getByRole("button", { name: /next/i })
     await user.click(nextButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Page 2 of 2")).toBeTruthy()
+      expect(screen.getByText("Page 2 of 2")).toBeInTheDocument()
     })
   })
 
@@ -268,7 +268,7 @@ describe("ViewLogDashboard", () => {
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Basic Bo Techniques")).toBeTruthy()
+      expect(screen.getByText("Basic Bo Techniques")).toBeInTheDocument()
     })
 
     expect(screen.queryByRole("button", { name: /previous/i })).toBeNull()
@@ -288,11 +288,11 @@ describe("ViewLogDashboard", () => {
 
     vi.mocked(actions.fetchVideoViewLogs).mockResolvedValue(manyLogs)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ViewLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Page 1 of 2")).toBeTruthy()
+      expect(screen.getByText("Page 1 of 2")).toBeInTheDocument()
     })
 
     // Navigate to page 2
@@ -300,7 +300,7 @@ describe("ViewLogDashboard", () => {
     await user.click(nextButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Page 2 of 2")).toBeTruthy()
+      expect(screen.getByText("Page 2 of 2")).toBeInTheDocument()
     })
 
     // Search - should reset to page 1

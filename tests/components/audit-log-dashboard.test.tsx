@@ -42,9 +42,9 @@ describe("AuditLogDashboard", () => {
 
     render(<AuditLogDashboard />)
 
-    expect(screen.getByText("Loading audit logs...")).toBeTruthy()
+    expect(screen.getByText("Loading audit logs...")).toBeInTheDocument()
     const spinner = document.querySelector(".animate-spin")
-    expect(spinner).toBeTruthy()
+    expect(spinner).toBeInTheDocument()
   })
 
   it("should display audit logs after successful fetch", async () => {
@@ -53,13 +53,13 @@ describe("AuditLogDashboard", () => {
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("admin@example.com")).toBeTruthy()
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("moderator@example.com")).toBeTruthy()
-    expect(screen.getByText("user1@example.com")).toBeTruthy()
-    expect(screen.getByText("user2@example.com")).toBeTruthy()
-    expect(screen.getByText("2 logs total")).toBeTruthy()
+    expect(screen.getByText("moderator@example.com")).toBeInTheDocument()
+    expect(screen.getByText("user1@example.com")).toBeInTheDocument()
+    expect(screen.getByText("user2@example.com")).toBeInTheDocument()
+    expect(screen.getByText("2 logs total")).toBeInTheDocument()
   })
 
   it("should display empty state when no logs exist", async () => {
@@ -68,10 +68,10 @@ describe("AuditLogDashboard", () => {
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No audit logs found")).toBeTruthy()
+      expect(screen.getByText("No audit logs found")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Logs will appear here when users sign up, get approved, or are deleted")).toBeTruthy()
+    expect(screen.getByText("Logs will appear here when users sign up, get approved, or are deleted")).toBeInTheDocument()
   })
 
   it("should handle fetch errors gracefully", async () => {
@@ -91,11 +91,11 @@ describe("AuditLogDashboard", () => {
   it("should refresh logs when refresh button is clicked", async () => {
     vi.mocked(actions.fetchAuditLogs).mockResolvedValue(mockLogs)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("admin@example.com")).toBeTruthy()
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
     })
 
     const refreshButton = screen.getByRole("button", { name: /refresh/i })
@@ -110,11 +110,11 @@ describe("AuditLogDashboard", () => {
     vi.mocked(actions.fetchAuditLogs).mockResolvedValue(mockLogs)
     vi.mocked(actions.clearAuditLogs).mockResolvedValue(undefined)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("admin@example.com")).toBeTruthy()
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })
@@ -125,7 +125,7 @@ describe("AuditLogDashboard", () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText("No audit logs found")).toBeTruthy()
+      expect(screen.getByText("No audit logs found")).toBeInTheDocument()
     })
 
     expect(actions.clearAuditLogs).toHaveBeenCalledTimes(1)
@@ -138,11 +138,11 @@ describe("AuditLogDashboard", () => {
 
     vi.mocked(actions.fetchAuditLogs).mockResolvedValue(mockLogs)
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("admin@example.com")).toBeTruthy()
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })
@@ -150,7 +150,7 @@ describe("AuditLogDashboard", () => {
 
     expect(confirmSpy).toHaveBeenCalled()
     expect(actions.clearAuditLogs).not.toHaveBeenCalled()
-    expect(screen.getByText("admin@example.com")).toBeTruthy()
+    expect(screen.getByText("admin@example.com")).toBeInTheDocument()
 
     confirmSpy.mockRestore()
   })
@@ -161,7 +161,7 @@ describe("AuditLogDashboard", () => {
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("No audit logs found")).toBeTruthy()
+      expect(screen.getByText("No audit logs found")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })
@@ -182,13 +182,13 @@ describe("AuditLogDashboard", () => {
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Signup")).toBeTruthy()
+      expect(screen.getByText("Signup")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("Approval")).toBeTruthy()
-    expect(screen.getByText("Deletion")).toBeTruthy()
-    expect(screen.getByText("Invitation")).toBeTruthy()
-    expect(screen.getByText("Password Reset")).toBeTruthy()
+    expect(screen.getByText("Approval")).toBeInTheDocument()
+    expect(screen.getByText("Deletion")).toBeInTheDocument()
+    expect(screen.getByText("Invitation")).toBeInTheDocument()
+    expect(screen.getByText("Password Reset")).toBeInTheDocument()
   })
 
   it("should display actor and target names from additional data", async () => {
@@ -197,12 +197,12 @@ describe("AuditLogDashboard", () => {
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("Admin User")).toBeTruthy()
+      expect(screen.getByText("Admin User")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("John Doe")).toBeTruthy()
-    expect(screen.getByText("Moderator")).toBeTruthy()
-    expect(screen.getByText("Jane Smith")).toBeTruthy()
+    expect(screen.getByText("John Doe")).toBeInTheDocument()
+    expect(screen.getByText("Moderator")).toBeInTheDocument()
+    expect(screen.getByText("Jane Smith")).toBeInTheDocument()
   })
 
   it("should handle logs without target information", async () => {
@@ -220,11 +220,11 @@ describe("AuditLogDashboard", () => {
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("admin@example.com")).toBeTruthy()
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
     })
 
     const actorRow = screen.getByText("admin@example.com").closest("tr")
-    expect(actorRow).toBeTruthy()
+    expect(actorRow).toBeInTheDocument()
 
     const cells = actorRow?.querySelectorAll("td")
     const hasEmptyTarget = Array.from(cells || []).some((cell) => cell.textContent?.trim() === "-")
@@ -238,11 +238,11 @@ describe("AuditLogDashboard", () => {
     vi.mocked(actions.fetchAuditLogs).mockResolvedValue(mockLogs)
     vi.mocked(actions.clearAuditLogs).mockRejectedValue(new Error("Clear failed"))
 
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AuditLogDashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText("admin@example.com")).toBeTruthy()
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
     })
 
     const clearButton = screen.getByRole("button", { name: /clear all logs/i })

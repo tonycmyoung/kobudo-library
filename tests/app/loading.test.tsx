@@ -10,7 +10,7 @@ describe("Loading Pages", () => {
       const { container } = render(<Loading />)
 
       // Check for gradient background
-      expect(container.querySelector('[class*="bg-gradient"]')).toBeTruthy()
+      expect(container.querySelector('[class*="bg-gradient"]')).toBeInTheDocument()
 
       // Check for skeleton elements
       const skeletons = container.querySelectorAll(".animate-pulse")
@@ -22,7 +22,7 @@ describe("Loading Pages", () => {
 
       // Check for header area
       const headerSkeleton = container.querySelector('[class*="h-16"]')
-      expect(headerSkeleton).toBeTruthy()
+      expect(headerSkeleton).toBeInTheDocument()
     })
 
     it("should render video card skeletons in grid", () => {
@@ -30,7 +30,7 @@ describe("Loading Pages", () => {
 
       // Check for grid layout
       const grid = container.querySelector(".grid")
-      expect(grid).toBeTruthy()
+      expect(grid).toBeInTheDocument()
 
       // Should have multiple card skeletons (12 in grid)
       const cardSkeletons = container.querySelectorAll(".rounded-lg.bg-black\\/30")
@@ -43,24 +43,17 @@ describe("Loading Pages", () => {
       const { container } = render(<FavoritesLoading />)
 
       // Check for main structure
-      expect(container.querySelector('[class*="bg-gradient"]')).toBeTruthy()
+      expect(container.querySelector('[class*="bg-gradient"]')).toBeInTheDocument()
 
       // Check for skeleton elements
       const skeletons = container.querySelectorAll(".animate-pulse")
       expect(skeletons.length).toBeGreaterThan(0)
     })
 
-    it("should have similar structure to main loading", () => {
-      const mainContainer = render(<Loading />).container
-      const favContainer = render(<FavoritesLoading />).container
+    it("should render a grid of video card skeletons", () => {
+      const { container } = render(<FavoritesLoading />)
 
-      // Both should have gradient backgrounds
-      expect(mainContainer.querySelector('[class*="bg-gradient"]')).toBeTruthy()
-      expect(favContainer.querySelector('[class*="bg-gradient"]')).toBeTruthy()
-
-      // Both should have grids for video cards
-      expect(mainContainer.querySelector(".grid")).toBeTruthy()
-      expect(favContainer.querySelector(".grid")).toBeTruthy()
+      expect(container.querySelector(".grid")).toBeInTheDocument()
     })
   })
 
@@ -69,7 +62,7 @@ describe("Loading Pages", () => {
       const { container } = render(<MyLevelLoading />)
 
       // Check for main structure
-      expect(container.querySelector('[class*="bg-gradient"]')).toBeTruthy()
+      expect(container.querySelector('[class*="bg-gradient"]')).toBeInTheDocument()
 
       // Check for skeleton elements
       const skeletons = container.querySelectorAll(".animate-pulse")
@@ -80,7 +73,7 @@ describe("Loading Pages", () => {
       const { container } = render(<MyLevelLoading />)
 
       const grid = container.querySelector(".grid")
-      expect(grid).toBeTruthy()
+      expect(grid).toBeInTheDocument()
     })
   })
 

@@ -70,42 +70,42 @@ describe("UserProfile", () => {
   it("should render user profile information", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("John Doe")).toBeTruthy()
-    expect(screen.getAllByText("test@example.com")[0]).toBeTruthy()
-    expect(screen.getByText("Sensei Bob")).toBeTruthy()
-    expect(screen.getByText("Test Dojo")).toBeTruthy()
+    expect(screen.getByText("John Doe")).toBeInTheDocument()
+    expect(screen.getAllByText("test@example.com")[0]).toBeInTheDocument()
+    expect(screen.getByText("Sensei Bob")).toBeInTheDocument()
+    expect(screen.getByText("Test Dojo")).toBeInTheDocument()
   })
 
   it("should display favorite count and member since date", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("5")).toBeTruthy()
-    expect(screen.getByText(/Member Since/i)).toBeTruthy()
+    expect(screen.getByText("5")).toBeInTheDocument()
+    expect(screen.getByText(/Member Since/i)).toBeInTheDocument()
   })
 
   it("should render quick action buttons", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("View My Favorites")).toBeTruthy()
-    expect(screen.getByText("Change Password")).toBeTruthy()
-    expect(screen.getByText("Browse Video Library")).toBeTruthy()
+    expect(screen.getByText("View My Favorites")).toBeInTheDocument()
+    expect(screen.getByText("Change Password")).toBeInTheDocument()
+    expect(screen.getByText("Browse Video Library")).toBeInTheDocument()
   })
 
   it("should enter edit mode when Edit Profile button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
     const editButton = screen.getByRole("button", { name: /edit profile/i })
     await user.click(editButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /cancel/i })).toBeTruthy()
-      expect(screen.getByRole("button", { name: /save/i })).toBeTruthy()
+      expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument()
     })
   })
 
   it("should update full name input when in edit mode", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
     const editButton = screen.getByRole("button", { name: /edit profile/i })
@@ -119,7 +119,7 @@ describe("UserProfile", () => {
   })
 
   it("should save profile changes when Save button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} />)
 
     const editButton = screen.getByRole("button", { name: /edit profile/i })
@@ -144,7 +144,7 @@ describe("UserProfile", () => {
   })
 
   it("should cancel edit mode when Cancel button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} />)
 
     const editButton = screen.getByRole("button", { name: /edit profile/i })
@@ -155,12 +155,12 @@ describe("UserProfile", () => {
 
     await waitFor(() => {
       expect(screen.queryByRole("button", { name: /save/i })).toBeNull()
-      expect(screen.getByRole("button", { name: /edit profile/i })).toBeTruthy()
+      expect(screen.getByRole("button", { name: /edit profile/i })).toBeInTheDocument()
     })
   })
 
   it("should show error alert when profile update fails", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(updateProfile).mockResolvedValue({ success: false, error: "Update failed" })
 
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} />)
@@ -180,7 +180,7 @@ describe("UserProfile", () => {
     const adminUser = { ...mockUser, isAdmin: true }
     render(<UserProfile user={adminUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("Administrator")).toBeTruthy()
+    expect(screen.getByText("Administrator")).toBeInTheDocument()
   })
 
   it("should display teacher badge for teacher role", () => {
@@ -194,20 +194,20 @@ describe("UserProfile", () => {
   it("should show current belt with color indicator", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("White Belt")).toBeTruthy()
+    expect(screen.getByText("White Belt")).toBeInTheDocument()
   })
 
   it("should show belt select dropdown with all curriculum options", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("White Belt")).toBeTruthy()
+    expect(screen.getByText("White Belt")).toBeInTheDocument()
   })
 
   describe("Curriculum Set Display and Belt Filtering", () => {
     it("should display curriculum set name as read-only", () => {
       render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-      expect(screen.getByText("Okinawa Kobudo Australia")).toBeTruthy()
+      expect(screen.getByText("Okinawa Kobudo Australia")).toBeInTheDocument()
     })
 
     it("should display curriculum set as unassigned when null", () => {
@@ -218,7 +218,7 @@ describe("UserProfile", () => {
       }
       render(<UserProfile user={userWithoutSet} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-      expect(screen.getByText("Not assigned")).toBeTruthy()
+      expect(screen.getByText("Not assigned")).toBeInTheDocument()
     })
 
     it("should use curriculum levels for belt options when curriculum set is assigned", () => {
@@ -226,7 +226,7 @@ describe("UserProfile", () => {
 
       // When user has a curriculum set and levels are provided, it should use those levels
       // The belt dropdown should exist (text visible is current selection, not all options)
-      expect(screen.getByText("White Belt")).toBeTruthy()
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
       // Verify the select component exists
       const selectElements = screen.getAllByRole("combobox")
       expect(selectElements.length).toBeGreaterThan(0)
@@ -257,7 +257,7 @@ describe("UserProfile", () => {
     }
     render(<UserProfile user={incompleteUser} curriculums={mockCurriculums} />)
 
-    expect(screen.getByText("No name set")).toBeTruthy()
+    expect(screen.getByText("No name set")).toBeInTheDocument()
     const notSpecified = screen.getAllByText("Not specified")
     expect(notSpecified.length).toBeGreaterThan(0)
   })

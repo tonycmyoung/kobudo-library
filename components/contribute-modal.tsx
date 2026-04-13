@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Upload, ExternalLink } from "lucide-react"
 
@@ -25,6 +25,7 @@ export default function ContributeModal({ isOpen, onClose }: ContributeModalProp
             <Upload className="w-6 h-6 text-red-400" />
             Contribute your videos
           </DialogTitle>
+          <DialogDescription className="sr-only">Information on how to share your videos with the community.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="text-center text-gray-300 leading-relaxed space-y-2">

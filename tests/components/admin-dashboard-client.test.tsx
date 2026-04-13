@@ -24,27 +24,27 @@ describe("AdminDashboardClient", () => {
   it("should render dashboard title and description", () => {
     render(<AdminDashboardClient />)
 
-    expect(screen.getByText("Admin Dashboard")).toBeTruthy()
-    expect(screen.getByText("Manage users, videos, and categories")).toBeTruthy()
+    expect(screen.getByText("Admin Dashboard")).toBeInTheDocument()
+    expect(screen.getByText("Manage users, videos, and categories")).toBeInTheDocument()
   })
 
   it("should render all child components", () => {
     render(<AdminDashboardClient />)
 
-    expect(screen.getByTestId("admin-stats")).toBeTruthy()
-    expect(screen.getByTestId("pending-users")).toBeTruthy()
-    expect(screen.getByTestId("unconfirmed-email-users")).toBeTruthy()
+    expect(screen.getByTestId("admin-stats")).toBeInTheDocument()
+    expect(screen.getByTestId("pending-users")).toBeInTheDocument()
+    expect(screen.getByTestId("unconfirmed-email-users")).toBeInTheDocument()
   })
 
   it("should render refresh button", () => {
     render(<AdminDashboardClient />)
 
     const refreshButton = screen.getByRole("button", { name: /refresh all/i })
-    expect(refreshButton).toBeTruthy()
+    expect(refreshButton).toBeInTheDocument()
   })
 
   it("should dispatch custom events when refresh button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const dispatchSpy = vi.spyOn(window, "dispatchEvent")
 
     render(<AdminDashboardClient />)
@@ -61,24 +61,24 @@ describe("AdminDashboardClient", () => {
   })
 
   it("should show refreshing state when button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminDashboardClient />)
 
     const refreshButton = screen.getByRole("button", { name: /refresh all/i })
     await user.click(refreshButton)
 
     // Button should show "Refreshing..." immediately
-    expect(screen.getByText("Refreshing...")).toBeTruthy()
+    expect(screen.getByText("Refreshing...")).toBeInTheDocument()
     expect(refreshButton).toBeDisabled()
 
     // Wait for refresh to complete
     await waitFor(() => {
-      expect(screen.getByText("Refresh All")).toBeTruthy()
+      expect(screen.getByText("Refresh All")).toBeInTheDocument()
     })
   })
 
   it("should show spinning icon during refresh", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<AdminDashboardClient />)
 
     const refreshButton = screen.getByRole("button", { name: /refresh all/i })
@@ -89,11 +89,11 @@ describe("AdminDashboardClient", () => {
     await user.click(refreshButton)
 
     const spinningIcon = refreshButton.querySelector("svg.animate-spin")
-    expect(spinningIcon).toBeTruthy()
+    expect(spinningIcon).toBeInTheDocument()
   })
 
   it("should handle refresh errors gracefully", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
     vi.spyOn(window, "dispatchEvent").mockImplementation(() => {
@@ -111,7 +111,7 @@ describe("AdminDashboardClient", () => {
 
     // Button should still reset to normal state
     await waitFor(() => {
-      expect(screen.getByText("Refresh All")).toBeTruthy()
+      expect(screen.getByText("Refresh All")).toBeInTheDocument()
       expect(refreshButton).not.toBeDisabled()
     })
 

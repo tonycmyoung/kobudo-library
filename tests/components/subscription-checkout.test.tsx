@@ -85,9 +85,9 @@ describe("SubscriptionCheckout", () => {
       />
     )
 
-    expect(screen.getByText("Supporter")).toBeTruthy()
-    expect(screen.getByText("Patron")).toBeTruthy()
-    expect(screen.getByText("Champion")).toBeTruthy()
+    expect(screen.getByText("Supporter")).toBeInTheDocument()
+    expect(screen.getByText("Patron")).toBeInTheDocument()
+    expect(screen.getByText("Champion")).toBeInTheDocument()
   })
 
   it("should render interval toggle buttons", () => {
@@ -100,8 +100,8 @@ describe("SubscriptionCheckout", () => {
       />
     )
 
-    expect(screen.getByText("Monthly")).toBeTruthy()
-    expect(screen.getByText("Annual")).toBeTruthy()
+    expect(screen.getByText("Monthly")).toBeInTheDocument()
+    expect(screen.getByText("Annual")).toBeInTheDocument()
   })
 
   it("should show monthly prices by default", () => {
@@ -115,7 +115,7 @@ describe("SubscriptionCheckout", () => {
     )
 
     // Check for monthly price display ($2.00/month for Supporter)
-    expect(screen.getByText("$2.00")).toBeTruthy()
+    expect(screen.getByText("$2.00")).toBeInTheDocument()
   })
 
   it("should switch to annual prices when annual is selected", async () => {
@@ -133,7 +133,7 @@ describe("SubscriptionCheckout", () => {
 
     await waitFor(() => {
       // Check for annual price display ($20.00/year for Supporter)
-      expect(screen.getByText("$20.00")).toBeTruthy()
+      expect(screen.getByText("$20.00")).toBeInTheDocument()
     })
   })
 
@@ -259,7 +259,7 @@ describe("SubscriptionCheckout", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId("embedded-checkout")).toBeTruthy()
+      expect(screen.getByTestId("embedded-checkout")).toBeInTheDocument()
     })
   })
 
@@ -282,7 +282,7 @@ describe("SubscriptionCheckout", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Subscription creation failed")).toBeTruthy()
+      expect(screen.getByText("Subscription creation failed")).toBeInTheDocument()
     })
   })
 
@@ -333,7 +333,7 @@ describe("SubscriptionCheckout", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Network error")).toBeTruthy()
+      expect(screen.getByText("Network error")).toBeInTheDocument()
     })
   })
 
@@ -354,7 +354,7 @@ describe("SubscriptionCheckout", () => {
     fireEvent.click(subscribeButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Processing...")).toBeTruthy()
+      expect(screen.getByText("Processing...")).toBeInTheDocument()
     })
   })
 })

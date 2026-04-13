@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
 import { extractVideoMetadata } from "@/lib/video-utils"
 import { saveVideo } from "@/lib/actions"
@@ -213,6 +213,9 @@ export default function VideoModal({
           <DialogTitle className="text-white">
             {editingVideo ? `Edit Video: ${editingVideo.title}` : "Add New Video"}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {editingVideo ? "Update the details of this video." : "Add a new video to the library."}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Plus, Pencil, Trash2, MoreVertical, ChevronUp, ChevronDown, Loader2, Film } from "lucide-react"
 import {
@@ -253,6 +253,9 @@ export default function CurriculumSetsManagement() {
           <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
             <DialogHeader>
               <DialogTitle>{editingSet ? "Edit" : "Create"} Curriculum Set</DialogTitle>
+              <DialogDescription className="sr-only">
+                {editingSet ? "Update the name of this curriculum set." : "Create a new curriculum set to organise belt levels."}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={editingSet ? handleUpdateSet : handleAddSet} className="space-y-4">
               <div>
@@ -381,6 +384,9 @@ export default function CurriculumSetsManagement() {
                   <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
                     <DialogHeader>
                       <DialogTitle className="text-white">{editingLevel ? "Edit" : "Add"} Level</DialogTitle>
+                      <DialogDescription className="sr-only">
+                        {editingLevel ? "Update this level's name and display order." : "Add a new level to this curriculum set."}
+                      </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={editingLevel ? handleUpdateLevel : handleAddLevel} className="space-y-4">
                       <div>

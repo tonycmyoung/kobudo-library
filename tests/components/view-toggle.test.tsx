@@ -29,7 +29,7 @@ describe("ViewToggle", () => {
   })
 
   it("should call onViewChange with grid when grid button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onViewChange = vi.fn()
     render(<ViewToggle view="list" onViewChange={onViewChange} />)
 
@@ -40,7 +40,7 @@ describe("ViewToggle", () => {
   })
 
   it("should call onViewChange with list when list button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     const onViewChange = vi.fn()
     render(<ViewToggle view="grid" onViewChange={onViewChange} />)
 

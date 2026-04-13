@@ -40,17 +40,17 @@ describe("AdminStats", () => {
     render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("Total Users")).toBeTruthy()
+      expect(screen.getByText("Total Users")).toBeInTheDocument()
     })
 
-    expect(screen.getByText("150")).toBeTruthy()
-    expect(screen.getByText("Videos Viewed This Week")).toBeTruthy()
-    expect(screen.getByText("300")).toBeTruthy()
-    expect(screen.getByText("Last week: 250")).toBeTruthy()
-    expect(screen.getByText("Total Views: 5,000")).toBeTruthy()
-    expect(screen.getByText("Logons This Week")).toBeTruthy()
-    expect(screen.getByText("75")).toBeTruthy()
-    expect(screen.getByText("Last week: 60")).toBeTruthy()
+    expect(screen.getByText("150")).toBeInTheDocument()
+    expect(screen.getByText("Videos Viewed This Week")).toBeInTheDocument()
+    expect(screen.getByText("300")).toBeInTheDocument()
+    expect(screen.getByText("Last week: 250")).toBeInTheDocument()
+    expect(screen.getByText("Total Views: 5,000")).toBeInTheDocument()
+    expect(screen.getByText("Logons This Week")).toBeInTheDocument()
+    expect(screen.getByText("75")).toBeInTheDocument()
+    expect(screen.getByText("Last week: 60")).toBeInTheDocument()
   })
 
   it("should handle fetch errors gracefully", async () => {
@@ -67,7 +67,7 @@ describe("AdminStats", () => {
     consoleErrorSpy.mockRestore()
   })
 
-  it("should display all stat card icons", async () => {
+  it("should display three stat cards with correct titles", async () => {
     vi.mocked(actions.getTelemetryData).mockResolvedValue({
       success: true,
       data: {
@@ -83,12 +83,13 @@ describe("AdminStats", () => {
     render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("Total Users")).toBeTruthy()
+      expect(screen.getByText("Total Users")).toBeInTheDocument()
     })
 
-    // Icons are rendered as SVG elements with lucide classes
-    const cards = screen.getAllByRole("generic").filter((el) => el.className.includes("border-gray-800"))
-    expect(cards.length).toBe(3)
+    expect(screen.getByText("Total Users")).toBeInTheDocument()
+    expect(screen.getByText("100")).toBeInTheDocument()
+    expect(screen.getByText("Videos Viewed This Week")).toBeInTheDocument()
+    expect(screen.getByText("Logons This Week")).toBeInTheDocument()
   })
 
   it("should refresh stats when admin-refresh-stats event is dispatched", async () => {
@@ -119,14 +120,14 @@ describe("AdminStats", () => {
     render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("100")).toBeTruthy()
+      expect(screen.getByText("100")).toBeInTheDocument()
     })
 
     // Dispatch refresh event
     globalThis.dispatchEvent(new Event("admin-refresh-stats"))
 
     await waitFor(() => {
-      expect(screen.getByText("120")).toBeTruthy()
+      expect(screen.getByText("120")).toBeInTheDocument()
     })
 
     expect(actions.getTelemetryData).toHaveBeenCalledTimes(2)
@@ -165,7 +166,7 @@ describe("AdminStats", () => {
     const { unmount } = render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("Total Users")).toBeTruthy()
+      expect(screen.getByText("Total Users")).toBeInTheDocument()
     })
 
     unmount()
@@ -191,11 +192,11 @@ describe("AdminStats", () => {
     render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("Total Users")).toBeTruthy()
+      expect(screen.getByText("Total Users")).toBeInTheDocument()
     })
 
     const totalUsersLink = screen.getByText("Total Users").closest("a")
-    expect(totalUsersLink).toBeTruthy()
+    expect(totalUsersLink).toBeInTheDocument()
     expect(totalUsersLink?.getAttribute("href")).toBe("/admin/users")
   })
 
@@ -215,11 +216,11 @@ describe("AdminStats", () => {
     render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("Logons This Week")).toBeTruthy()
+      expect(screen.getByText("Logons This Week")).toBeInTheDocument()
     })
 
     const logonsLink = screen.getByText("Logons This Week").closest("a")
-    expect(logonsLink).toBeTruthy()
+    expect(logonsLink).toBeInTheDocument()
     expect(logonsLink?.getAttribute("href")).toBe("/admin/debug")
   })
 
@@ -239,11 +240,11 @@ describe("AdminStats", () => {
     render(<AdminStats />)
 
     await waitFor(() => {
-      expect(screen.getByText("Videos Viewed This Week")).toBeTruthy()
+      expect(screen.getByText("Videos Viewed This Week")).toBeInTheDocument()
     })
 
     const videosLink = screen.getByText("Videos Viewed This Week").closest("a")
-    expect(videosLink).toBeTruthy()
+    expect(videosLink).toBeInTheDocument()
     expect(videosLink?.getAttribute("href")).toBe("/admin/viewlog")
   })
 })

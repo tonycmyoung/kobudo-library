@@ -33,20 +33,20 @@ describe("SignUpForm", () => {
   it("should render sign up form with all fields", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByText(/Join Okinawa Kobudo Library/)).toBeTruthy()
-    expect(screen.getByLabelText("Full Name")).toBeTruthy()
-    expect(screen.getByLabelText("Email")).toBeTruthy()
-    expect(screen.getByLabelText("Teacher")).toBeTruthy()
-    expect(screen.getByLabelText("School")).toBeTruthy()
-    expect(screen.getByLabelText("Password")).toBeTruthy()
-    expect(screen.getByRole("button", { name: /Create Account/i })).toBeTruthy()
+    expect(screen.getByText(/Join Okinawa Kobudo Library/)).toBeInTheDocument()
+    expect(screen.getByLabelText("Full Name")).toBeInTheDocument()
+    expect(screen.getByLabelText("Email")).toBeInTheDocument()
+    expect(screen.getByLabelText("Teacher")).toBeInTheDocument()
+    expect(screen.getByLabelText("School")).toBeInTheDocument()
+    expect(screen.getByLabelText("Password")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Create Account/i })).toBeInTheDocument()
   })
 
   it("should render legal agreement checkboxes", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByLabelText(/End User License Agreement/i)).toBeTruthy()
-    expect(screen.getByLabelText(/Privacy Policy/i)).toBeTruthy()
+    expect(screen.getByLabelText(/End User License Agreement/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Privacy Policy/i)).toBeInTheDocument()
   })
 
   it("should disable submit button when legal agreements are not checked", () => {
@@ -57,7 +57,7 @@ describe("SignUpForm", () => {
   })
 
   it("should enable submit button when both legal agreements are checked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<SignUpForm />)
 
     const eulaCheckbox = screen.getByLabelText(/End User License Agreement/i)
@@ -73,11 +73,11 @@ describe("SignUpForm", () => {
   it("should show warning when legal agreements are not accepted", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByText(/You must accept both the EULA and Privacy Policy/i)).toBeTruthy()
+    expect(screen.getByText(/You must accept both the EULA and Privacy Policy/i)).toBeInTheDocument()
   })
 
   it("should hide warning when legal agreements are accepted", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<SignUpForm />)
 
     const eulaCheckbox = screen.getByLabelText(/End User License Agreement/i)
@@ -90,7 +90,7 @@ describe("SignUpForm", () => {
   })
 
   it("should toggle password visibility", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<SignUpForm />)
 
     const passwordInput = screen.getByLabelText("Password")
@@ -134,20 +134,20 @@ describe("SignUpForm", () => {
   it("should display password requirements text", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByText(/min 6 characters with uppercase, lowercase, number, and symbol/i)).toBeTruthy()
+    expect(screen.getByText(/min 6 characters with uppercase, lowercase, number, and symbol/i)).toBeInTheDocument()
   })
 
   it("should display admin approval notice", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByText(/Your account will require admin approval/i)).toBeTruthy()
+    expect(screen.getByText(/Your account will require admin approval/i)).toBeInTheDocument()
   })
 
   it("should render sign in link", () => {
     render(<SignUpForm />)
 
     const signInLink = screen.getByRole("link", { name: /Sign in/i })
-    expect(signInLink).toBeTruthy()
+    expect(signInLink).toBeInTheDocument()
     expect(signInLink).toHaveAttribute("href", "/auth/login")
   })
 
@@ -157,9 +157,9 @@ describe("SignUpForm", () => {
     const eulaLink = screen.getByRole("link", { name: /End User License Agreement.*EULA/i })
     const privacyLink = screen.getByRole("link", { name: /Privacy Policy/i })
 
-    expect(eulaLink).toBeTruthy()
+    expect(eulaLink).toBeInTheDocument()
     expect(eulaLink).toHaveAttribute("href", "/eula")
-    expect(privacyLink).toBeTruthy()
+    expect(privacyLink).toBeInTheDocument()
     expect(privacyLink).toHaveAttribute("href", "/privacy-policy")
   })
 })

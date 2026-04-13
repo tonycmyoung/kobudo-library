@@ -36,40 +36,40 @@ describe("LoginForm", () => {
   it("should render login form with all fields", () => {
     render(<LoginForm />)
 
-    expect(screen.getByText(/Welcome to the/)).toBeTruthy()
-    expect(screen.getByText(/Okinawa Kobudo Library/)).toBeTruthy()
-    expect(screen.getByLabelText("Email")).toBeTruthy()
-    expect(screen.getByLabelText("Password")).toBeTruthy()
-    expect(screen.getByRole("button", { name: /Sign In/i })).toBeTruthy()
+    expect(screen.getByText(/Welcome to the/)).toBeInTheDocument()
+    expect(screen.getByText(/Okinawa Kobudo Library/)).toBeInTheDocument()
+    expect(screen.getByLabelText("Email")).toBeInTheDocument()
+    expect(screen.getByLabelText("Password")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign In/i })).toBeInTheDocument()
   })
 
   it("should display error message when error prop is provided", () => {
     render(<LoginForm error="Invalid credentials" />)
 
-    expect(screen.getByText("Invalid credentials")).toBeTruthy()
+    expect(screen.getByText("Invalid credentials")).toBeInTheDocument()
   })
 
   it("should render password reset link", () => {
     render(<LoginForm />)
 
     const resetLink = screen.getByRole("button", { name: /Forgot your password?/i })
-    expect(resetLink).toBeTruthy()
+    expect(resetLink).toBeInTheDocument()
   })
 
   it("should show password reset input when forgot password is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<LoginForm />)
 
     const resetLink = screen.getByRole("button", { name: /Forgot your password?/i })
     await user.click(resetLink)
 
-    expect(screen.getByPlaceholderText("Enter email for reset")).toBeTruthy()
-    expect(screen.getByRole("button", { name: /Send Reset/i })).toBeTruthy()
-    expect(screen.getByRole("button", { name: /Cancel/i })).toBeTruthy()
+    expect(screen.getByPlaceholderText("Enter email for reset")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Send Reset/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Cancel/i })).toBeInTheDocument()
   })
 
   it("should hide password reset input when cancel is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<LoginForm />)
 
     const resetLink = screen.getByRole("button", { name: /Forgot your password?/i })
@@ -82,7 +82,7 @@ describe("LoginForm", () => {
   })
 
   it("should toggle password visibility", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<LoginForm />)
 
     const passwordInput = screen.getByLabelText("Password")
@@ -98,7 +98,7 @@ describe("LoginForm", () => {
   })
 
   it("should call resetPasswordForEmail when reset form is submitted", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockSupabase.auth.resetPasswordForEmail.mockResolvedValue({ error: null })
     render(<LoginForm />)
 
@@ -119,7 +119,7 @@ describe("LoginForm", () => {
   })
 
   it("should show success message after successful password reset", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockSupabase.auth.resetPasswordForEmail.mockResolvedValue({ error: null })
     render(<LoginForm />)
 
@@ -141,7 +141,7 @@ describe("LoginForm", () => {
   })
 
   it("should show error message when password reset fails", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockSupabase.auth.resetPasswordForEmail.mockResolvedValue({ error: { message: "Error" } })
     render(<LoginForm />)
 
@@ -155,12 +155,12 @@ describe("LoginForm", () => {
     await user.click(sendButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to send reset email/i)).toBeTruthy()
+      expect(screen.getByText(/Failed to send reset email/i)).toBeInTheDocument()
     })
   })
 
   it("should have required attribute on reset email input for HTML5 validation", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<LoginForm />)
 
     const resetLink = screen.getByRole("button", { name: /Forgot your password?/i })
@@ -174,7 +174,7 @@ describe("LoginForm", () => {
     render(<LoginForm />)
 
     const signUpLink = screen.getByRole("link", { name: /Request one/i })
-    expect(signUpLink).toBeTruthy()
+    expect(signUpLink).toBeInTheDocument()
     expect(signUpLink).toHaveAttribute("href", "/auth/sign-up")
   })
 
@@ -182,14 +182,14 @@ describe("LoginForm", () => {
     render(<LoginForm returnTo="/dashboard" />)
 
     const returnToInput = document.querySelector('input[name="returnTo"]')
-    expect(returnToInput).toBeTruthy()
+    expect(returnToInput).toBeInTheDocument()
     expect(returnToInput).toHaveAttribute("value", "/dashboard")
   })
 
   it("should render EULA text", () => {
     render(<LoginForm />)
 
-    expect(screen.getByText(/End User License Agreement/i)).toBeTruthy()
-    expect(screen.getByText(/Tony Young/i)).toBeTruthy()
+    expect(screen.getByText(/End User License Agreement/i)).toBeInTheDocument()
+    expect(screen.getByText(/Tony Young/i)).toBeInTheDocument()
   })
 })

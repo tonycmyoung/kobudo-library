@@ -26,7 +26,7 @@ import {
   UserPlus,
   User,
 } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { deleteUserCompletely } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
@@ -630,6 +630,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                 <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-sm max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="text-white">Filter Students</DialogTitle>
+                    <DialogDescription className="sr-only">Filter students by role, school, or belt level.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <UserFilter

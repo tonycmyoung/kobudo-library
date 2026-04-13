@@ -27,7 +27,7 @@ describe("LoadingProvider", () => {
       </LoadingProvider>,
     )
 
-    expect(screen.getByText("Test Content")).toBeTruthy()
+    expect(screen.getByText("Test Content")).toBeInTheDocument()
   })
 
   it("should provide loading context", () => {
@@ -42,7 +42,7 @@ describe("LoadingProvider", () => {
       </LoadingProvider>,
     )
 
-    expect(screen.getByText("Loading: false")).toBeTruthy()
+    expect(screen.getByText("Loading: false")).toBeInTheDocument()
   })
 
   it("should throw error when useLoading is used outside provider", () => {

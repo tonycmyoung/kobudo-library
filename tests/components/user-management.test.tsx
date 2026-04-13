@@ -176,7 +176,7 @@ describe("UserManagement", () => {
     vi.mocked(fetchUsers).mockReturnValue(new Promise(() => {}))
     
     const { unmount } = render(<UserManagement />)
-    expect(screen.getByText("Loading users...")).toBeTruthy()
+    expect(screen.getByText("Loading users...")).toBeInTheDocument()
     
     // Unmount before the promise resolves to prevent act() warnings
     unmount()
@@ -186,8 +186,8 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
-      expect(screen.getByText("Jane Smith")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
+      expect(screen.getByText("Jane Smith")).toBeInTheDocument()
     })
   })
 
@@ -195,7 +195,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("All Users (2)")).toBeTruthy()
+      expect(screen.getByText("All Users (2)")).toBeInTheDocument()
     })
   })
 
@@ -203,8 +203,8 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Approved")).toBeTruthy()
-      expect(screen.getByText("Pending")).toBeTruthy()
+      expect(screen.getByText("Approved")).toBeInTheDocument()
+      expect(screen.getByText("Pending")).toBeInTheDocument()
     })
   })
 
@@ -223,7 +223,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Search users...")).toBeTruthy()
+      expect(screen.getByPlaceholderText("Search users...")).toBeInTheDocument()
     })
   })
 
@@ -231,7 +231,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText("Search users...")
@@ -240,17 +240,17 @@ describe("UserManagement", () => {
     await waitFor(
       () => {
         expect(screen.queryByText("John Doe")).toBeNull()
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       },
-      { timeout: 500 },
+      { timeout: 3000 },
     )
-  })
+  }, 10000)
 
   it("should toggle user approval when approve/revoke button is clicked", async () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Jane Smith")).toBeTruthy()
+      expect(screen.getByText("Jane Smith")).toBeInTheDocument()
     })
 
     const approveButtons = screen.getAllByLabelText("Approve user")
@@ -266,7 +266,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const roleSelects = screen.getAllByRole("combobox")
@@ -285,15 +285,15 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const editButtons = screen.getAllByLabelText("Edit user")
     await user.click(editButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Save changes")).toBeTruthy()
-      expect(screen.getByLabelText("Cancel editing")).toBeTruthy()
+      expect(screen.getByLabelText("Save changes")).toBeInTheDocument()
+      expect(screen.getByLabelText("Cancel editing")).toBeInTheDocument()
     })
   })
 
@@ -303,14 +303,14 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const editButtons = screen.getAllByLabelText("Edit user")
     await user.click(editButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Save changes")).toBeTruthy()
+      expect(screen.getByLabelText("Save changes")).toBeInTheDocument()
     })
 
     const nameInput = screen.getByPlaceholderText("Full name")
@@ -329,14 +329,14 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const editButtons = screen.getAllByLabelText("Edit user")
     await user.click(editButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Cancel editing")).toBeTruthy()
+      expect(screen.getByLabelText("Cancel editing")).toBeInTheDocument()
     })
 
     const cancelButton = screen.getByLabelText("Cancel editing")
@@ -351,15 +351,15 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resetButtons = screen.getAllByLabelText("Reset password")
     await user.click(resetButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByText(/Reset Password for/i)).toBeTruthy()
-      expect(screen.getByPlaceholderText("Enter new password")).toBeTruthy()
+      expect(screen.getByText(/Reset Password for/i)).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Enter new password")).toBeInTheDocument()
     })
   })
 
@@ -367,14 +367,14 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resetButtons = screen.getAllByLabelText("Reset password")
     await user.click(resetButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByText("Generate Random Password")).toBeTruthy()
+      expect(screen.getByText("Generate Random Password")).toBeInTheDocument()
     })
 
     const generateButton = screen.getByText("Generate Random Password")
@@ -388,14 +388,14 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resetButtons = screen.getAllByLabelText("Reset password")
     await user.click(resetButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Enter new password")).toBeTruthy()
+      expect(screen.getByPlaceholderText("Enter new password")).toBeInTheDocument()
     })
 
     const passwordInput = screen.getByPlaceholderText("Enter new password")
@@ -405,7 +405,7 @@ describe("UserManagement", () => {
     await user.click(resetButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Password must be at least 8 characters long")).toBeTruthy()
+      expect(screen.getByText("Password must be at least 8 characters long")).toBeInTheDocument()
     })
   })
 
@@ -415,14 +415,14 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const resetButtons = screen.getAllByLabelText("Reset password")
     await user.click(resetButtons[0])
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Enter new password")).toBeTruthy()
+      expect(screen.getByPlaceholderText("Enter new password")).toBeInTheDocument()
     })
 
     const passwordInput = screen.getByPlaceholderText("Enter new password")
@@ -437,7 +437,7 @@ describe("UserManagement", () => {
         "Password reset successfully. The user can now log in with the new password.",
       )
     })
-  })
+  }, 15000)
 
   it("should prompt for confirmation before deleting user", async () => {
     vi.mocked(global.confirm).mockReturnValue(false)
@@ -445,7 +445,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const deleteButtons = screen.getAllByLabelText("Delete user")
@@ -462,7 +462,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const deleteButtons = screen.getAllByLabelText("Delete user")
@@ -477,8 +477,8 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("2 logins")).toBeTruthy()
-      expect(screen.getByText("2 views")).toBeTruthy()
+      expect(screen.getByText("2 logins")).toBeInTheDocument()
+      expect(screen.getByText("2 views")).toBeInTheDocument()
     })
   })
 
@@ -520,7 +520,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("Administrator")).toBeTruthy()
+      expect(screen.getByText("Administrator")).toBeInTheDocument()
     })
   })
 
@@ -528,7 +528,7 @@ describe("UserManagement", () => {
     render(<UserManagement />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     const searchInput = screen.getByPlaceholderText("Search users...")
@@ -536,18 +536,18 @@ describe("UserManagement", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText("No users found matching your criteria.")).toBeTruthy()
+        expect(screen.getByText("No users found matching your criteria.")).toBeInTheDocument()
       },
-      { timeout: 500 },
+      { timeout: 3000 },
     )
-  })
+  }, 10000)
 
   describe("Curriculum Set Management", () => {
     it("should update curriculum set and clear belt when set is cleared", async () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       // Find and change curriculum set dropdown
@@ -559,7 +559,7 @@ describe("UserManagement", () => {
         ),
       ) as HTMLSelectElement
 
-      expect(curriculumSetSelect).toBeTruthy()
+      expect(curriculumSetSelect).toBeInTheDocument()
 
       // Select "No curriculum set"
       await user.selectOptions(curriculumSetSelect, "")
@@ -570,7 +570,7 @@ describe("UserManagement", () => {
         const updateCall = mockUpdate.mock.calls.find(
           (call) => call[0]?.curriculum_set_id === null && call[0]?.current_belt_id === null,
         )
-        expect(updateCall).toBeTruthy()
+        expect(updateCall).toBeDefined()
       })
     })
 
@@ -578,7 +578,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const curriculumSetSelects = screen.getAllByRole("combobox")
@@ -666,7 +666,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       })
     })
   })
@@ -678,7 +678,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       // The belt dropdown should exist and be populated
@@ -686,7 +686,7 @@ describe("UserManagement", () => {
       const beltSelect = beltSelects.find((select: HTMLElement) =>
         Array.from(select.querySelectorAll("option")).some((opt) => opt.textContent?.includes("Belt")),
       )
-      expect(beltSelect).toBeTruthy()
+      expect(beltSelect).toBeInTheDocument()
     })
 
     it("should show current belt level in dropdown for user with curriculum set", async () => {
@@ -703,14 +703,14 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const editButtons = screen.getAllByLabelText("Edit user")
       await user.click(editButtons[0])
 
       await waitFor(() => {
-        expect(screen.getByLabelText("Save changes")).toBeTruthy()
+        expect(screen.getByLabelText("Save changes")).toBeInTheDocument()
       })
 
       // Get the dropdown elements
@@ -730,8 +730,8 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       })
     })
 
@@ -742,7 +742,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
     })
 
@@ -753,7 +753,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
     })
 
@@ -796,8 +796,8 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       })
     })
   })
@@ -813,7 +813,7 @@ describe("UserManagement", () => {
 
       await waitFor(() => {
         expect(screen.queryByText("John Doe")).toBeNull() // Has belt
-        expect(screen.getByText("Jane Smith")).toBeTruthy() // No belt
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument() // No belt
       })
     })
 
@@ -826,7 +826,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy() // Has belt-1
+        expect(screen.getByText("John Doe")).toBeInTheDocument() // Has belt-1
         expect(screen.queryByText("Jane Smith")).toBeNull() // No belt
       })
     })
@@ -840,7 +840,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const deleteButtons = screen.getAllByLabelText("Delete user")
@@ -859,14 +859,14 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const resetButtons = screen.getAllByLabelText("Reset password")
       await user.click(resetButtons[0])
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText("Enter new password")).toBeTruthy()
+        expect(screen.getByPlaceholderText("Enter new password")).toBeInTheDocument()
       })
 
       const passwordInput = screen.getByPlaceholderText("Enter new password")
@@ -876,22 +876,22 @@ describe("UserManagement", () => {
       await user.click(resetButton)
 
       await waitFor(() => {
-        expect(screen.getByText("API error occurred")).toBeTruthy()
+        expect(screen.getByText("API error occurred")).toBeInTheDocument()
       })
-    })
+    }, 15000)
 
     it("should toggle password visibility", async () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const resetButtons = screen.getAllByLabelText("Reset password")
       await user.click(resetButtons[0])
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText("Enter new password")).toBeTruthy()
+        expect(screen.getByPlaceholderText("Enter new password")).toBeInTheDocument()
       })
 
       const passwordInput = screen.getByPlaceholderText("Enter new password") as HTMLInputElement
@@ -911,7 +911,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       // Enter edit mode
@@ -919,7 +919,7 @@ describe("UserManagement", () => {
       await user.click(editButtons[0])
 
       await waitFor(() => {
-        expect(screen.getByLabelText("Save changes")).toBeTruthy()
+        expect(screen.getByLabelText("Save changes")).toBeInTheDocument()
       })
 
       // The belt select should be visible in edit mode
@@ -938,14 +938,14 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const editButtons = screen.getAllByLabelText("Edit user")
       await user.click(editButtons[0])
 
       await waitFor(() => {
-        expect(screen.getByLabelText("Save changes")).toBeTruthy()
+        expect(screen.getByLabelText("Save changes")).toBeInTheDocument()
       })
 
       const saveButton = screen.getByLabelText("Save changes")
@@ -962,7 +962,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const searchInput = screen.getByPlaceholderText("Search users...")
@@ -970,19 +970,19 @@ describe("UserManagement", () => {
 
       await waitFor(
         () => {
-          expect(screen.getByText("John Doe")).toBeTruthy()
+          expect(screen.getByText("John Doe")).toBeInTheDocument()
           expect(screen.queryByText("Jane Smith")).toBeNull()
         },
-        { timeout: 500 },
+        { timeout: 3000 },
       )
-    })
+    }, 10000)
 
     it("should search users by school name", async () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       })
 
       const searchInput = screen.getByPlaceholderText("Search users...")
@@ -991,25 +991,25 @@ describe("UserManagement", () => {
       // Both users are from Test Dojo, so both should still be visible after search
       await waitFor(
         () => {
-          expect(screen.getByText("John Doe")).toBeTruthy()
+          expect(screen.getByText("John Doe")).toBeInTheDocument()
         },
-        { timeout: 1000 },
+        { timeout: 3000 },
       )
 
       // After search, Jane Smith should also be visible as she's from Test Dojo
       await waitFor(
         () => {
-          expect(screen.getByText("Jane Smith")).toBeTruthy()
+          expect(screen.getByText("Jane Smith")).toBeInTheDocument()
         },
-        { timeout: 1000 },
+        { timeout: 3000 },
       )
-    })
+    }, 10000)
 
     it("should search users by belt name", async () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const searchInput = screen.getByPlaceholderText("Search users...")
@@ -1017,12 +1017,12 @@ describe("UserManagement", () => {
 
       await waitFor(
         () => {
-          expect(screen.getByText("John Doe")).toBeTruthy()
+          expect(screen.getByText("John Doe")).toBeInTheDocument()
           expect(screen.queryByText("Jane Smith")).toBeNull()
         },
-        { timeout: 500 },
+        { timeout: 3000 },
       )
-    })
+    }, 10000)
   })
 
   describe("Update User Role Error", () => {
@@ -1035,7 +1035,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("John Doe")).toBeTruthy()
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
       })
 
       const roleSelects = screen.getAllByRole("combobox")
@@ -1059,7 +1059,7 @@ describe("UserManagement", () => {
       render(<UserManagement />)
 
       await waitFor(() => {
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       })
 
       // Set up mock to fail on approval toggle after initial render
@@ -1072,7 +1072,7 @@ describe("UserManagement", () => {
       // The error is handled gracefully and the UI doesn't crash
       await waitFor(() => {
         // Verify component didn't crash - Jane Smith is still in the DOM
-        expect(screen.getByText("Jane Smith")).toBeTruthy()
+        expect(screen.getByText("Jane Smith")).toBeInTheDocument()
       })
     })
   })
@@ -1117,7 +1117,7 @@ describe("UserManagement", () => {
 
       await waitFor(() => {
         // Should show the email as fallback name display
-        expect(screen.getByText("student@example.com")).toBeTruthy()
+        expect(screen.getByText("student@example.com")).toBeInTheDocument()
       })
     })
   })

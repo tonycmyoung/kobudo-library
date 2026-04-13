@@ -30,15 +30,15 @@ describe("ChangePasswordForm", () => {
   it("should render the form with all fields", () => {
     render(<ChangePasswordForm />)
 
-    expect(screen.getByText("Change Password")).toBeTruthy()
-    expect(screen.getByLabelText("Current Password")).toBeTruthy()
-    expect(screen.getByLabelText("New Password")).toBeTruthy()
-    expect(screen.getByLabelText("Confirm New Password")).toBeTruthy()
-    expect(screen.getByRole("button", { name: /Update Password/i })).toBeTruthy()
+    expect(screen.getByText("Change Password")).toBeInTheDocument()
+    expect(screen.getByLabelText("Current Password")).toBeInTheDocument()
+    expect(screen.getByLabelText("New Password")).toBeInTheDocument()
+    expect(screen.getByLabelText("Confirm New Password")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Update Password/i })).toBeInTheDocument()
   })
 
   it("should toggle current password visibility", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ChangePasswordForm />)
 
     const currentPasswordInput = screen.getByLabelText("Current Password") as HTMLInputElement
@@ -66,7 +66,7 @@ describe("ChangePasswordForm", () => {
   })
 
   it("should show error when new passwords don't match", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ChangePasswordForm />)
 
     const currentPasswordInput = screen.getByLabelText("Current Password")
@@ -81,12 +81,12 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText("New passwords do not match")).toBeTruthy()
+      expect(screen.getByText("New passwords do not match")).toBeInTheDocument()
     })
   })
 
   it("should show error when password is too short", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ChangePasswordForm />)
 
     const currentPasswordInput = screen.getByLabelText("Current Password")
@@ -101,12 +101,12 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Password must be at least 6 characters long")).toBeTruthy()
+      expect(screen.getByText("Password must be at least 6 characters long")).toBeInTheDocument()
     })
   })
 
   it("should show error when current password is incorrect", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: { email: "test@example.com" } },
       error: null,
@@ -131,12 +131,12 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Current password is incorrect")).toBeTruthy()
+      expect(screen.getByText("Current password is incorrect")).toBeInTheDocument()
     })
   })
 
   it("should successfully change password", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: { email: "test@example.com" } },
       error: null,
@@ -166,7 +166,7 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Password changed successfully! Redirecting...")).toBeTruthy()
+      expect(screen.getByText("Password changed successfully! Redirecting...")).toBeInTheDocument()
     })
 
     expect(mockGetUser).toHaveBeenCalled()
@@ -180,7 +180,7 @@ describe("ChangePasswordForm", () => {
   })
 
   it("should show loading state during submission", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({
       data: { user: { email: "test@example.com" } },
       error: null,
@@ -209,7 +209,7 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText("Updating password...")).toBeTruthy()
+      expect(screen.getByText("Updating password...")).toBeInTheDocument()
     })
   })
 })

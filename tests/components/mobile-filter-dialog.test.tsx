@@ -11,6 +11,7 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogContent: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-content">{children}</div>,
   DialogHeader: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-header">{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2 data-testid="dialog-title">{children}</h2>,
+  DialogDescription: () => null,
   DialogTrigger: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-trigger">{children}</div>,
 }))
 
@@ -98,15 +99,15 @@ describe("MobileFilterDialog", () => {
     it("should render the filter button trigger", () => {
       render(<MobileFilterDialog {...defaultProps} showMobileFilters={false} />)
 
-      expect(screen.getByTestId("dialog-trigger")).toBeTruthy()
-      expect(screen.getByTestId("filter-icon")).toBeTruthy()
+      expect(screen.getByTestId("dialog-trigger")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-icon")).toBeInTheDocument()
     })
 
     it("should show dialog content when open", () => {
       render(<MobileFilterDialog {...defaultProps} />)
 
-      expect(screen.getByTestId("dialog")).toBeTruthy()
-      expect(screen.getByTestId("dialog-content")).toBeTruthy()
+      expect(screen.getByTestId("dialog")).toBeInTheDocument()
+      expect(screen.getByTestId("dialog-content")).toBeInTheDocument()
       expect(screen.getByTestId("dialog-title")).toHaveTextContent("Filter Videos")
     })
 
@@ -134,7 +135,7 @@ describe("MobileFilterDialog", () => {
       // Query within dialog-trigger to avoid matching "Apply Filters" button
       const dialogTrigger = screen.getByTestId("dialog-trigger")
       const triggerButton = within(dialogTrigger).getByRole("button")
-      expect(triggerButton).toBeTruthy()
+      expect(triggerButton).toBeInTheDocument()
       expect(triggerButton.textContent).not.toMatch(/\d/)
     })
   })
@@ -150,11 +151,11 @@ describe("MobileFilterDialog", () => {
       )
 
       // Filter mode toggle appears when 2+ filters selected
-      expect(screen.getByText(/Filter mode/i)).toBeTruthy()
+      expect(screen.getByText(/Filter mode/i)).toBeInTheDocument()
     })
 
     it("should call onFilterModeChange when toggling filter mode", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(
         <MobileFilterDialog
           {...defaultProps}
@@ -172,7 +173,7 @@ describe("MobileFilterDialog", () => {
 
   describe("Apply Filters", () => {
     it("should call setShowMobileFilters when Apply Filters button is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<MobileFilterDialog {...defaultProps} />)
 
       const applyButton = screen.getByText("Apply Filters")
@@ -182,7 +183,7 @@ describe("MobileFilterDialog", () => {
     })
 
     it("should call onApplyFilters when Apply Filters button is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<MobileFilterDialog {...defaultProps} />)
 
       const applyButton = screen.getByText("Apply Filters")
@@ -196,13 +197,13 @@ describe("MobileFilterDialog", () => {
     it("should render CategoryFilter component with categories", () => {
       render(<MobileFilterDialog {...defaultProps} />)
 
-      expect(screen.getByTestId("category-filter")).toBeTruthy()
-      expect(screen.getByText("Bo")).toBeTruthy()
-      expect(screen.getByText("Sai")).toBeTruthy()
+      expect(screen.getByTestId("category-filter")).toBeInTheDocument()
+      expect(screen.getByText("Bo")).toBeInTheDocument()
+      expect(screen.getByText("Sai")).toBeInTheDocument()
     })
 
     it("should call onCategoryToggle when category is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<MobileFilterDialog {...defaultProps} />)
 
       const categoryButton = screen.getByTestId("category-cat-1")
@@ -216,13 +217,13 @@ describe("MobileFilterDialog", () => {
     it("should render CategoryFilter component with curriculums", () => {
       render(<MobileFilterDialog {...defaultProps} />)
 
-      expect(screen.getByTestId("curriculums-section")).toBeTruthy()
-      expect(screen.getByText("10.Kyu")).toBeTruthy()
-      expect(screen.getByText("9.Kyu")).toBeTruthy()
+      expect(screen.getByTestId("curriculums-section")).toBeInTheDocument()
+      expect(screen.getByText("10.Kyu")).toBeInTheDocument()
+      expect(screen.getByText("9.Kyu")).toBeInTheDocument()
     })
 
     it("should call onCurriculumToggle when curriculum is clicked", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({ delay: null })
       render(<MobileFilterDialog {...defaultProps} />)
 
       const curriculumButton = screen.getByTestId("curriculum-curr-1")

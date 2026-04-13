@@ -31,7 +31,7 @@ describe("PendingUsers", () => {
 
     render(<PendingUsers />)
 
-    expect(screen.getByText("Loading pending users...")).toBeTruthy()
+    expect(screen.getByText("Loading pending users...")).toBeInTheDocument()
   })
 
   it("should display empty state when no pending users", async () => {
@@ -43,7 +43,7 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("No pending user approvals")).toBeTruthy()
+      expect(screen.getByText("No pending user approvals")).toBeInTheDocument()
     })
   })
 
@@ -66,11 +66,11 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
-    expect(screen.getByText("john@example.com")).toBeTruthy()
-    expect(screen.getAllByText(/Mr\. Smith/i)[0]).toBeTruthy()
-    expect(screen.getAllByText(/Test School/i)[0]).toBeTruthy()
+    expect(screen.getByText("john@example.com")).toBeInTheDocument()
+    expect(screen.getAllByText(/Mr\. Smith/i)[0]).toBeInTheDocument()
+    expect(screen.getAllByText(/Test School/i)[0]).toBeInTheDocument()
   })
 
   it("should display inviter information when user was invited", async () => {
@@ -92,7 +92,7 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText(/Invited by: Admin User/)).toBeTruthy()
+      expect(screen.getByText(/Invited by: Admin User/)).toBeInTheDocument()
     })
   })
 
@@ -115,12 +115,12 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("Direct signup")).toBeTruthy()
+      expect(screen.getByText("Direct signup")).toBeInTheDocument()
     })
   })
 
   it("should approve user when approve button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
       data: [
         {
@@ -143,13 +143,13 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     // Find the approve button (green button with Check icon)
     const approveButtons = screen.getAllByRole("button")
     const approveButton = approveButtons.find((btn) => btn.className.includes("bg-green-600"))
-    expect(approveButton).toBeTruthy()
+    expect(approveButton).toBeInTheDocument()
 
     await user.click(approveButton!)
 
@@ -164,7 +164,7 @@ describe("PendingUsers", () => {
   })
 
   it("should reject user when reject button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
       data: [
         {
@@ -187,13 +187,13 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     // Find the reject button (red button with X icon)
     const rejectButtons = screen.getAllByRole("button")
     const rejectButton = rejectButtons.find((btn) => btn.className.includes("border-red-600"))
-    expect(rejectButton).toBeTruthy()
+    expect(rejectButton).toBeInTheDocument()
 
     await user.click(rejectButton!)
 
@@ -208,7 +208,7 @@ describe("PendingUsers", () => {
   })
 
   it("should allow changing user role before approval", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
       data: [
         {
@@ -231,7 +231,7 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     // Find and change the role select
@@ -249,7 +249,7 @@ describe("PendingUsers", () => {
   })
 
   it("should open edit mode when edit button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
       data: [
         {
@@ -268,13 +268,13 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     // Find the edit button (blue button with Edit2 icon)
     const editButtons = screen.getAllByRole("button")
     const editButton = editButtons.find((btn) => btn.className.includes("border-blue-600"))
-    expect(editButton).toBeTruthy()
+    expect(editButton).toBeInTheDocument()
 
     await user.click(editButton!)
 
@@ -286,7 +286,7 @@ describe("PendingUsers", () => {
   })
 
   it("should save edited user fields", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
       data: [
         {
@@ -309,7 +309,7 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     // Click edit button
@@ -338,7 +338,7 @@ describe("PendingUsers", () => {
   })
 
   it("should cancel editing when cancel button is clicked", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
       data: [
         {
@@ -357,7 +357,7 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeTruthy()
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
     // Click edit button
@@ -376,7 +376,7 @@ describe("PendingUsers", () => {
     const cancelButton = allButtons.find(
       (btn) => btn.className.includes("border-gray-600") && !btn.className.includes("border-red-600"),
     )
-    expect(cancelButton).toBeTruthy()
+    expect(cancelButton).toBeInTheDocument()
     await user.click(cancelButton!)
 
     // Edit mode should be closed
@@ -415,7 +415,7 @@ describe("PendingUsers", () => {
     render(<PendingUsers />)
 
     await waitFor(() => {
-      expect(screen.getByText("2 pending")).toBeTruthy()
+      expect(screen.getByText("2 pending")).toBeInTheDocument()
     })
   })
 
@@ -429,7 +429,7 @@ describe("PendingUsers", () => {
 
     // Should show empty state when fetch fails (error logged via trace system)
     await waitFor(() => {
-      expect(screen.getByText("No pending user approvals")).toBeTruthy()
+      expect(screen.getByText("No pending user approvals")).toBeInTheDocument()
     })
   })
 })
