@@ -8,6 +8,7 @@ import { cleanup } from "@testing-library/react"
 // Cleanup after each test
 afterEach(() => {
   cleanup()
+  localStorage.clear()
 })
 
 // Mock Next.js modules

@@ -33,6 +33,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { createClient } from "@/lib/supabase/client"
 import { deleteUserCompletely, updateUserFields, adminResetUserPassword } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
+import { matchesSearch } from "@/lib/utils/search"
 import UserSortControl from "@/components/user-sort-control"
 import UserFilter from "@/components/user-filter"
 
@@ -847,14 +848,8 @@ export default function UserManagement() {
 
     // Apply search filter
     if (searchQuery) {
-      result = result.filter(
-        (user) =>
-          user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.teacher?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.school?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.role?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.current_belt?.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      result = result.filter((user) =>
+        matchesSearch(searchQuery, user.email, user.full_name, user.teacher, user.school, user.role, user.current_belt?.name),
       )
     }
 

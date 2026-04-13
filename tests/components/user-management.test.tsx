@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest"
+import { describe, it, expect, vi, beforeEach, type MockInstance } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import UserManagement from "@/components/user-management"
@@ -111,10 +111,6 @@ describe("UserManagement", () => {
   let mockEq: MockInstance
 
   const user = userEvent.setup({ delay: null })
-
-  afterEach(() => {
-    localStorage.clear()
-  })
 
   beforeEach(() => {
     vi.clearAllMocks()
