@@ -113,6 +113,144 @@ function handleResult(
   return false
 }
 
+interface SetFormDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  editingSet: CurriculumSet | null
+  onTriggerClick: () => void
+  formData: { name: string; description: string }
+  setFormData: (data: { name: string; description: string }) => void
+  saving: boolean
+  onAdd: (e: { preventDefault: () => void }) => void
+  onUpdate: (e: { preventDefault: () => void }) => void
+}
+
+const SetFormDialog = ({ open, onOpenChange, editingSet, onTriggerClick, formData, setFormData, saving, onAdd, onUpdate }: SetFormDialogProps) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogTrigger asChild>
+      <Button onClick={onTriggerClick} size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+        <Plus className="w-4 h-4 mr-2" />
+        New Curriculum Set
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+      <DialogHeader>
+        <DialogTitle>{editingSet ? "Edit" : "Create"} Curriculum Set</DialogTitle>
+        <DialogDescription className="sr-only">
+          {editingSet ? "Update the name of this curriculum set." : "Create a new curriculum set to organise belt levels."}
+        </DialogDescription>
+      </DialogHeader>
+      <form onSubmit={editingSet ? onUpdate : onAdd} className="space-y-4">
+        <div>
+          <label htmlFor="set-name" className="block text-sm font-medium mb-1">Name</label>
+          <Input
+            id="set-name"
+            placeholder="e.g., Okinawa Kobudo Australia"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="set-description" className="block text-sm font-medium mb-1">Description</label>
+          <Textarea
+            id="set-description"
+            placeholder="Describe this curriculum set..."
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            rows={3}
+          />
+        </div>
+        <div className="flex gap-2 justify-end">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button type="submit" disabled={saving || !formData.name}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {editingSet ? "Update" : "Create"}
+          </Button>
+        </div>
+      </form>
+    </DialogContent>
+  </Dialog>
+)
+
+interface LevelFormDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  editingLevel: { id: string; name: string; description: string | null; color: string } | null
+  onTriggerClick: () => void
+  formData: { name: string; description: string; color: string }
+  setFormData: (data: { name: string; description: string; color: string }) => void
+  saving: boolean
+  onAdd: (e: { preventDefault: () => void }) => void
+  onUpdate: (e: { preventDefault: () => void }) => void
+}
+
+const LevelFormDialog = ({ open, onOpenChange, editingLevel, onTriggerClick, formData, setFormData, saving, onAdd, onUpdate }: LevelFormDialogProps) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogTrigger asChild>
+      <Button onClick={onTriggerClick} size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+        <Plus className="mr-2 h-4 w-4" />
+        Add Level
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+      <DialogHeader>
+        <DialogTitle className="text-white">{editingLevel ? "Edit" : "Add"} Level</DialogTitle>
+        <DialogDescription className="sr-only">
+          {editingLevel ? "Update this level's name and display order." : "Add a new level to this curriculum set."}
+        </DialogDescription>
+      </DialogHeader>
+      <form onSubmit={editingLevel ? onUpdate : onAdd} className="space-y-4">
+        <div>
+          <label htmlFor="level-name" className="block text-sm font-medium text-gray-200 mb-1">Level Name</label>
+          <Input
+            id="level-name"
+            placeholder="e.g., 1st Kyu"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="level-description" className="block text-sm font-medium text-gray-200 mb-1">Description</label>
+          <Textarea
+            id="level-description"
+            placeholder="Describe this level..."
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+            rows={2}
+          />
+        </div>
+        <div>
+          <label htmlFor="level-color" className="block text-sm font-medium text-gray-200 mb-2">Color</label>
+          <div className="flex gap-2 flex-wrap">
+            {PRESET_COLORS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                className={`w-8 h-8 rounded border-2 transition ${formData.color === color ? "border-white" : "border-gray-600"}`}
+                style={{ backgroundColor: color }}
+                onClick={() => setFormData({ ...formData, color })}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2 justify-end">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={saving || !formData.name} className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50">
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {editingLevel ? "Update" : "Add"}
+          </Button>
+        </div>
+      </form>
+    </DialogContent>
+  </Dialog>
+)
+
 export default function CurriculumSetsManagement() {
   const { toast } = useToast()
   const [sets, setSets] = useState<CurriculumSet[]>([])
@@ -126,6 +264,16 @@ export default function CurriculumSetsManagement() {
 
   const openVideoManagement = (level: CurriculumLevel) => {
     setManagingVideosForLevel(level)
+  }
+
+  const handleLevelSuccess = async () => {
+    if (selectedSet) await fetchSetDetails(selectedSet.id)
+  }
+
+  const handleEditLevelClick = (level: CurriculumLevel) => {
+    setEditingLevel(level)
+    setLevelFormData({ name: level.name, description: level.description ?? "", color: level.color })
+    setIsAddLevelDialogOpen(true)
   }
 
   const {
@@ -142,9 +290,7 @@ export default function CurriculumSetsManagement() {
   } = useLevelManagement({
     selectedSetId: selectedSet?.id,
     PRESET_COLORS,
-    onSuccess: async () => {
-      if (selectedSet) await fetchSetDetails(selectedSet.id)
-    },
+    onSuccess: handleLevelSuccess,
   })
 
   useEffect(() => {
@@ -245,57 +391,17 @@ export default function CurriculumSetsManagement() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">Manage curriculum sets and their levels</p>
-        <Dialog open={isAddSetDialogOpen} onOpenChange={setIsAddSetDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setEditingSet(null)} size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
-              <Plus className="w-4 h-4 mr-2" />
-              New Curriculum Set
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
-            <DialogHeader>
-              <DialogTitle>{editingSet ? "Edit" : "Create"} Curriculum Set</DialogTitle>
-              <DialogDescription className="sr-only">
-                {editingSet ? "Update the name of this curriculum set." : "Create a new curriculum set to organise belt levels."}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={editingSet ? handleUpdateSet : handleAddSet} className="space-y-4">
-              <div>
-                <label htmlFor="set-name" className="block text-sm font-medium mb-1">
-                  Name
-                </label>
-                <Input
-                  id="set-name"
-                  placeholder="e.g., Okinawa Kobudo Australia"
-                  value={setFormData.name}
-                  onChange={(e) => setSetFormData({ ...setFormData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="set-description" className="block text-sm font-medium mb-1">
-                  Description
-                </label>
-                <Textarea
-                  id="set-description"
-                  placeholder="Describe this curriculum set..."
-                  value={setFormData.description}
-                  onChange={(e) => setSetFormData({ ...setFormData, description: e.target.value })}
-                  rows={3}
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button type="button" variant="outline" onClick={() => setIsAddSetDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={savingSet || !setFormData.name}>
-                  {savingSet && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {editingSet ? "Update" : "Create"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <SetFormDialog
+          open={isAddSetDialogOpen}
+          onOpenChange={setIsAddSetDialogOpen}
+          editingSet={editingSet}
+          onTriggerClick={() => setEditingSet(null)}
+          formData={setFormData}
+          setFormData={setSetFormData}
+          saving={savingSet}
+          onAdd={handleAddSet}
+          onUpdate={handleUpdateSet}
+        />
       </div>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
@@ -369,93 +475,20 @@ export default function CurriculumSetsManagement() {
                     <p className="text-sm text-gray-400 mt-1">{selectedSet.description}</p>
                   )}
                 </div>
-                <Dialog open={isAddLevelDialogOpen} onOpenChange={setIsAddLevelDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        setEditingLevel(null)
-                        setLevelFormData({ name: "", description: "", color: PRESET_COLORS[0] })
-                      }}
-                      size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Level
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-white">{editingLevel ? "Edit" : "Add"} Level</DialogTitle>
-                      <DialogDescription className="sr-only">
-                        {editingLevel ? "Update this level's name and display order." : "Add a new level to this curriculum set."}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={editingLevel ? handleUpdateLevel : handleAddLevel} className="space-y-4">
-                      <div>
-                        <label htmlFor="level-name" className="block text-sm font-medium text-gray-200 mb-1">
-                          Level Name
-                        </label>
-                        <Input
-                          id="level-name"
-                          placeholder="e.g., 1st Kyu"
-                          value={levelFormData.name}
-                          onChange={(e) => setLevelFormData({ ...levelFormData, name: e.target.value })}
-                          className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="level-description" className="block text-sm font-medium text-gray-200 mb-1">
-                          Description
-                        </label>
-                        <Textarea
-                          id="level-description"
-                          placeholder="Describe this level..."
-                          value={levelFormData.description}
-                          onChange={(e) => setLevelFormData({ ...levelFormData, description: e.target.value })}
-                          className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
-                          rows={2}
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="level-color" className="block text-sm font-medium text-gray-200 mb-2">
-                          Color
-                        </label>
-                        <div className="flex gap-2 flex-wrap">
-                          {PRESET_COLORS.map((color) => (
-                            <button
-                              key={color}
-                              type="button"
-                              className={`w-8 h-8 rounded border-2 transition ${
-                                levelFormData.color === color ? "border-white" : "border-gray-600"
-                              }`}
-                              style={{ backgroundColor: color }}
-                              onClick={() => setLevelFormData({ ...levelFormData, color })}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setIsAddLevelDialogOpen(false)}
-                          className="bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="submit"
-                          disabled={savingSet || !levelFormData.name}
-                          className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
-                        >
-                          {savingSet && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          {editingLevel ? "Update" : "Add"}
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                <LevelFormDialog
+                  open={isAddLevelDialogOpen}
+                  onOpenChange={setIsAddLevelDialogOpen}
+                  editingLevel={editingLevel}
+                  onTriggerClick={() => {
+                    setEditingLevel(null)
+                    setLevelFormData({ name: "", description: "", color: PRESET_COLORS[0] })
+                  }}
+                  formData={levelFormData}
+                  setFormData={setLevelFormData}
+                  saving={savingSet}
+                  onAdd={handleAddLevel}
+                  onUpdate={handleUpdateLevel}
+                />
               </div>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {selectedSet.levels.length === 0 ? (
@@ -469,15 +502,7 @@ export default function CurriculumSetsManagement() {
                       totalLevels={selectedSet.levels.length}
                       onMoveUp={() => handleMoveLevel(selectedSet.levels, level, "up")}
                       onMoveDown={() => handleMoveLevel(selectedSet.levels, level, "down")}
-                      onEdit={() => {
-                        setEditingLevel(level)
-                        setLevelFormData({
-                          name: level.name,
-                          description: level.description || "",
-                          color: level.color,
-                        })
-                        setIsAddLevelDialogOpen(true)
-                      }}
+                      onEdit={() => handleEditLevelClick(level)}
                       onDelete={() => handleDeleteLevel(level.id)}
                       onManageVideos={() => openVideoManagement(level)}
                     />
