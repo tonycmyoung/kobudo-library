@@ -97,6 +97,22 @@ interface CurriculumSetWithLevels extends CurriculumSet {
 
 const PRESET_COLORS = ["#DC2626", "#EA580C", "#CA8A04", "#16A34A", "#2563EB", "#7C3AED", "#DB2777", "#059669", "#0891B2", "#7C2D12"]
 
+type ToastFn = ReturnType<typeof useToast>["toast"]
+
+function handleResult(
+  toast: ToastFn,
+  result: { success?: string; error?: string },
+  onSuccess?: () => void
+): boolean {
+  if (result.success) {
+    toast({ title: "Success", description: result.success })
+    onSuccess?.()
+    return true
+  }
+  toast({ title: "Error", description: result.error, variant: "destructive" })
+  return false
+}
+
 export default function CurriculumSetsManagement() {
   const { toast } = useToast()
   const [sets, setSets] = useState<CurriculumSet[]>([])
@@ -130,20 +146,6 @@ export default function CurriculumSetsManagement() {
       if (selectedSet) await fetchSetDetails(selectedSet.id)
     },
   })
-
-  // Helper to reduce cognitive complexity - handles success/error toasts
-  const handleResult = (
-    result: { success?: string; error?: string },
-    onSuccess?: () => void
-  ): boolean => {
-    if (result.success) {
-      toast({ title: "Success", description: result.success })
-      onSuccess?.()
-      return true
-    }
-    toast({ title: "Error", description: result.error, variant: "destructive" })
-    return false
-  }
 
   useEffect(() => {
     fetchSets()
@@ -182,7 +184,7 @@ export default function CurriculumSetsManagement() {
     setSavingSet(true)
     try {
       const result = await createCurriculumSet(setFormData)
-      handleResult(result, async () => {
+      handleResult(toast, result, async () => {
         await fetchSets()
         setSetFormData({ name: "", description: "" })
         setIsAddSetDialogOpen(false)
@@ -201,7 +203,7 @@ export default function CurriculumSetsManagement() {
     setSavingSet(true)
     try {
       const result = await updateCurriculumSet(editingSet.id, setFormData)
-      handleResult(result, async () => {
+      handleResult(toast, result, async () => {
         await fetchSets()
         await fetchSetDetails(editingSet.id)
         setEditingSet(null)
@@ -220,7 +222,7 @@ export default function CurriculumSetsManagement() {
     if (!globalThis.confirm("Are you sure? This will delete the curriculum set and all its levels.")) return
     try {
       const result = await deleteCurriculumSet(setId)
-      handleResult(result, async () => {
+      handleResult(toast, result, async () => {
         await fetchSets()
         setSelectedSet(null)
       })
