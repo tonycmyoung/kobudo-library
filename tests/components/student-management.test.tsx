@@ -114,6 +114,8 @@ describe("StudentManagement", () => {
   let mockEq: MockInstance
   let mockSingle: MockInstance
 
+  const user = userEvent.setup({ delay: null })
+
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
@@ -262,7 +264,6 @@ describe("StudentManagement", () => {
   })
 
   it("should filter students by search query", async () => {
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -282,7 +283,6 @@ describe("StudentManagement", () => {
   })
 
   it("should update user role when role select is changed", async () => {
-    const user = userEvent.setup()
     mockEq.mockResolvedValue({ data: null, error: null })
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
@@ -306,7 +306,6 @@ describe("StudentManagement", () => {
   })
 
   it("should update user belt when belt select is changed", async () => {
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -331,7 +330,6 @@ describe("StudentManagement", () => {
   })
 
   it("should enter edit mode when edit button is clicked", async () => {
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -351,7 +349,6 @@ describe("StudentManagement", () => {
   })
 
   it("should save edited user fields when save button is clicked", async () => {
-    const user = userEvent.setup()
     vi.mocked(updateStudentForHeadTeacher).mockResolvedValue({ success: "Student updated successfully" })
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
@@ -383,7 +380,6 @@ describe("StudentManagement", () => {
   })
 
   it("should cancel edit mode when cancel button is clicked", async () => {
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -409,7 +405,6 @@ describe("StudentManagement", () => {
   })
 
   it("should prompt for confirmation before deleting user", async () => {
-    const user = userEvent.setup()
     vi.mocked(global.confirm).mockReturnValue(false)
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
@@ -429,7 +424,6 @@ describe("StudentManagement", () => {
   })
 
   it("should delete user when confirmed", async () => {
-    const user = userEvent.setup()
     vi.mocked(global.confirm).mockReturnValue(true)
     vi.mocked(deleteUserCompletely).mockResolvedValue({ success: true })
 
@@ -460,7 +454,6 @@ describe("StudentManagement", () => {
   })
 
   it("should display no students message when filtered list is empty", async () => {
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -527,7 +520,6 @@ describe("StudentManagement", () => {
     ]
     vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch, error: null })
 
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -580,7 +572,6 @@ describe("StudentManagement", () => {
     vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch, error: null })
     vi.mocked(updateStudentForHeadTeacher).mockResolvedValue({ success: "Student updated successfully" })
 
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {
@@ -641,7 +632,6 @@ describe("StudentManagement", () => {
     vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch, error: null })
     vi.mocked(updateStudentForHeadTeacher).mockResolvedValue({ success: "Student updated successfully" })
 
-    const user = userEvent.setup()
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
     await waitFor(() => {

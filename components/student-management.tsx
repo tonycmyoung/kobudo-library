@@ -30,6 +30,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { deleteUserCompletely } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
+import { matchesSearch } from "@/lib/utils/search"
 import UserSortControl from "@/components/user-sort-control"
 import UserFilter from "@/components/user-filter"
 import { fetchStudentsForHeadTeacher, updateStudentForHeadTeacher, assignCurriculumSetToUser } from "@/lib/actions/users"
@@ -118,8 +119,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
 
   const [users, setUsers] = useState<UserInterface[]>([])
   const [filteredUsers, setFilteredUsers] = useState<UserInterface[]>([])
-  const [searchQuery, setSearchQuery] = useState(urlState.search)
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(urlState.search)
+  const searchQuery = urlState.search
   const [loading, setLoading] = useState(true)
   const [processingUsers, setProcessingUsers] = useState<Set<string>>(new Set())
 
@@ -182,14 +182,9 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
     let result = [...users]
 
     // Apply search filter
-    if (debouncedSearchQuery) {
-      result = result.filter(
-        (user) =>
-          user.email.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          user.full_name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          user.teacher?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          user.school?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          user.role?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()),
+    if (searchQuery) {
+      result = result.filter((user) =>
+        matchesSearch(searchQuery, user.email, user.full_name, user.teacher, user.school, user.role),
       )
     }
 
@@ -251,7 +246,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
     })
 
     return result
-  }, [users, debouncedSearchQuery, selectedRole, selectedSchool, selectedBelt, sortBy, sortOrder])
+  }, [users, searchQuery, selectedRole, selectedSchool, selectedBelt, sortBy, sortOrder])
 
   useEffect(() => {
     setFilteredUsers(processedUsers)
@@ -275,20 +270,6 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
     localStorage.setItem(`${storagePrefix}SortBy`, newSortBy)
     localStorage.setItem(`${storagePrefix}SortOrder`, newSortOrder)
   }
-
-  // Debounce search for filtering (URL update is handled by hook)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  // Sync search to URL (debounced via hook)
-  useEffect(() => {
-    setUrlSearch(searchQuery)
-  }, [searchQuery, setUrlSearch])
 
   useEffect(() => {
     fetchStudents()
@@ -604,7 +585,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
               <Input
                 placeholder="Search students..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => setUrlSearch(e.target.value)}
                 className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-red-500"
               />
             </div>
