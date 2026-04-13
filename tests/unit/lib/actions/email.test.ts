@@ -14,14 +14,13 @@ describe("sendEmail", () => {
     vi.clearAllMocks()
 
     mockSend = vi.fn()
-    vi.mocked(Resend).mockImplementation(
-      () =>
-        ({
-          emails: {
-            send: mockSend,
-          },
-        }) as unknown as InstanceType<typeof Resend>,
-    )
+    vi.mocked(Resend).mockImplementation(function () {
+      return {
+        emails: {
+          send: mockSend,
+        },
+      } as unknown as InstanceType<typeof Resend>
+    })
 
     process.env.RESEND_API_KEY = "test-api-key"
     process.env.ADMIN_EMAIL = "admin@test.com"

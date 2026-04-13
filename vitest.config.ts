@@ -13,11 +13,7 @@ export default defineConfig({
     },
     setupFiles: ["./tests/setup.ts"],
     globals: true,
-    poolOptions: {
-      threads: {
-        singleThread: false,
-      },
-    },
+    maxWorkers: 4,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
