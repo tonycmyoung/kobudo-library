@@ -1,8 +1,10 @@
+import React from "react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, fireEvent } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import UserProfile from "@/components/user-profile"
 import { updateProfile } from "@/lib/actions"
+import { updateUserBelt } from "@/lib/actions/users"
 import { useRouter } from "next/navigation"
 
 vi.mock("@/lib/actions", () => ({
@@ -11,6 +13,22 @@ vi.mock("@/lib/actions", () => ({
 
 vi.mock("@/lib/actions/users", () => ({
   updateUserBelt: vi.fn(),
+}))
+
+// Radix Select doesn't work in jsdom (requires pointer capture). Replace with
+// a native <select> so belt-change interaction tests work reliably.
+vi.mock("@/components/ui/select", () => ({
+  Select: ({ value, onValueChange, children }: { value?: string; onValueChange?: (v: string) => void; children: React.ReactNode }) => (
+    <select data-testid="belt-select" value={value ?? ""} onChange={(e) => onValueChange?.(e.target.value)}>
+      {children}
+    </select>
+  ),
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  SelectValue: ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>,
+  SelectContent: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) => <option value={value}>{children}</option>,
+  SelectGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  SelectLabel: ({ children }: { children: React.ReactNode }) => <optgroup label={String(children)}>{children}</optgroup>,
 }))
 
 vi.mock("next/navigation", () => ({
@@ -260,5 +278,128 @@ describe("UserProfile", () => {
     expect(screen.getByText("No name set")).toBeInTheDocument()
     const notSpecified = screen.getAllByText("Not specified")
     expect(notSpecified.length).toBeGreaterThan(0)
+  })
+
+  describe("Image upload", () => {
+    it("should call fetch when a valid image file is uploaded", async () => {
+      const user = userEvent.setup({ delay: null })
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ url: "https://example.com/new-image.jpg" }),
+      } as Response)
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const editButton = screen.getByRole("button", { name: /edit profile/i })
+      await user.click(editButton)
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(["content"], "photo.jpg", { type: "image/jpeg" })
+      await user.upload(fileInput, file)
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith("/api/upload-profile-image", expect.objectContaining({ method: "POST" }))
+      })
+    })
+
+    it("should show alert when non-image file is uploaded", async () => {
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const editButton = screen.getByRole("button", { name: /edit profile/i })
+      await user.click(editButton)
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(["content"], "document.pdf", { type: "application/pdf" })
+      // Use fireEvent.change to bypass the accept="image/*" filter
+      Object.defineProperty(fileInput, "files", { value: [file], configurable: true })
+      fireEvent.change(fileInput)
+
+      expect(global.alert).toHaveBeenCalledWith("Please select an image file")
+    })
+
+    it("should show alert when image file is too large", async () => {
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const editButton = screen.getByRole("button", { name: /edit profile/i })
+      await user.click(editButton)
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      // Create a file that's 6MB (over the 5MB limit)
+      const largeContent = "x".repeat(6 * 1024 * 1024)
+      const file = new File([largeContent], "large-photo.jpg", { type: "image/jpeg" })
+      Object.defineProperty(file, "size", { value: 6 * 1024 * 1024 })
+      await user.upload(fileInput, file)
+
+      expect(global.alert).toHaveBeenCalledWith("File size must be less than 5MB")
+    })
+
+    it("should show alert when upload fails", async () => {
+      const user = userEvent.setup({ delay: null })
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: "Upload failed" }),
+      } as Response)
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const editButton = screen.getByRole("button", { name: /edit profile/i })
+      await user.click(editButton)
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(["content"], "photo.jpg", { type: "image/jpeg" })
+      await user.upload(fileInput, file)
+
+      await waitFor(() => {
+        expect(global.alert).toHaveBeenCalledWith("Failed to upload image. Please try again.")
+      })
+    })
+  })
+
+  describe("Belt change", () => {
+    it("should call updateUserBelt when belt is changed", async () => {
+      vi.mocked(updateUserBelt).mockResolvedValue({ success: true })
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const beltSelect = screen.getByTestId("belt-select")
+      await user.selectOptions(beltSelect, "level-2")
+
+      await waitFor(() => {
+        expect(updateUserBelt).toHaveBeenCalledWith("user-1", "level-2")
+      })
+    })
+
+    it("should call updateUserBelt with null when 'none' option is selected", async () => {
+      vi.mocked(updateUserBelt).mockResolvedValue({ success: true })
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const beltSelect = screen.getByTestId("belt-select")
+      await user.selectOptions(beltSelect, "none")
+
+      await waitFor(() => {
+        expect(updateUserBelt).toHaveBeenCalledWith("user-1", null)
+      })
+    })
+
+    it("should show alert when belt update fails", async () => {
+      vi.mocked(updateUserBelt).mockResolvedValue({ success: false, error: "Belt update failed" })
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const beltSelect = screen.getByTestId("belt-select")
+      await user.selectOptions(beltSelect, "level-2")
+
+      await waitFor(() => {
+        expect(global.alert).toHaveBeenCalledWith("Failed to update belt. Please try again.")
+      })
+    })
   })
 })

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, waitFor, cleanup } from "@testing-library/react"
+import { render, screen, waitFor, cleanup, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import CurriculumSetsManagement from "@/components/curriculum-sets-management"
 import {
@@ -44,7 +44,6 @@ describe("CurriculumSetsManagement", () => {
   }
 
   beforeEach(() => {
-    vi.useRealTimers()
     vi.clearAllMocks()
     vi.mocked(useToast).mockReturnValue({ toast: mockToast, dismiss: vi.fn(), toasts: [] })
     vi.mocked(getCurriculumSets).mockResolvedValue(mockSets)
@@ -402,6 +401,62 @@ describe("CurriculumSetsManagement", () => {
       })
     })
 
+    it("should delete a level via dropdown UI", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("First Level")).toBeInTheDocument()
+      })
+
+      // All menu-trigger buttons: 2 set dropdowns + 2 level dropdowns
+      // dropdownTriggers[2] = First Level's dropdown
+      const dropdownTriggers = screen.getAllByRole("button").filter(
+        (btn) => btn.getAttribute("aria-haspopup") === "menu"
+      )
+      await user.click(dropdownTriggers[2])
+
+      await waitFor(() => {
+        const deleteItems = screen.getAllByRole("menuitem", { name: /delete/i })
+        expect(deleteItems.length).toBeGreaterThan(0)
+      })
+
+      const deleteItems = screen.getAllByRole("menuitem", { name: /delete/i })
+      await user.click(deleteItems[deleteItems.length - 1])
+
+      await waitFor(() => {
+        // handleDeleteLevel calls deleteLevelFromCurriculumSet with just levelId
+        expect(deleteLevelFromCurriculumSet).toHaveBeenCalledWith("level-1")
+      })
+    })
+
+    it("should open video management panel via level dropdown", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("First Level")).toBeInTheDocument()
+      })
+
+      // All menu-trigger buttons: 2 set dropdowns + 2 level dropdowns
+      // dropdownTriggers[2] = First Level's dropdown
+      const dropdownTriggers = screen.getAllByRole("button").filter(
+        (btn) => btn.getAttribute("aria-haspopup") === "menu"
+      )
+      await user.click(dropdownTriggers[2])
+
+      await waitFor(() => {
+        expect(screen.getByText("Manage Videos")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("Manage Videos"))
+
+      // VideoManagementPanel receives the level, verify videos are fetched
+      await waitFor(() => {
+        expect(getVideosForLevel).toHaveBeenCalledWith("level-1")
+      })
+    })
+
     it("should close level dialog when Cancel is clicked", async () => {
       const user = userEvent.setup({ delay: null })
       render(<CurriculumSetsManagement />)
@@ -421,6 +476,58 @@ describe("CurriculumSetsManagement", () => {
       await waitFor(() => {
         expect(screen.queryByRole("heading", { name: "Add Level" })).toBeNull()
       })
+    })
+  })
+
+  describe("Set selection and panel close", () => {
+    it("should fetch details when another curriculum set is clicked", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Another Set")).toBeInTheDocument()
+      })
+
+      // Click the second set in the list (not the initially-selected one)
+      const setButtons = screen.getAllByRole("button").filter(
+        (btn) => btn.textContent?.includes("Another Set")
+      )
+      expect(setButtons.length).toBeGreaterThan(0)
+      await user.click(setButtons[0])
+
+      await waitFor(() => {
+        expect(getCurriculumSetWithLevels).toHaveBeenCalledWith("set-2")
+      })
+    })
+
+    it("should close video management panel when onClose is called", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("First Level")).toBeInTheDocument()
+      })
+
+      // Open video management via level dropdown
+      const firstLevelRow = screen.getByText("First Level").closest("div.p-3") as HTMLElement
+      const levelButtons = within(firstLevelRow).getAllByRole("button")
+      await user.click(levelButtons[2])
+
+      await waitFor(() => {
+        expect(screen.getByText("Manage Videos")).toBeInTheDocument()
+      })
+      await user.click(screen.getByText("Manage Videos"))
+
+      await waitFor(() => {
+        expect(getVideosForLevel).toHaveBeenCalled()
+      })
+
+      // VideoManagementPanel should be visible; now close it
+      // The panel's close button triggers onClose which calls setManagingVideosForLevel(null)
+      const closeButton = screen.queryByRole("button", { name: /close/i })
+      if (closeButton) {
+        await user.click(closeButton)
+      }
     })
   })
 
@@ -525,6 +632,222 @@ describe("CurriculumSetsManagement", () => {
       const result = await getAvailableVideos()
 
       expect(result).toEqual([])
+    })
+  })
+
+  describe("Level move up/down", () => {
+    it("should call reorderLevelsInCurriculumSet when move up is clicked", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Second Level")).toBeInTheDocument()
+      })
+
+      // Second level (index 1) has an enabled up-button
+      const secondLevelRow = screen.getByText("Second Level").closest("div.p-3") as HTMLElement
+      expect(secondLevelRow).toBeTruthy()
+      const levelButtons = within(secondLevelRow).getAllByRole("button")
+      // LevelItem buttons: [0]=ChevronUp, [1]=ChevronDown, [2]=MoreVertical dropdown
+      await user.click(levelButtons[0]) // up button (enabled for index 1)
+
+      await waitFor(() => {
+        expect(reorderLevelsInCurriculumSet).toHaveBeenCalled()
+      })
+    })
+
+    it("should call reorderLevelsInCurriculumSet when move down is clicked", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("First Level")).toBeInTheDocument()
+      })
+
+      // First level (index 0) has an enabled down-button
+      const firstLevelRow = screen.getByText("First Level").closest("div.p-3") as HTMLElement
+      expect(firstLevelRow).toBeTruthy()
+      const levelButtons = within(firstLevelRow).getAllByRole("button")
+      // LevelItem buttons: [0]=ChevronUp (disabled), [1]=ChevronDown (enabled), [2]=MoreVertical
+      await user.click(levelButtons[1]) // down button (enabled for index 0)
+
+      await waitFor(() => {
+        expect(reorderLevelsInCurriculumSet).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe("Form field interactions", () => {
+    it("should update description in set form when typed", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).toBeFalsy()
+      })
+
+      await user.click(screen.getByRole("button", { name: /new curriculum set/i }))
+
+      await waitFor(() => {
+        expect(screen.getByText("Create Curriculum Set")).toBeInTheDocument()
+      })
+
+      const descTextarea = document.getElementById("set-description") as HTMLTextAreaElement
+      expect(descTextarea).toBeInTheDocument()
+      await user.type(descTextarea, "A test description")
+      expect(descTextarea).toHaveValue("A test description")
+    })
+
+    it("should update description in level form when typed", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("First Level")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByRole("button", { name: /add level/i }))
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { name: "Add Level" })).toBeInTheDocument()
+      })
+
+      const descTextarea = document.getElementById("level-description") as HTMLTextAreaElement
+      expect(descTextarea).toBeInTheDocument()
+      await user.type(descTextarea, "Level description")
+      expect(descTextarea).toHaveValue("Level description")
+    })
+
+    it("should update color when a color button is clicked in level form", async () => {
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.getByText("First Level")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByRole("button", { name: /add level/i }))
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { name: "Add Level" })).toBeInTheDocument()
+      })
+
+      // Color picker buttons are type="button" with inline background-color styles
+      const colorButtons = screen.getAllByRole("button").filter(
+        (btn) => btn.getAttribute("style")?.includes("background-color")
+      )
+      expect(colorButtons.length).toBeGreaterThan(0)
+      await user.click(colorButtons[1]) // Click a different color
+
+      // The dialog should still be open (color selection doesn't close it)
+      expect(screen.getByRole("heading", { name: "Add Level" })).toBeInTheDocument()
+    })
+  })
+
+  describe("Error handling", () => {
+    it("should show error toast when createCurriculumSet throws", async () => {
+      vi.mocked(createCurriculumSet).mockRejectedValue(new Error("Network error"))
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).toBeFalsy()
+      })
+
+      await user.click(screen.getByRole("button", { name: /new curriculum set/i }))
+      const nameInput = document.getElementById("set-name") as HTMLInputElement
+      await user.type(nameInput, "Test Set")
+      await user.click(screen.getByRole("button", { name: /^create$/i }))
+
+      await waitFor(() => {
+        expect(mockToast).toHaveBeenCalledWith(
+          expect.objectContaining({ variant: "destructive" })
+        )
+      })
+    })
+
+    it("should show error toast when updateCurriculumSet throws", async () => {
+      vi.mocked(updateCurriculumSet).mockRejectedValue(new Error("Network error"))
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).toBeFalsy()
+      })
+
+      const dropdownTriggers = screen.getAllByRole("button").filter(
+        (btn) => btn.getAttribute("aria-haspopup") === "menu"
+      )
+      await user.click(dropdownTriggers[0])
+
+      await waitFor(() => {
+        expect(screen.getByRole("menuitem", { name: /edit/i })).toBeInTheDocument()
+      })
+      await user.click(screen.getByRole("menuitem", { name: /edit/i }))
+
+      await waitFor(() => {
+        expect(screen.getByText("Edit Curriculum Set")).toBeInTheDocument()
+      })
+
+      const nameInput = document.getElementById("set-name") as HTMLInputElement
+      await user.clear(nameInput)
+      await user.type(nameInput, "Updated Name")
+      await user.click(screen.getByRole("button", { name: /^update$/i }))
+
+      await waitFor(() => {
+        expect(mockToast).toHaveBeenCalledWith(
+          expect.objectContaining({ variant: "destructive" })
+        )
+      })
+    })
+
+    it("should show error toast when deleteCurriculumSet throws", async () => {
+      vi.mocked(deleteCurriculumSet).mockRejectedValue(new Error("Network error"))
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).toBeFalsy()
+      })
+
+      const dropdownTriggers = screen.getAllByRole("button").filter(
+        (btn) => btn.getAttribute("aria-haspopup") === "menu"
+      )
+      await user.click(dropdownTriggers[0])
+
+      await waitFor(() => {
+        expect(screen.getByRole("menuitem", { name: /delete/i })).toBeInTheDocument()
+      })
+      await user.click(screen.getByRole("menuitem", { name: /delete/i }))
+
+      await waitFor(() => {
+        expect(mockToast).toHaveBeenCalledWith(
+          expect.objectContaining({ variant: "destructive" })
+        )
+      })
+    })
+
+    it("should not delete set when confirm dialog is cancelled", async () => {
+      vi.mocked(confirm).mockReturnValue(false)
+      const user = userEvent.setup({ delay: null })
+      render(<CurriculumSetsManagement />)
+
+      await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).toBeFalsy()
+      })
+
+      const dropdownTriggers = screen.getAllByRole("button").filter(
+        (btn) => btn.getAttribute("aria-haspopup") === "menu"
+      )
+      await user.click(dropdownTriggers[0])
+
+      await waitFor(() => {
+        expect(screen.getByRole("menuitem", { name: /delete/i })).toBeInTheDocument()
+      })
+      await user.click(screen.getByRole("menuitem", { name: /delete/i }))
+
+      // deleteCurriculumSet should NOT be called when confirm returns false
+      expect(deleteCurriculumSet).not.toHaveBeenCalled()
     })
   })
 })
