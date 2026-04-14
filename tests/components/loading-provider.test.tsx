@@ -187,7 +187,6 @@ describe("LoadingProvider", () => {
       render(
         <LoadingProvider>
           <ContextReader />
-          {/* eslint-disable-next-line react/jsx-no-target-blank */}
           <a href="/page" target="_blank" rel="noreferrer">Open</a>
         </LoadingProvider>,
       )
