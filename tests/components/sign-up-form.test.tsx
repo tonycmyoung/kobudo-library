@@ -1,12 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { render, screen, act, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import SignUpForm from "@/components/sign-up-form"
+import { useActionState } from "react"
 
 // Mock dependencies
 vi.mock("@/lib/actions", () => ({
   signUp: vi.fn(),
 }))
+
+vi.mock("react", async () => {
+  const actual = await vi.importActual("react")
+  return {
+    ...actual,
+    useActionState: vi.fn(),
+  }
+})
 
 vi.mock("react-dom", async () => {
   const actual = await vi.importActual("react-dom")
@@ -28,6 +37,8 @@ vi.mock("next/navigation", () => ({
 describe("SignUpForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Provide a default useActionState mock so existing tests render correctly
+    vi.mocked(useActionState).mockReturnValue([null, vi.fn(), false])
   })
 
   it("should render sign up form with all fields", () => {
@@ -161,5 +172,54 @@ describe("SignUpForm", () => {
     expect(eulaLink).toHaveAttribute("href", "/eula")
     expect(privacyLink).toBeInTheDocument()
     expect(privacyLink).toHaveAttribute("href", "/privacy-policy")
+  })
+
+  describe("Form submission with agreements accepted", () => {
+    it("should call form action when form is submitted with agreements accepted", async () => {
+      const mockFormAction = vi.fn()
+      vi.mocked(useActionState).mockReturnValue([null, mockFormAction, false])
+      const user = userEvent.setup({ delay: null })
+
+      render(<SignUpForm />)
+
+      // Accept legal agreements
+      await user.click(screen.getByLabelText(/End User License Agreement/i))
+      await user.click(screen.getByLabelText(/Privacy Policy/i))
+
+      // Fill required fields
+      await user.type(screen.getByLabelText("Full Name"), "John Doe")
+      await user.type(screen.getByLabelText("Email"), "john@example.com")
+      await user.type(screen.getByLabelText("Teacher"), "Sensei Smith")
+      await user.type(screen.getByLabelText("School"), "Test Dojo")
+      await user.type(screen.getByLabelText("Password"), "Password123!")
+
+      // Submit the form
+      await user.click(screen.getByRole("button", { name: /Create Account/i }))
+
+      await waitFor(() => {
+        expect(mockFormAction).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe("State effects", () => {
+    it("should redirect to login after success state with timer", () => {
+      vi.mocked(useActionState).mockReturnValue([{ success: "Account created!" }, vi.fn(), false])
+
+      render(<SignUpForm />)
+
+      // Success message should be visible immediately
+      expect(screen.getByText(/Redirecting to login page/)).toBeInTheDocument()
+    })
+
+    it("should show error message when state has error", async () => {
+      vi.mocked(useActionState).mockReturnValue([{ error: "Email already exists" }, vi.fn(), false])
+
+      render(<SignUpForm />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Email already exists")).toBeInTheDocument()
+      })
+    })
   })
 })

@@ -14,10 +14,13 @@ beforeEach(() => {
 
 // Cleanup after each test — restoreAllMocks cleans up the global console.error spy above
 // as well as any additional spies created within individual tests.
+// useRealTimers ensures fake timers from one test file cannot leak into another when
+// worker threads are reused across files (vitest maxWorkers > 1).
 afterEach(() => {
   cleanup()
   localStorage.clear()
   vi.restoreAllMocks()
+  vi.useRealTimers()
 })
 
 // Mock Next.js modules
