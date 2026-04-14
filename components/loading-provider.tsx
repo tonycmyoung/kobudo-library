@@ -25,7 +25,7 @@ function shouldSkipLink(link: HTMLAnchorElement): boolean {
   return (
     link.href.startsWith("mailto:") ||
     link.href.startsWith("tel:") ||
-    link.href.startsWith("#") ||
+    (link.getAttribute("href")?.startsWith("#") ?? false) ||
     link.target === "_blank"
   )
 }
