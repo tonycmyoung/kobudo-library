@@ -161,4 +161,145 @@ describe("VideoCardList", () => {
     const link = screen.getByRole("link")
     expect(link).toHaveAttribute("href", "/video/video-1")
   })
+
+  it("should render gradient placeholder when thumbnail_url is null", async () => {
+    const videoNoThumb = { ...mockVideo, thumbnail_url: null }
+    await act(async () => {
+      render(<VideoCardList video={videoNoThumb} />)
+    })
+    // No <img> element; the Play icon div should be present instead
+    expect(screen.queryByAltText("Test Video")).toBeNull()
+  })
+
+  it("should show 0 views when video.views is null", async () => {
+    const videoNoViews = { ...mockVideo, views: null }
+    await act(async () => {
+      render(<VideoCardList video={videoNoViews} />)
+    })
+    expect(screen.getByText("0 views")).toBeInTheDocument()
+  })
+
+  it("should not toggle favorite when user is not loaded", async () => {
+    const mockSupabaseNoUser = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      },
+      from: vi.fn(() => ({
+        delete: vi.fn(() => ({ eq: vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) })) })),
+        insert: vi.fn().mockResolvedValue({ error: null }),
+      })),
+    }
+    vi.mocked(createClient).mockReturnValue(mockSupabaseNoUser as unknown as ReturnType<typeof createClient>)
+
+    const user = userEvent.setup({ delay: null })
+    const onFavoriteToggle = vi.fn()
+    await act(async () => {
+      render(<VideoCardList video={mockVideo} isFavorited={false} onFavoriteToggle={onFavoriteToggle} />)
+    })
+
+    const favoriteButton = screen.getByRole("button")
+    await user.click(favoriteButton)
+
+    expect(onFavoriteToggle).not.toHaveBeenCalled()
+  })
+
+  it("should call delete when unfavoriting", async () => {
+    const mockDelete = vi.fn().mockResolvedValue({ error: null })
+    const mockEq2 = vi.fn(() => ({ mockDelete }))
+    const mockEq1 = vi.fn(() => ({ eq: mockEq2 }))
+    const mockDeleteFn = vi.fn(() => ({ eq: mockEq1 }))
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } }, error: null }),
+      },
+      from: vi.fn(() => ({
+        delete: mockDeleteFn,
+        insert: vi.fn().mockResolvedValue({ error: null }),
+      })),
+    }
+    vi.mocked(createClient).mockReturnValue(mockSupabase as unknown as ReturnType<typeof createClient>)
+
+    const user = userEvent.setup({ delay: null })
+    const onFavoriteToggle = vi.fn()
+    await act(async () => {
+      render(<VideoCardList video={mockVideo} isFavorited={true} onFavoriteToggle={onFavoriteToggle} />)
+    })
+
+    const favoriteButton = screen.getByRole("button")
+    await user.click(favoriteButton)
+
+    expect(mockDeleteFn).toHaveBeenCalled()
+    expect(onFavoriteToggle).toHaveBeenCalledWith("video-1", false)
+  })
+
+  it("handles getUser error gracefully", async () => {
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockRejectedValue(new Error("auth error")),
+      },
+      from: vi.fn(() => ({
+        delete: vi.fn(() => ({ eq: vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) })) })),
+        insert: vi.fn().mockResolvedValue({ error: null }),
+      })),
+    }
+    vi.mocked(createClient).mockReturnValue(mockSupabase as unknown as ReturnType<typeof createClient>)
+
+    await act(async () => {
+      render(<VideoCardList video={mockVideo} />)
+    })
+    // Component should still render after auth error
+    expect(screen.getByText("Test Video")).toBeInTheDocument()
+  })
+
+  it("handles toggleFavorite error gracefully", async () => {
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } }, error: null }),
+      },
+      from: vi.fn(() => ({
+        insert: vi.fn().mockRejectedValue(new Error("insert error")),
+        delete: vi.fn(() => ({ eq: vi.fn(() => ({ eq: vi.fn().mockRejectedValue(new Error("delete error")) })) })),
+      })),
+    }
+    vi.mocked(createClient).mockReturnValue(mockSupabase as unknown as ReturnType<typeof createClient>)
+
+    const user = userEvent.setup({ delay: null })
+    await act(async () => {
+      render(<VideoCardList video={mockVideo} isFavorited={false} />)
+    })
+
+    const favoriteButton = screen.getByRole("button")
+    // Should not throw
+    await expect(user.click(favoriteButton)).resolves.not.toThrow()
+  })
+
+  it("should render curricula filtered by userCurriculumSetId", async () => {
+    const videoWithCurriculums = {
+      ...mockVideo,
+      curriculums: [
+        { id: "cur-1", name: "Set A Curriculum", color: "#ff0000", display_order: 1, curriculum_set_id: "set-a" },
+        { id: "cur-2", name: "Set B Curriculum", color: "#00ff00", display_order: 2, curriculum_set_id: "set-b" },
+      ],
+    }
+    await act(async () => {
+      render(<VideoCardList video={videoWithCurriculums} userCurriculumSetId="set-a" />)
+    })
+
+    expect(screen.getByText("Set A Curriculum")).toBeInTheDocument()
+    expect(screen.queryByText("Set B Curriculum")).toBeNull()
+  })
+
+  it("should render curriculum badge without color styles when color is invalid", async () => {
+    const videoWithBadColor = {
+      ...mockVideo,
+      curriculums: [
+        { id: "cur-1", name: "No Color Curriculum", color: "invalid", display_order: 1, curriculum_set_id: null },
+      ],
+      categories: [],
+    }
+    await act(async () => {
+      render(<VideoCardList video={videoWithBadColor} />)
+    })
+    expect(screen.getByText("No Color Curriculum")).toBeInTheDocument()
+  })
 })

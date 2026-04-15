@@ -8,6 +8,15 @@ import { deleteUserCompletely } from "@/lib/actions"
 import { useRouter, useSearchParams } from "next/navigation"
 import { within } from "@testing-library/react"
 
+vi.mock("react-toastify", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+  },
+}))
+
 vi.mock("@/lib/supabase/client", () => ({
   createClient: vi.fn(),
 }))
@@ -663,6 +672,239 @@ describe("StudentManagement", () => {
         "Test Dojo",
         null
       )
+    })
+  })
+
+  describe("error paths and edge cases", () => {
+    it("handles fetchStudents throwing an exception", async () => {
+      vi.mocked(fetchStudentsForHeadTeacher).mockRejectedValue(new Error("network error"))
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        expect(screen.getByText("No students found for your school.")).toBeInTheDocument()
+      })
+      consoleSpy.mockRestore()
+    })
+
+    it("handles curriculum_sets fetch error gracefully", async () => {
+      mockFrom = vi.fn((table: string) => {
+        if (table === "curriculum_sets") {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: null, error: { message: "sets error" } }),
+            }),
+          }
+        }
+        if (table === "curriculums") {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: [], error: null }),
+            }),
+          }
+        }
+        if (table === "curriculum_levels") {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: mockCurriculumLevels, error: null }),
+            }),
+          }
+        }
+        return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [], error: null }) }) }
+      })
+      vi.mocked(createBrowserClient).mockReturnValue({ from: mockFrom } as unknown as ReturnType<typeof createBrowserClient>)
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
+      })
+      consoleSpy.mockRestore()
+    })
+
+    it("handles curriculums fetch error gracefully", async () => {
+      mockFrom = vi.fn((table: string) => {
+        if (table === "curriculum_sets") {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: mockCurriculumSets, error: null }),
+            }),
+          }
+        }
+        if (table === "curriculums") {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: null, error: { message: "curriculums error" } }),
+            }),
+          }
+        }
+        if (table === "curriculum_levels") {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: mockCurriculumLevels, error: null }),
+            }),
+          }
+        }
+        return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [], error: null }) }) }
+      })
+      vi.mocked(createBrowserClient).mockReturnValue({ from: mockFrom } as unknown as ReturnType<typeof createBrowserClient>)
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        expect(screen.getByText("John Doe")).toBeInTheDocument()
+      })
+      consoleSpy.mockRestore()
+    })
+
+    it("getRoleBadgeClass: renders Admin badge", async () => {
+      vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({
+        data: [{ ...mockStudents[0], role: "Admin" }],
+        error: null,
+      })
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        const badge = screen.getByText((content, el) =>
+          el?.tagName.toLowerCase() === "span" &&
+          el?.textContent === "Admin" &&
+          el?.getAttribute("data-slot") === "badge"
+        )
+        expect(badge.className).toContain("bg-red-600")
+      })
+    })
+
+    it("getRoleBadgeClass: renders Head Teacher badge", async () => {
+      vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({
+        data: [{ ...mockStudents[0], role: "Head Teacher" }],
+        error: null,
+      })
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        const badge = screen.getByText((content, el) =>
+          el?.tagName.toLowerCase() === "span" &&
+          el?.textContent === "Head Teacher" &&
+          el?.getAttribute("data-slot") === "badge"
+        )
+        expect(badge.className).toContain("bg-teal-600")
+      })
+    })
+
+    it("getRoleBadgeClass: renders default badge for unknown role", async () => {
+      vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({
+        data: [{ ...mockStudents[0], role: "UnknownRole" }],
+        error: null,
+      })
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        const badge = screen.getByText((content, el) =>
+          el?.tagName.toLowerCase() === "span" &&
+          el?.textContent === "UnknownRole" &&
+          el?.getAttribute("data-slot") === "badge"
+        )
+        expect(badge.className).toContain("bg-gray-600")
+      })
+    })
+
+    it("getInitials: uses email[0] when full_name is null", async () => {
+      vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({
+        data: [{ ...mockStudents[0], full_name: null, email: "zara@example.com" }],
+        error: null,
+      })
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => {
+        // Avatar fallback should show "Z" (first letter of email)
+        expect(screen.getByText("Z")).toBeInTheDocument()
+      })
+    })
+
+    it("deleteUser: shows error toast when deleteUserCompletely throws", async () => {
+      const { toast } = await import("react-toastify")
+      vi.mocked(global.confirm).mockReturnValue(true)
+      vi.mocked(deleteUserCompletely).mockRejectedValue(new Error("delete failed"))
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnDoeCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const deleteButton = johnDoeCard?.querySelector('button[aria-label="Delete user"]') as HTMLButtonElement
+      await user.click(deleteButton)
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Failed to delete user. Please try again.")
+      })
+      consoleSpy.mockRestore()
+    })
+
+    it("deleteUser: shows error toast when result.success is false", async () => {
+      const { toast } = await import("react-toastify")
+      vi.mocked(global.confirm).mockReturnValue(true)
+      vi.mocked(deleteUserCompletely).mockResolvedValue({ success: false, error: "Server error" })
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnDoeCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const deleteButton = johnDoeCard?.querySelector('button[aria-label="Delete user"]') as HTMLButtonElement
+      await user.click(deleteButton)
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Failed to delete user. Please try again.")
+      })
+      consoleSpy.mockRestore()
+    })
+
+    it("updateUserRole: shows error toast when supabase update fails", async () => {
+      const { toast } = await import("react-toastify")
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+      // Make the update chain throw
+      const mockEqThrow = vi.fn().mockRejectedValue(new Error("role update failed"))
+      const mockUpdateThrow = vi.fn().mockReturnValue({ eq: mockEqThrow })
+      mockFrom = vi.fn((table: string) => {
+        if (table === "users") return { select: vi.fn().mockReturnValue({ eq: mockEq }), update: mockUpdateThrow }
+        if (table === "curriculums") return { select: mockSelect }
+        if (table === "curriculum_sets") {
+          return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: mockCurriculumSets, error: null }) }) }
+        }
+        if (table === "curriculum_levels") {
+          return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: mockCurriculumLevels, error: null }) }) }
+        }
+        return { select: mockSelect }
+      })
+      vi.mocked(createBrowserClient).mockReturnValue({ from: mockFrom } as unknown as ReturnType<typeof createBrowserClient>)
+
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnDoeCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const roleSelect = johnDoeCard?.querySelector('select option[value="Student"]')?.closest("select") as HTMLSelectElement
+      await user.selectOptions(roleSelect, "Teacher")
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Failed to update user role. Please try again.")
+      })
+      consoleSpy.mockRestore()
+    })
+
+    it("updateStudentForHeadTeacher: shows error toast when result has error", async () => {
+      const { toast } = await import("react-toastify")
+      vi.mocked(updateStudentForHeadTeacher).mockResolvedValue({ error: "Update failed" })
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnDoeCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const editButton = johnDoeCard?.querySelector('button[aria-label="Edit user"]') as HTMLButtonElement
+      await user.click(editButton)
+      await waitFor(() => { expect(screen.getByLabelText("Save changes")).toBeInTheDocument() })
+
+      const saveButton = screen.getByLabelText("Save changes")
+      await user.click(saveButton)
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Failed to update user fields. Please try again.")
+      })
+      consoleSpy.mockRestore()
     })
   })
 
