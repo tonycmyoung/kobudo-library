@@ -4,7 +4,6 @@ vi.mock("stripe", () => {
   class MockStripe {
     customers = { list: vi.fn() }
     subscriptions = { list: vi.fn() }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     constructor(_key: string) {}
   }
   return { default: MockStripe }
