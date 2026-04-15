@@ -1,7 +1,20 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import React from "react"
 import PaginationControls from "@/components/pagination-controls"
+
+// Radix Select triggers jsdom "Not implemented: navigation" errors via focus/portal
+// management. Swap in a native <select> to keep tests focused on PaginationControls logic.
+vi.mock("@/components/ui/select", () => ({
+  Select: ({ value, onValueChange, children }: { value?: string; onValueChange?: (v: string) => void; children: React.ReactNode }) =>
+    React.createElement("select", { value, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => onValueChange?.(e.target.value) }, children),
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  SelectValue: () => null,
+  SelectContent: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) =>
+    React.createElement("option", { value }, children),
+}))
 
 describe("PaginationControls", () => {
   const user = userEvent.setup({ delay: null })

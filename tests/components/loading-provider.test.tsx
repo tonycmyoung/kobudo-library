@@ -131,8 +131,10 @@ describe("LoadingProvider", () => {
         </LoadingProvider>,
       )
 
+      const link = screen.getByText("Internal")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(screen.getByText("Internal"))
+        fireEvent.click(link)
       })
 
       expect(screen.getByTestId("loading-state")).toHaveTextContent("loading")
@@ -191,8 +193,10 @@ describe("LoadingProvider", () => {
         </LoadingProvider>,
       )
 
+      const link = screen.getByText("Open")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(screen.getByText("Open"))
+        fireEvent.click(link)
       })
 
       expect(screen.getByTestId("loading-state")).toHaveTextContent("idle")
@@ -257,8 +261,10 @@ describe("LoadingProvider", () => {
         </LoadingProvider>,
       )
 
+      const link = screen.getByText("Navigate")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(screen.getByText("Navigate"))
+        fireEvent.click(link)
       })
       expect(screen.getByTestId("loading-state")).toHaveTextContent("loading")
 
