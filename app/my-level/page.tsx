@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import VideoLibrary from "@/components/video-library"
 import Header from "@/components/header"
 import type { CurrentBelt } from "@/lib/utils/admin-header-user"
+import { getVideosForLibrary } from "@/lib/actions/videos"
 
 export default async function MyLevelPage() {
   // If Supabase is not configured, show setup message directly
@@ -84,10 +85,12 @@ export default async function MyLevelPage() {
     }
   }
 
+  const initialVideos = await getVideosForLibrary()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-orange-900">
       <Header user={userWithEmail} />
-      <VideoLibrary maxCurriculumOrder={maxCurriculumOrder} storagePrefix="myLevel" nextBeltName={nextBeltName} userProfile={{ curriculum_set_id: userProfile?.curriculum_set_id }} />
+      <VideoLibrary maxCurriculumOrder={maxCurriculumOrder} storagePrefix="myLevel" nextBeltName={nextBeltName} userProfile={{ curriculum_set_id: userProfile?.curriculum_set_id }} initialVideos={initialVideos} />
     </div>
   )
 }

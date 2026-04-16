@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import VideoLibrary from "@/components/video-library"
 import Header from "@/components/header"
 import type { CurrentBelt } from "@/lib/utils/admin-header-user"
+import { getVideosForLibrary } from "@/lib/actions/videos"
 
 export default async function Home() {
   // If Supabase is not configured, show setup message directly
@@ -47,6 +48,9 @@ export default async function Home() {
     redirect("/pending-approval")
   }
 
+  // Pre-fetch video library data server-side (cached; skips 4 client-side queries)
+  const initialVideos = await getVideosForLibrary()
+
   const userWithEmail = {
     id: user.id,
     email: user.email ?? "",
@@ -60,7 +64,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-orange-900">
       <Header user={userWithEmail} />
-      <VideoLibrary userProfile={{ curriculum_set_id: userProfile?.curriculum_set_id }} />
+      <VideoLibrary userProfile={{ curriculum_set_id: userProfile?.curriculum_set_id }} initialVideos={initialVideos} />
     </div>
   )
 }

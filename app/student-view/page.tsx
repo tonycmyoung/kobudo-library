@@ -2,6 +2,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import VideoLibrary from "@/components/video-library"
 import Header from "@/components/header"
+import { getVideosForLibrary } from "@/lib/actions/videos"
 
 export default async function StudentView() {
   // If Supabase is not configured, show setup message directly
@@ -49,10 +50,12 @@ export default async function StudentView() {
     is_approved: userProfile?.is_approved || false,
   }
 
+  const initialVideos = await getVideosForLibrary()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-orange-900">
       <Header user={userWithEmail} />
-      <VideoLibrary />
+      <VideoLibrary initialVideos={initialVideos} />
     </div>
   )
 }

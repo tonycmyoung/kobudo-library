@@ -65,6 +65,7 @@ interface VideoLibraryProps {
   readonly storagePrefix?: string // Allow custom storage prefix for separate UI state
   readonly nextBeltName?: string // Add prop for next belt name
   readonly userProfile?: { curriculum_set_id?: string | null } // Added prop for user profile
+  readonly initialVideos?: Video[] // Server-prefetched videos (without view counts/favorites); skips client fetch
 }
 
 
@@ -463,6 +464,7 @@ export default function VideoLibrary({
   storagePrefix: customStoragePrefix,
   nextBeltName, // Destructure new prop
   userProfile, // Destructure userProfile
+  initialVideos, // Server-prefetched video data (skips client-side video fetch if provided)
 }: VideoLibraryProps) {
   const storagePrefix = customStoragePrefix || (favoritesOnly ? "favoritesLibrary" : "videoLibrary")
 
@@ -470,7 +472,7 @@ export default function VideoLibrary({
   const { urlState, updateUrl, updateUrlImmediate, commitUrl } = useVideoLibraryUrl()
 
   const [videos, setVideos] = useState<Video[]>([])
-  const [allVideos, setAllVideos] = useState<Video[]>([])
+  const [allVideos, setAllVideos] = useState<Video[]>(initialVideos ?? [])
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set())
   const [categories, setCategories] = useState<Category[]>([])
   const [curriculums, setCurriculums] = useState<Curriculum[]>([])
@@ -552,6 +554,36 @@ export default function VideoLibrary({
       if (!mounted) return
       setLoading(true)
 
+      if (initialVideos) {
+        // Fast path: video data was pre-fetched server-side; only fetch user-specific data client-side
+        try {
+          const [favoritesResult, viewCounts] = await Promise.all([
+            user
+              ? supabase.from("user_favorites").select("video_id").eq("user_id", user.id)
+              : Promise.resolve({ data: [], error: null }),
+            getBatchVideoViewCounts(initialVideos.map((v) => v.id)),
+          ])
+
+          if (!mounted) return
+
+          const videosWithViewCounts = initialVideos.map((video) => ({
+            ...video,
+            views: viewCounts[video.id] || 0,
+          }))
+
+          if (mounted) {
+            setAllVideos(videosWithViewCounts)
+            setUserFavorites(new Set(favoritesResult.data?.map((f) => f.video_id) || []))
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error)
+        } finally {
+          if (mounted) setLoading(false)
+        }
+        return
+      }
+
+      // Standard path: full client-side fetch (used when no initialVideos provided)
       if (isCircuitBreakerOpen()) {
         // eslint-disable-next-line no-console -- intentional diagnostic log for circuit breaker state
         console.log("Circuit breaker is open, using cached data if available")
@@ -566,7 +598,7 @@ export default function VideoLibrary({
             supabase
               .from("videos")
               .select(`
-              id, title, description, video_url, thumbnail_url, duration_seconds, 
+              id, title, description, video_url, thumbnail_url, duration_seconds,
               created_at, recorded, updated_at
             `)
               .order("created_at", { ascending: false }),
@@ -634,7 +666,7 @@ export default function VideoLibrary({
     return () => {
       mounted = false
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadFromCache/saveToCache/supabase are stable refs; effect triggers on user/favoritesOnly
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadFromCache/saveToCache/supabase/initialVideos are stable refs; effect triggers on user/favoritesOnly
   }, [user, favoritesOnly])
 
   const loadFromCache = () => {
