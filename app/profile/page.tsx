@@ -2,6 +2,7 @@ import { createClient, getServerUser, isSupabaseConfigured } from "@/lib/supabas
 import { redirect } from "next/navigation"
 import Header from "@/components/header"
 import UserProfile from "@/components/user-profile"
+import { getCurriculumsForDisplay } from "@/lib/actions/curriculums"
 
 export default async function ProfilePage() {
   // If Supabase is not configured, show setup message directly
@@ -23,8 +24,9 @@ export default async function ProfilePage() {
 
   const supabase = await createClient()
 
-  // Fetch userProfile, favoriteCount, and curriculums in parallel — all independent
-  const [{ data: userProfile }, { data: favoriteCount }, { data: curriculums }] = await Promise.all([
+  // Fetch userProfile, favoriteCount, and curriculums in parallel — all independent.
+  // getCurriculumsForDisplay is unstable_cache-wrapped (tagged "curriculums").
+  const [{ data: userProfile }, { data: favoriteCount }, curriculums] = await Promise.all([
     supabase
       .from("users")
       .select(`
@@ -44,7 +46,7 @@ export default async function ProfilePage() {
       .eq("id", user.id)
       .single(),
     supabase.from("user_favorites").select("id", { count: "exact" }).eq("user_id", user.id),
-    supabase.from("curriculums").select("id, name, color, display_order").order("display_order", { ascending: true }),
+    getCurriculumsForDisplay(),
   ])
 
   if (!userProfile?.is_approved) {
@@ -98,7 +100,7 @@ export default async function ProfilePage() {
           <h1 className="text-3xl font-bold text-white mb-2">My Profile</h1>
           <p className="text-gray-300">Manage your account information</p>
         </div>
-        <UserProfile user={userWithStats} curriculums={curriculums || []} curriculumLevels={curriculumLevels} />
+        <UserProfile user={userWithStats} curriculums={curriculums} curriculumLevels={curriculumLevels} />
       </div>
     </div>
   )

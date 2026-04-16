@@ -35,6 +35,11 @@ const _mockIlike = vi.fn()
 
 const mockFrom = vi.fn()
 
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: unknown) => fn,
+  revalidateTag: vi.fn(),
+}))
+
 vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(() => ({
     from: mockFrom,

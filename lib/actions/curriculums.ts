@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@supabase/supabase-js"
+import { unstable_cache, revalidateTag } from "next/cache"
 
 interface Curriculum {
   id: string
@@ -13,7 +14,23 @@ interface Curriculum {
   video_count?: number
 }
 
-export async function getCurriculums(): Promise<Curriculum[]> {
+// Lightweight cached fetch for server components (profile page, belt selector)
+export const getCurriculumsForDisplay = unstable_cache(
+  async (): Promise<Array<{ id: string; name: string; color: string; display_order: number }>> => {
+    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    const { data } = await serviceSupabase
+      .from("curriculums")
+      .select("id, name, color, display_order")
+      .order("display_order", { ascending: true })
+    return data || []
+  },
+  ["curriculums-display"],
+  { tags: ["curriculums"] },
+)
+
+// Full admin fetch (includes description, created_by, video_count)
+export const getCurriculums = unstable_cache(
+  async (): Promise<Curriculum[]> => {
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -49,7 +66,10 @@ export async function getCurriculums(): Promise<Curriculum[]> {
     console.error("Error in getCurriculums:", error)
     return []
   }
-}
+  },
+  ["curriculums-admin"],
+  { tags: ["curriculums"] },
+)
 
 export async function addCurriculum(curriculumData: {
   name: string
@@ -85,6 +105,7 @@ export async function addCurriculum(curriculumData: {
       return { error: "Failed to add curriculum" }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculum added successfully" }
   } catch (error) {
     console.error("Error in addCurriculum:", error)
@@ -121,6 +142,7 @@ export async function updateCurriculum(
       return { error: "Failed to update curriculum" }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculum updated successfully" }
   } catch (error) {
     console.error("Error in updateCurriculum:", error)
@@ -175,6 +197,7 @@ export async function deleteCurriculum(curriculumId: string): Promise<{ success?
       )
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculum deleted successfully" }
   } catch (error) {
     console.error("Error in deleteCurriculum:", error)
@@ -195,6 +218,7 @@ export async function reorderCurriculums(
 
     await Promise.all(updates)
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculums reordered successfully" }
   } catch (error) {
     console.error("Error in reorderCurriculums:", error)
@@ -414,6 +438,7 @@ export async function addLevelToCurriculumSet(
       return { error: `Failed to add level: ${error.message}` }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Level added successfully", id: newLevel?.id }
   } catch (error) {
     console.error("Error in addLevelToCurriculumSet:", error)
@@ -450,6 +475,7 @@ export async function updateLevelInCurriculumSet(
       return { error: "Failed to update level" }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Level updated successfully" }
   } catch (error) {
     console.error("Error in updateLevelInCurriculumSet:", error)
@@ -505,6 +531,7 @@ export async function deleteLevelFromCurriculumSet(levelId: string): Promise<{ s
       )
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Level deleted successfully" }
   } catch (error) {
     console.error("Error in deleteLevelFromCurriculumSet:", error)
@@ -525,6 +552,7 @@ export async function reorderLevelsInCurriculumSet(
 
     await Promise.all(updates)
 
+    revalidateTag("curriculums", "max")
     return { success: "Levels reordered successfully" }
   } catch (error) {
     console.error("Error in reorderLevelsInCurriculumSet:", error)
