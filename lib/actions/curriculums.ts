@@ -167,12 +167,11 @@ export async function deleteCurriculum(curriculumId: string): Promise<{ success?
       .order("display_order", { ascending: true })
 
     if (curriculumsToUpdate && curriculumsToUpdate.length > 0) {
-      for (const curr of curriculumsToUpdate) {
-        await serviceSupabase
-          .from("curriculums")
-          .update({ display_order: curr.display_order - 1 })
-          .eq("id", curr.id)
-      }
+      await Promise.all(
+        curriculumsToUpdate.map((curr) =>
+          serviceSupabase.from("curriculums").update({ display_order: curr.display_order - 1 }).eq("id", curr.id),
+        ),
+      )
     }
 
     return { success: "Curriculum deleted successfully" }
@@ -498,12 +497,11 @@ export async function deleteLevelFromCurriculumSet(levelId: string): Promise<{ s
       .order("display_order", { ascending: true })
 
     if (levelsToUpdate && levelsToUpdate.length > 0) {
-      for (const level of levelsToUpdate) {
-        await serviceSupabase
-          .from("curriculums")
-          .update({ display_order: level.display_order - 1 })
-          .eq("id", level.id)
-      }
+      await Promise.all(
+        levelsToUpdate.map((level) =>
+          serviceSupabase.from("curriculums").update({ display_order: level.display_order - 1 }).eq("id", level.id),
+        ),
+      )
     }
 
     return { success: "Level deleted successfully" }
