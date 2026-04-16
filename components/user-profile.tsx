@@ -3,7 +3,6 @@
 import type React from "react"
 import { updateProfile } from "@/lib/actions"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -292,11 +291,15 @@ function BeltSelectorValue({
 
 // Custom hook to manage profile editing state and handlers
 function useProfileEditor(user: UserProfileProps["user"]) {
-  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  // Tracks the last successfully saved display values for optimistic UI
+  const [displayData, setDisplayData] = useState({
+    full_name: user.full_name || null as string | null,
+    profile_image_url: user.profile_image_url || null as string | null,
+  })
   const [formData, setFormData] = useState({
     full_name: user.full_name || "",
     profile_image_url: user.profile_image_url || "",
@@ -341,9 +344,13 @@ function useProfileEditor(user: UserProfileProps["user"]) {
         throw new Error(result.error || "Failed to update profile")
       }
 
+      const saved = {
+        full_name: formData.full_name || null,
+        profile_image_url: formData.profile_image_url || null,
+      }
+      setDisplayData(saved)
       setIsEditing(false)
       setImagePreview(null)
-      router.refresh()
     } catch (error) {
       console.error("Error updating profile:", error)
       alert("Failed to update profile. Please try again.")
@@ -354,8 +361,8 @@ function useProfileEditor(user: UserProfileProps["user"]) {
 
   const handleCancel = () => {
     setFormData({
-      full_name: user.full_name || "",
-      profile_image_url: user.profile_image_url || "",
+      full_name: displayData.full_name || "",
+      profile_image_url: displayData.profile_image_url || "",
     })
     setImagePreview(null)
     setIsEditing(false)
@@ -368,6 +375,7 @@ function useProfileEditor(user: UserProfileProps["user"]) {
     uploadingImage,
     imagePreview,
     setImagePreview,
+    displayData,
     formData,
     setFormData,
     handleImageUpload,
@@ -377,9 +385,15 @@ function useProfileEditor(user: UserProfileProps["user"]) {
 }
 
 // Custom hook to manage belt selection state and handlers
-function useBeltSelector(userId: string, initialBeltId: string | null) {
-  const router = useRouter()
+function useBeltSelector(
+  userId: string,
+  initialBeltId: string | null,
+  initialBelt: UserProfileProps["user"]["current_belt"],
+  curriculums: UserProfileProps["curriculums"],
+  curriculumLevels?: UserProfileProps["curriculumLevels"],
+) {
   const [currentBeltId, setCurrentBeltId] = useState<string | null>(initialBeltId)
+  const [currentBelt, setCurrentBelt] = useState(initialBelt)
   const [beltLoading, setBeltLoading] = useState(false)
 
   const handleBeltChange = async (beltId: string) => {
@@ -395,7 +409,22 @@ function useBeltSelector(userId: string, initialBeltId: string | null) {
       }
 
       setCurrentBeltId(newBeltId)
-      router.refresh()
+      if (newBeltId) {
+        // Look up in curriculums first (includes color), then fall back to levels list
+        const fromCurriculums = curriculums.find((c) => c.id === newBeltId)
+        if (fromCurriculums) {
+          setCurrentBelt(fromCurriculums)
+        } else {
+          const fromLevels = curriculumLevels?.find((l) => l.id === newBeltId)
+          setCurrentBelt(
+            fromLevels
+              ? { id: fromLevels.id, name: fromLevels.display_name, color: "", display_order: fromLevels.sort_order }
+              : null,
+          )
+        }
+      } else {
+        setCurrentBelt(null)
+      }
     } catch (error) {
       console.error("Error updating belt:", error)
       alert("Failed to update belt. Please try again.")
@@ -404,7 +433,7 @@ function useBeltSelector(userId: string, initialBeltId: string | null) {
     }
   }
 
-  return { currentBeltId, beltLoading, handleBeltChange }
+  return { currentBeltId, currentBelt, beltLoading, handleBeltChange }
 }
 
 // Extracted component for account statistics card
@@ -542,6 +571,7 @@ function BeltSelector({
 function AccountInformationCard({
   user,
   currentBeltId,
+  currentBelt,
   beltLoading,
   handleBeltChange,
   curriculums,
@@ -549,6 +579,7 @@ function AccountInformationCard({
 }: Readonly<{
   user: UserProfileProps["user"]
   currentBeltId: string | null
+  currentBelt: UserProfileProps["user"]["current_belt"]
   beltLoading: boolean
   handleBeltChange: (beltId: string) => void
   curriculums: UserProfileProps["curriculums"]
@@ -583,7 +614,7 @@ function AccountInformationCard({
             currentBeltId={currentBeltId}
             beltLoading={beltLoading}
             handleBeltChange={handleBeltChange}
-            currentBelt={user.current_belt}
+            currentBelt={currentBelt}
             curriculums={curriculums}
             curriculumLevels={curriculumLevels}
             hasCurriculumSet={!!user.curriculum_set_id}
@@ -698,8 +729,6 @@ function ProfileHeaderCard({
 }
 
 export default function UserProfile({ user, curriculums, curriculumLevels }: UserProfileProps) {
-  const initials = getInitials(user.full_name, user.email)
-
   const {
     isEditing,
     setIsEditing,
@@ -707,6 +736,7 @@ export default function UserProfile({ user, curriculums, curriculumLevels }: Use
     uploadingImage,
     imagePreview,
     setImagePreview,
+    displayData,
     formData,
     setFormData,
     handleImageUpload,
@@ -714,13 +744,23 @@ export default function UserProfile({ user, curriculums, curriculumLevels }: Use
     handleCancel,
   } = useProfileEditor(user)
 
-  const { currentBeltId, beltLoading, handleBeltChange } = useBeltSelector(user.id, user.current_belt_id)
+  const { currentBeltId, currentBelt, beltLoading, handleBeltChange } = useBeltSelector(
+    user.id,
+    user.current_belt_id,
+    user.current_belt,
+    curriculums,
+    curriculumLevels,
+  )
+
+  // Merge server-provided user with locally updated display values for optimistic rendering
+  const displayUser = { ...user, full_name: displayData.full_name, profile_image_url: displayData.profile_image_url }
+  const initials = getInitials(displayData.full_name, user.email)
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Profile Header */}
       <ProfileHeaderCard
-        user={user}
+        user={displayUser}
         initials={initials}
         isEditing={isEditing}
         setIsEditing={setIsEditing}
@@ -745,6 +785,7 @@ export default function UserProfile({ user, curriculums, curriculumLevels }: Use
       <AccountInformationCard
         user={user}
         currentBeltId={currentBeltId}
+        currentBelt={currentBelt}
         beltLoading={beltLoading}
         handleBeltChange={handleBeltChange}
         curriculums={curriculums}

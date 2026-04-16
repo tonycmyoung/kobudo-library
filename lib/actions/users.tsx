@@ -521,6 +521,7 @@ export async function updateProfile(params: {
       return { error: "Failed to update profile", success: false }
     }
 
+    revalidatePath("/profile")
     return { success: true }
   } catch (error) {
     console.error("Error in updateProfile:", error)
