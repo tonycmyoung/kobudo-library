@@ -169,6 +169,11 @@ describe("User Actions", () => {
 
   describe("updateProfile", () => {
     it("should successfully update user profile", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "user-123", email: "test@example.com" } },
+        error: null,
+      })
+
       mockServiceClient.from.mockReturnValue({
         update: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
@@ -198,6 +203,11 @@ describe("User Actions", () => {
     })
 
     it("should handle database errors", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "user-123", email: "test@example.com" } },
+        error: null,
+      })
+
       mockServiceClient.from.mockReturnValue({
         update: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
@@ -1005,6 +1015,19 @@ describe("User Actions", () => {
 
   describe("deleteUserCompletely", () => {
     it("should successfully delete user from both database and auth", async () => {
+      mockSupabaseClient.auth = {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "admin-123", email: "admin@example.com" } },
+          error: null,
+        }),
+      } as unknown as typeof mockSupabaseClient.auth
+
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" }, error: null }),
+      })
+
       let fromCallCount = 0
       mockServiceClient.from.mockImplementation((_table: string) => {
         fromCallCount++
@@ -1038,13 +1061,6 @@ describe("User Actions", () => {
         return {}
       })
 
-      mockSupabaseClient.auth = {
-        getUser: vi.fn().mockResolvedValue({
-          data: { user: { id: "admin-123", email: "admin@example.com" } },
-          error: null,
-        }),
-      } as unknown as typeof mockSupabaseClient.auth
-
       mockServiceClient.auth = {
         admin: {
           deleteUser: vi.fn().mockResolvedValue({ error: null }),
@@ -1058,6 +1074,12 @@ describe("User Actions", () => {
     })
 
     it("should return error if database deletion fails", async () => {
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" }, error: null }),
+      })
+
       let fromCallCount = 0
       mockServiceClient.from.mockImplementation((_table: string) => {
         fromCallCount++
@@ -1098,6 +1120,12 @@ describe("User Actions", () => {
     })
 
     it("should handle auth deletion errors gracefully", async () => {
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" }, error: null }),
+      })
+
       let fromCallCount = 0
       mockServiceClient.from.mockImplementation((_table: string) => {
         fromCallCount++
