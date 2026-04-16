@@ -1,7 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import React from "react"
 import SortControl from "@/components/sort-control"
+
+// Radix Select triggers jsdom navigation errors. Swap in a native <select> so
+// onValueChange can be exercised through standard userEvent.selectOptions.
+vi.mock("@/components/ui/select", () => ({
+  Select: ({ value, onValueChange, children }: { value?: string; onValueChange?: (v: string) => void; children: React.ReactNode }) =>
+    React.createElement("select", { value, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => onValueChange?.(e.target.value) }, children),
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  SelectValue: () => null,
+  SelectContent: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) =>
+    React.createElement("option", { value }, children),
+}))
 
 describe("SortControl", () => {
   const defaultProps = {
@@ -91,5 +104,16 @@ describe("SortControl", () => {
 
     const trigger2 = screen.getAllByRole("combobox")[1]
     expect(trigger2).toHaveTextContent("Category")
+  })
+
+  it("should call onSortChange with new sort key and existing order when sort-by selection changes", async () => {
+    const user = userEvent.setup({ delay: null })
+    const onSortChange = vi.fn()
+    render(<SortControl {...defaultProps} sortBy="curriculum" sortOrder="asc" onSortChange={onSortChange} />)
+
+    const select = screen.getByRole("combobox")
+    await user.selectOptions(select, "title")
+
+    expect(onSortChange).toHaveBeenCalledWith("title", "asc")
   })
 })

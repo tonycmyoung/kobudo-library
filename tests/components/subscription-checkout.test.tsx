@@ -337,6 +337,51 @@ describe("SubscriptionCheckout", () => {
     })
   })
 
+  it("should call setInterval('monthly') when Monthly button is clicked directly", async () => {
+    render(
+      <SubscriptionCheckout
+        email="test@example.com"
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+        onBack={mockOnBack}
+      />
+    )
+
+    // The Monthly button is the first interval button; click it directly to exercise its onClick handler
+    const monthlyButton = screen.getByRole("button", { name: /monthly/i })
+    fireEvent.click(monthlyButton)
+
+    // State stays monthly — verify monthly price is still shown
+    expect(screen.getByText("$2.00")).toBeInTheDocument()
+  })
+
+  it("should switch back to monthly prices when monthly is clicked after annual", async () => {
+    render(
+      <SubscriptionCheckout
+        email="test@example.com"
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+        onBack={mockOnBack}
+      />
+    )
+
+    // Switch to annual first
+    const annualButton = screen.getByText("Annual")
+    fireEvent.click(annualButton)
+
+    await waitFor(() => {
+      expect(screen.getByText("$20.00")).toBeInTheDocument()
+    })
+
+    // Switch back to monthly
+    const monthlyButton = screen.getByText("Monthly")
+    fireEvent.click(monthlyButton)
+
+    await waitFor(() => {
+      expect(screen.getByText("$2.00")).toBeInTheDocument()
+    })
+  })
+
   it("should show loading state while creating subscription", async () => {
     // Make the mock take a bit to resolve
     mockCreateSubscriptionCheckout.mockImplementation(() => new Promise(() => {}))

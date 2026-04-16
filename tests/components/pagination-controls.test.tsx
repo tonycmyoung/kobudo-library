@@ -236,6 +236,46 @@ describe("PaginationControls", () => {
       expect(screen.getAllByRole("button").some((b) => b.textContent === "1")).toBe(true)
     })
 
+    it("calls onPageChange(1) when the page-1 button inside PageNumbers is clicked (line 125)", async () => {
+      // startPage > 1 when currentPage is far enough from start; page 1 is prepended as a
+      // standalone button inside PageNumbers (distinct from the First nav button).
+      const onPageChange = vi.fn()
+      render(
+        <PaginationControls
+          totalPages={20}
+          itemsPerPage={12}
+          onItemsPerPageChange={noop}
+          currentPage={10}
+          onPageChange={onPageChange}
+        />
+      )
+      // There are two buttons labelled "1": the "First" nav button and the page-1 button
+      // inside PageNumbers. Find the one whose textContent is exactly "1".
+      const pageOneButtons = screen.getAllByRole("button").filter((b) => b.textContent === "1")
+      // Click the last one (the PageNumbers button; First nav button has label "First")
+      await user.click(pageOneButtons[pageOneButtons.length - 1])
+      expect(onPageChange).toHaveBeenCalledWith(1)
+    })
+
+    it("calls onPageChange(totalPages) when the last-page button inside PageNumbers is clicked (line 169)", async () => {
+      // endPage < totalPages when currentPage is far enough from end; last page is appended
+      // as a standalone button inside PageNumbers (distinct from the Last nav button).
+      const onPageChange = vi.fn()
+      render(
+        <PaginationControls
+          totalPages={20}
+          itemsPerPage={12}
+          onItemsPerPageChange={noop}
+          currentPage={10}
+          onPageChange={onPageChange}
+        />
+      )
+      // Find buttons whose textContent is exactly "20"
+      const lastPageButtons = screen.getAllByRole("button").filter((b) => b.textContent === "20")
+      await user.click(lastPageButtons[lastPageButtons.length - 1])
+      expect(onPageChange).toHaveBeenCalledWith(20)
+    })
+
     it("calls onPageChange with page number when a page button is clicked", async () => {
       const onPageChange = vi.fn()
       render(

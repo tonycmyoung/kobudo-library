@@ -48,6 +48,16 @@ describe("performers actions", () => {
 
       expect(result.error).toBe("Failed to add performer")
     })
+
+    it("should handle thrown exceptions from Supabase", async () => {
+      mockFrom.mockReturnValue({
+        insert: vi.fn().mockRejectedValue(new Error("db crash")),
+      })
+
+      const result = await addPerformer("Test Performer")
+
+      expect(result.error).toBe("Failed to add performer")
+    })
   })
 
   describe("updatePerformer", () => {
@@ -68,6 +78,18 @@ describe("performers actions", () => {
       mockFrom.mockReturnValue({
         update: vi.fn().mockReturnValue({
           eq: vi.fn().mockResolvedValue({ error: { message: "Update failed" } }),
+        }),
+      })
+
+      const result = await updatePerformer("perf-123", "Name", "Bio")
+
+      expect(result.error).toBe("Failed to update performer")
+    })
+
+    it("should handle thrown exceptions from Supabase", async () => {
+      mockFrom.mockReturnValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockRejectedValue(new Error("db crash")),
         }),
       })
 

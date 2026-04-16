@@ -204,6 +204,81 @@ describe("DebugDashboard", () => {
     expect(within(user2Row!).getByText("Error")).toBeInTheDocument()
   })
 
+  it("should use default gray icon for unknown event types (line 78)", async () => {
+    const logsWithUnknownEvent = [
+      {
+        ...mockLogs[0],
+        id: "log-unknown",
+        event_type: "unknown_event_type",
+        user_email: "unknown@example.com",
+        error_message: null,
+        additional_data: null,
+      },
+    ]
+
+    vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(logsWithUnknownEvent)
+
+    render(<DebugDashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText("unknown@example.com")).toBeInTheDocument()
+    })
+
+    // The default branch renders badge with a humanised label (replace _ with space, first only)
+    expect(screen.getByText("unknown event_type")).toBeInTheDocument()
+  })
+
+  it("should display failure_reason from additional_data when present (line 124)", async () => {
+    const logsWithFailureReason = [
+      {
+        ...mockLogs[0],
+        id: "log-failure",
+        event_type: "login_attempt",
+        user_email: "fail@example.com",
+        success: false,
+        error_message: null,
+        additional_data: { failure_reason: "account_locked" },
+      },
+    ]
+
+    vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(logsWithFailureReason)
+
+    render(<DebugDashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText("fail@example.com")).toBeInTheDocument()
+    })
+
+    expect(screen.getByText("Reason: account_locked")).toBeInTheDocument()
+  })
+
+  it("should return null from getKeyAdditionalData when no matching key exists (line 131)", async () => {
+    const logsWithUnrecognisedData = [
+      {
+        ...mockLogs[0],
+        id: "log-no-key",
+        event_type: "login_attempt",
+        user_email: "nokey@example.com",
+        success: true,
+        error_message: null,
+        additional_data: { some_other_field: "value" },
+      },
+    ]
+
+    vi.mocked(actions.fetchAuthDebugLogs).mockResolvedValue(logsWithUnrecognisedData)
+
+    render(<DebugDashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText("nokey@example.com")).toBeInTheDocument()
+    })
+
+    // When getKeyAdditionalData returns null the cell falls back to showing "-"
+    const row = screen.getByText("nokey@example.com").closest("tr")
+    expect(row).toBeInTheDocument()
+    expect(within(row!).getByText("-")).toBeInTheDocument()
+  })
+
   it("should handle clear logs errors gracefully", async () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 

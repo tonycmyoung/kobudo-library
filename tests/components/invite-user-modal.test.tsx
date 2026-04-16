@@ -208,6 +208,23 @@ describe("InviteUserModal", () => {
     expect(mockOnClose).toHaveBeenCalled()
   })
 
+  it("should show error when submitting with empty email", async () => {
+    render(<InviteUserModal isOpen={true} onClose={mockOnClose} />)
+
+    // The email input has `required` but jsdom doesn't enforce HTML5 constraint
+    // validation, so dispatching submit fires handleInvite with an empty email value.
+    const emailInput = screen.getByLabelText(/email address/i)
+    emailInput.removeAttribute("required")
+
+    const form = emailInput.closest("form")!
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      expect(screen.getByText("Please enter an email address")).toBeInTheDocument()
+    })
+    expect(inviteUser).not.toHaveBeenCalled()
+  })
+
   it("should handle unexpected errors gracefully", async () => {
     const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockRejectedValue(new Error("Network error"))

@@ -25,13 +25,16 @@ vi.mock("react-dom", async () => {
   }
 })
 
+const mockRouterPush = vi.fn()
+const mockSearchParamsGet = vi.fn()
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-  }),
-  useSearchParams: () => ({
-    get: vi.fn(),
-  }),
+  useRouter: vi.fn(() => ({
+    push: mockRouterPush,
+  })),
+  useSearchParams: vi.fn(() => ({
+    get: mockSearchParamsGet,
+  })),
 }))
 
 describe("SignUpForm", () => {
@@ -39,6 +42,8 @@ describe("SignUpForm", () => {
     vi.clearAllMocks()
     // Provide a default useActionState mock so existing tests render correctly
     vi.mocked(useActionState).mockReturnValue([null, vi.fn(), false])
+    // Default: no invitation token
+    mockSearchParamsGet.mockReturnValue(null)
   })
 
   it("should render sign up form with all fields", () => {
@@ -202,6 +207,31 @@ describe("SignUpForm", () => {
     })
   })
 
+  describe("Invitation token", () => {
+    it("should append invitationToken to formData when token is present in search params", async () => {
+      const mockFormAction = vi.fn()
+      vi.mocked(useActionState).mockReturnValue([null, mockFormAction, false])
+      mockSearchParamsGet.mockImplementation((key: string) => (key === "invitation" ? "invite-abc123" : null))
+      const user = userEvent.setup({ delay: null })
+
+      render(<SignUpForm />)
+
+      await user.click(screen.getByLabelText(/End User License Agreement/i))
+      await user.click(screen.getByLabelText(/Privacy Policy/i))
+      await user.type(screen.getByLabelText("Full Name"), "John Doe")
+      await user.type(screen.getByLabelText("Email"), "john@example.com")
+      await user.type(screen.getByLabelText("Teacher"), "Sensei Smith")
+      await user.type(screen.getByLabelText("School"), "Test Dojo")
+      await user.type(screen.getByLabelText("Password"), "Password123!")
+
+      await user.click(screen.getByRole("button", { name: /Create Account/i }))
+
+      await waitFor(() => {
+        expect(mockFormAction).toHaveBeenCalled()
+      })
+    })
+  })
+
   describe("State effects", () => {
     it("should redirect to login after success state with timer", () => {
       vi.mocked(useActionState).mockReturnValue([{ success: "Account created!" }, vi.fn(), false])
@@ -210,6 +240,20 @@ describe("SignUpForm", () => {
 
       // Success message should be visible immediately
       expect(screen.getByText(/Redirecting to login page/)).toBeInTheDocument()
+    })
+
+    it("should call router.push to login after success timer elapses", async () => {
+      vi.useFakeTimers()
+      vi.mocked(useActionState).mockReturnValue([{ success: "Account created!" }, vi.fn(), false])
+
+      render(<SignUpForm />)
+
+      await act(async () => {
+        vi.advanceTimersByTime(2500)
+      })
+
+      expect(mockRouterPush).toHaveBeenCalledWith("/auth/login")
+      vi.useRealTimers()
     })
 
     it("should show error message when state has error", async () => {

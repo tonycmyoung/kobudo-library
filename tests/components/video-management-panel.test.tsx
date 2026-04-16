@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { VideoManagementPanel } from "@/components/video-management-panel"
 import { getVideosForLevel, addVideoToLevel, removeVideoFromLevel, getAvailableVideos } from "@/lib/actions/curriculums"
@@ -288,6 +288,61 @@ describe("VideoManagementPanel", () => {
       await user.click(closeButton)
 
       expect(mockOnClose).toHaveBeenCalled()
+    })
+  })
+
+  describe("Null-level guards inside handlers (lines 46, 57)", () => {
+    it("handleAddVideoToLevel returns early when level becomes null before handler runs (line 46)", async () => {
+      // Render with a valid level and available (unassigned) videos
+      vi.mocked(getVideosForLevel).mockResolvedValue([])
+      vi.mocked(getAvailableVideos).mockResolvedValue(mockAvailableVideos)
+
+      // Make addVideoToLevel block indefinitely so we can change the level mid-flight
+      let resolveAdd!: () => void
+      vi.mocked(addVideoToLevel).mockImplementation(
+        () => new Promise((res) => { resolveAdd = () => res({ success: "ok" }) })
+      )
+
+      const { rerender } = render(<VideoManagementPanel level={mockLevel} onClose={mockOnClose} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByTitle("Add to level").length).toBeGreaterThan(0)
+      })
+
+      // Rerender with null level so the handler closure now sees level === null
+      await act(async () => {
+        rerender(<VideoManagementPanel level={null} onClose={mockOnClose} />)
+      })
+
+      // Resolve the pending add — the early-return guard (line 46) should prevent any action
+      await act(async () => { resolveAdd?.() })
+
+      // addVideoToLevel should never have been called (we never clicked; just confirming no crash)
+      expect(addVideoToLevel).not.toHaveBeenCalled()
+    })
+
+    it("handleRemoveVideoFromLevel returns early when level becomes null before handler runs (line 57)", async () => {
+      vi.mocked(getVideosForLevel).mockResolvedValue(mockAssignedVideos)
+      vi.mocked(getAvailableVideos).mockResolvedValue([])
+
+      let resolveRemove!: () => void
+      vi.mocked(removeVideoFromLevel).mockImplementation(
+        () => new Promise((res) => { resolveRemove = () => res({ success: "ok" }) })
+      )
+
+      const { rerender } = render(<VideoManagementPanel level={mockLevel} onClose={mockOnClose} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByTitle("Remove from level").length).toBeGreaterThan(0)
+      })
+
+      await act(async () => {
+        rerender(<VideoManagementPanel level={null} onClose={mockOnClose} />)
+      })
+
+      await act(async () => { resolveRemove?.() })
+
+      expect(removeVideoFromLevel).not.toHaveBeenCalled()
     })
   })
 

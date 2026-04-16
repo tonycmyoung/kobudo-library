@@ -305,4 +305,79 @@ describe("NotificationBell", () => {
       )
     })
   })
+
+  it("should log traceError when markAllAsRead throws", async () => {
+    // Covers line 116: catch block in markAllAsRead
+    mockIn.mockReturnValue({ select: mockSelect })
+    // Make the update chain throw instead of resolving
+    mockUpdate.mockImplementation(() => {
+      throw new Error("Network error")
+    })
+
+    render(<NotificationBell userId="user-123" />)
+
+    await user.click(screen.getByRole("button"))
+
+    await waitFor(() => {
+      expect(screen.getByText(/1 unread/)).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByText(/all read/i))
+
+    await waitFor(() => {
+      expect(traceError).toHaveBeenCalledWith(
+        "Error marking all notifications as read",
+        expect.objectContaining({ category: "notifications" }),
+      )
+    })
+  })
+
+  it("should log traceError when deleteNotification returns an error", async () => {
+    // Covers lines 129-130: error branch in deleteNotification
+    mockEq.mockResolvedValue({ data: null, error: { message: "Delete failed" } })
+    mockDelete.mockReturnValue({ eq: mockEq, in: mockIn })
+
+    render(<NotificationBell userId="user-123" />)
+
+    await user.click(screen.getByRole("button"))
+
+    await waitFor(() => {
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
+    })
+
+    const deleteButtons = screen.getAllByTitle("Delete notification")
+    await user.click(deleteButtons[0])
+
+    await waitFor(() => {
+      expect(traceError).toHaveBeenCalledWith(
+        "Error deleting notification",
+        expect.objectContaining({ category: "notifications" }),
+      )
+    })
+  })
+
+  it("should log traceError when deleteNotification throws", async () => {
+    // Covers line 137: catch block in deleteNotification
+    mockDelete.mockImplementation(() => {
+      throw new Error("Network error")
+    })
+
+    render(<NotificationBell userId="user-123" />)
+
+    await user.click(screen.getByRole("button"))
+
+    await waitFor(() => {
+      expect(screen.getByText("Test notification 1")).toBeInTheDocument()
+    })
+
+    const deleteButtons = screen.getAllByTitle("Delete notification")
+    await user.click(deleteButtons[0])
+
+    await waitFor(() => {
+      expect(traceError).toHaveBeenCalledWith(
+        "Error deleting notification",
+        expect.objectContaining({ category: "notifications" }),
+      )
+    })
+  })
 })

@@ -250,6 +250,89 @@ describe("LoadingProvider", () => {
     })
   })
 
+  describe("isInternalNavigation with malformed URL (catch branch)", () => {
+    it("should not trigger loading when link href cannot be parsed as a URL", () => {
+      // jsdom resolves relative hrefs to absolute URLs on real <a> elements,
+      // so we use a span with an onclick that dispatches a click on a synthetic
+      // element whose href property is an unparseable string.
+      render(
+        <LoadingProvider>
+          <ContextReader />
+        </LoadingProvider>,
+      )
+
+      // Create a detached anchor whose .href property is a non-URL string so
+      // that new URL(href) throws, exercising the catch-return-false branch.
+      const fakeAnchor = document.createElement("a")
+      Object.defineProperty(fakeAnchor, "href", { value: "not-a-valid-url:::bad", configurable: true })
+      Object.defineProperty(fakeAnchor, "getAttribute", { value: () => null, configurable: true })
+      Object.defineProperty(fakeAnchor, "target", { value: "", configurable: true })
+      document.body.appendChild(fakeAnchor)
+
+      act(() => {
+        fakeAnchor.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+      })
+
+      expect(screen.getByTestId("loading-state")).toHaveTextContent("idle")
+
+      document.body.removeChild(fakeAnchor)
+    })
+  })
+
+  describe("showSpinnerIfLoading and clearLoadingState timers", () => {
+    it("should show spinner overlay after 200ms when loading is still active", () => {
+      render(
+        <LoadingProvider>
+          <ContextReader />
+          <a href="/page-a">Go</a>
+        </LoadingProvider>,
+      )
+
+      // Flush the 0ms mount-reset timer (from the pathname useEffect) before clicking,
+      // so it doesn't fire mid-test and override the loading state set by the click.
+      act(() => {
+        vi.advanceTimersByTime(0)
+      })
+
+      const link = screen.getByText("Go")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
+      act(() => {
+        fireEvent.click(link)
+      })
+
+      expect(screen.queryByText("Loading...")).toBeNull()
+
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+
+      expect(screen.getByText("Loading...")).toBeInTheDocument()
+    })
+
+    it("should auto-clear loading state after 10 seconds fallback", () => {
+      render(
+        <LoadingProvider>
+          <ContextReader />
+          <a href="/page-b">Go</a>
+        </LoadingProvider>,
+      )
+
+      const link = screen.getByText("Go")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
+      act(() => {
+        fireEvent.click(link)
+      })
+
+      expect(screen.getByTestId("loading-state")).toHaveTextContent("loading")
+
+      act(() => {
+        vi.advanceTimersByTime(10000)
+      })
+
+      expect(screen.getByTestId("loading-state")).toHaveTextContent("idle")
+    })
+  })
+
   describe("Pathname change resets loading", () => {
     it("should clear loading state when pathname changes", () => {
       vi.mocked(usePathname).mockReturnValue("/old")

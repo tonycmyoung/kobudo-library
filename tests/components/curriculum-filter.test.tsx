@@ -80,6 +80,26 @@ describe("CurriculumFilter", () => {
     expect(selectedBadge).toHaveStyle({ backgroundColor: "#ffffff" })
   })
 
+  it("should render unselected curriculum badge with invalid color without crashing", () => {
+    // addTransparency returns null when color is not a valid hex (< 7 chars or no #)
+    // The badge falls back to item.color for borderColor in that case
+    const curriculumsWithInvalidColor = [
+      { id: "curr-bad", name: "BadColor", color: "red", display_order: 1 },
+    ]
+    render(
+      <CurriculumFilter
+        curriculums={curriculumsWithInvalidColor}
+        selectedCurriculums={[]}
+        onCurriculumToggle={vi.fn()}
+      />,
+    )
+
+    const badge = screen.getByText("BadColor")
+    expect(badge).toBeInTheDocument()
+    // borderColor should fall back to item.color ("red") since addTransparency returned null
+    expect(badge).toHaveStyle({ borderColor: "red" })
+  })
+
   describe("groupBySet", () => {
     it("should render curriculums grouped by set when groupBySet is true", () => {
       render(<CurriculumFilter {...defaultProps} groupBySet={true} />)

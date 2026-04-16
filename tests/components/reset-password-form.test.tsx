@@ -139,6 +139,33 @@ describe("ResetPasswordForm", () => {
     )
   })
 
+  it("should show error when SIGNED_OUT event is triggered", async () => {
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
+
+    let authStateCallback: ((event: string, session: unknown) => void) | null = null
+    mockOnAuthStateChange.mockImplementation((callback) => {
+      authStateCallback = callback
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    let unmount: () => void
+    await act(async () => {
+      const result = render(<ResetPasswordForm />)
+      unmount = result.unmount
+    })
+
+    await act(async () => {
+      if (authStateCallback) {
+        authStateCallback("SIGNED_OUT", null)
+      }
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText(/Your password reset link has expired/i)).toBeInTheDocument()
+    })
+    unmount!()
+  })
+
   it("should show error when no session after timeout", async () => {
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
 
@@ -225,4 +252,49 @@ describe("ResetPasswordForm", () => {
       { timeout: 7000 },
     )
   }, 10000) // Add test timeout as parameter to it() function
+
+  it("should navigate to login when Return to Login is clicked", async () => {
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
+
+    const assignMock = vi.fn()
+    Object.defineProperty(globalThis, "location", {
+      value: { href: "" },
+      writable: true,
+      configurable: true,
+    })
+
+    render(<ResetPasswordForm />)
+
+    await waitFor(
+      () => {
+        const returnButton = screen.getByRole("button", { name: /return to login/i })
+        returnButton.click()
+        expect(globalThis.location.href).toBe("/auth/login")
+      },
+      { timeout: 7000 },
+    )
+
+    void assignMock
+  }, 10000)
+
+  it("should toggle confirm password visibility when form is shown", async () => {
+    const user = userEvent.setup({ delay: null })
+    mockGetSession.mockResolvedValue({
+      data: { session: { user: { id: "user-123" } } },
+      error: null,
+    })
+
+    render(<ResetPasswordForm />)
+
+    await waitFor(async () => {
+      const confirmInput = screen.getByLabelText("Confirm New Password") as HTMLInputElement
+      expect(confirmInput.type).toBe("password")
+
+      const toggleButton = confirmInput.parentElement?.querySelector("button")
+      if (toggleButton) {
+        await user.click(toggleButton)
+        expect(confirmInput.type).toBe("text")
+      }
+    })
+  })
 })

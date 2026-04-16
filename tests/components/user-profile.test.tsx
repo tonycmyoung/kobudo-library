@@ -24,7 +24,7 @@ vi.mock("@/components/ui/select", () => ({
     </select>
   ),
   SelectTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SelectValue: ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>,
+  SelectValue: ({ placeholder, children }: { placeholder?: string; children?: React.ReactNode }) => <span>{children ?? placeholder}</span>,
   SelectContent: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) => <option value={value}>{children}</option>,
   SelectGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -356,6 +356,106 @@ describe("UserProfile", () => {
       await waitFor(() => {
         expect(global.alert).toHaveBeenCalledWith("Failed to upload image. Please try again.")
       })
+    })
+  })
+
+  describe("Remove image button in edit mode", () => {
+    it("should clear image preview and profile_image_url when remove button is clicked with an imagePreview set", async () => {
+      // Covers lines 184-185: the onClick of the remove-image Button inside ProfileEditForm
+      const user = userEvent.setup({ delay: null })
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ url: "https://example.com/uploaded.jpg" }),
+      } as Response)
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      // Enter edit mode
+      await user.click(screen.getByRole("button", { name: /edit profile/i }))
+
+      // Upload a file so imagePreview is set (causing the remove button to appear)
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(["content"], "photo.jpg", { type: "image/jpeg" })
+      await user.upload(fileInput, file)
+
+      // Wait for upload to complete and the remove button to appear
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "" })).toBeInTheDocument()
+      })
+
+      // The remove button is the outline button with just the X icon inside ProfileEditForm
+      const removeButton = screen.getByRole("button", { name: "" })
+      await user.click(removeButton)
+
+      // After clearing, the file input shows "Choose Image" again (uploadingImage is false)
+      await waitFor(() => {
+        expect(screen.getByText("Choose Image")).toBeInTheDocument()
+      })
+    })
+
+    it("should show remove button when user has an existing profile image (no preview needed)", async () => {
+      // Covers line 145: showRemoveButton is truthy when profileImageUrl is set
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      // Enter edit mode — mockUser has profile_image_url set
+      await user.click(screen.getByRole("button", { name: /edit profile/i }))
+
+      // The remove button (X icon) should be present because profileImageUrl is set
+      await waitFor(() => {
+        // There should be a button with just the X icon (no text label)
+        const buttons = screen.getAllByRole("button")
+        const removeBtn = buttons.find((b) => b.getAttribute("type") === "button" && b.querySelector("svg"))
+        expect(removeBtn).toBeDefined()
+      })
+    })
+  })
+
+  describe("BeltSelectorValue display", () => {
+    it("should show loading spinner text while belt is updating", async () => {
+      // Covers lines 274-280: beltLoading=true branch of BeltSelectorValue
+      vi.mocked(updateUserBelt).mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            // Never resolves during the test — keeps beltLoading=true
+            setTimeout(() => resolve({ success: true }), 60000)
+          }),
+      )
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const beltSelect = screen.getByTestId("belt-select")
+      // Trigger a belt change — beltLoading becomes true immediately
+      user.selectOptions(beltSelect, "level-2")
+
+      await waitFor(() => {
+        // While loading, the BeltSelectorValue renders "Updating..."
+        expect(screen.getByText("Updating...")).toBeInTheDocument()
+      })
+    })
+
+    it("should show belt color swatch and name when currentBeltId and currentBelt are set", () => {
+      // Covers lines 282-289: the currentBeltId && currentBelt branch of BeltSelectorValue
+      // mockUser already has current_belt_id and current_belt populated
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      // The BeltSelectorValue renders the belt name inside the SelectValue
+      expect(screen.getByText("White Belt")).toBeInTheDocument()
+    })
+
+    it("should show Not specified text when no belt is selected", () => {
+      // Covers line 290: the fallback return "Not specified" branch
+      const userNoBelt = {
+        ...mockUser,
+        current_belt_id: null,
+        current_belt: null,
+      }
+      render(<UserProfile user={userNoBelt} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      const notSpecified = screen.getAllByText("Not specified")
+      expect(notSpecified.length).toBeGreaterThan(0)
     })
   })
 

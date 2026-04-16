@@ -1,7 +1,20 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import React from "react"
 import UserSortControl from "@/components/user-sort-control"
+
+// Radix Select triggers jsdom navigation errors. Swap in a native <select> so
+// onValueChange can be exercised through standard userEvent.selectOptions.
+vi.mock("@/components/ui/select", () => ({
+  Select: ({ value, onValueChange, children }: { value?: string; onValueChange?: (v: string) => void; children: React.ReactNode }) =>
+    React.createElement("select", { value, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => onValueChange?.(e.target.value) }, children),
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  SelectValue: () => null,
+  SelectContent: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) =>
+    React.createElement("option", { value }, children),
+}))
 
 describe("UserSortControl", () => {
   it("should render sort label and controls", () => {
@@ -30,6 +43,17 @@ describe("UserSortControl", () => {
     await user.click(toggleButton)
 
     expect(onSortChange).toHaveBeenCalledWith("full_name", "desc")
+  })
+
+  it("should call onSortChange with new sort key and existing order when sort-by selection changes", async () => {
+    const user = userEvent.setup({ delay: null })
+    const onSortChange = vi.fn()
+    render(<UserSortControl sortBy="full_name" sortOrder="asc" onSortChange={onSortChange} />)
+
+    const select = screen.getByRole("combobox")
+    await user.selectOptions(select, "created_at")
+
+    expect(onSortChange).toHaveBeenCalledWith("created_at", "asc")
   })
 
   it("should show correct tooltip based on sort order", () => {

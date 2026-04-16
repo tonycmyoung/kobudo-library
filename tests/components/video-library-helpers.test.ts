@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest"
 import {
   compareVideos,
+  compareVideosWithLastViewed,
   videoMatchesSearch,
   videoMatchesFilters,
   parseSelectedFilters,
   checkFilterMatch,
   checkViewsMatch,
   type SortableVideo,
+  type SortableVideoWithLastViewed,
 } from "@/lib/video-sorting"
 
 // Interface extensions for test data - these remain local for video data processing tests
@@ -394,6 +396,35 @@ describe("Video Library Helper Functions", () => {
     it("should handle videos with no curriculums", () => {
       const videoNoCurriculum = createMockVideo({ id: "no-curr", title: "No Curr", curriculums: [] })
       expect(compareVideos(videoNoCurriculum, videoA, "curriculum", "asc")).toBeGreaterThan(0)
+    })
+  })
+
+  describe("compareVideosWithLastViewed", () => {
+    const createMockVideoWithLastViewed = (overrides: Partial<SortableVideoWithLastViewed> = {}): SortableVideoWithLastViewed => ({
+      ...createMockVideo(),
+      last_viewed_at: null,
+      ...overrides,
+    })
+
+    it("should sort by last_viewed ascending", () => {
+      const videoA = createMockVideoWithLastViewed({ id: "a", title: "Alpha", last_viewed_at: "2024-01-01T00:00:00Z" })
+      const videoB = createMockVideoWithLastViewed({ id: "b", title: "Beta", last_viewed_at: "2024-02-01T00:00:00Z" })
+      expect(compareVideosWithLastViewed(videoA, videoB, "last_viewed", "asc")).toBeLessThan(0)
+      expect(compareVideosWithLastViewed(videoA, videoB, "last_viewed", "desc")).toBeGreaterThan(0)
+    })
+
+    it("should use title as secondary sort when last_viewed_at values are equal", () => {
+      const sameTime = "2024-01-15T12:00:00Z"
+      const videoA = createMockVideoWithLastViewed({ id: "a", title: "Alpha Video", last_viewed_at: sameTime })
+      const videoB = createMockVideoWithLastViewed({ id: "b", title: "Zeta Video", last_viewed_at: sameTime })
+      expect(compareVideosWithLastViewed(videoA, videoB, "last_viewed", "asc")).toBeLessThan(0)
+      expect(compareVideosWithLastViewed(videoB, videoA, "last_viewed", "asc")).toBeGreaterThan(0)
+    })
+
+    it("should delegate non-last_viewed sorts to compareVideos", () => {
+      const videoA = createMockVideoWithLastViewed({ id: "a", title: "Alpha Video", last_viewed_at: null })
+      const videoB = createMockVideoWithLastViewed({ id: "b", title: "Beta Video", last_viewed_at: null })
+      expect(compareVideosWithLastViewed(videoA, videoB, "title", "asc")).toBeLessThan(0)
     })
   })
 

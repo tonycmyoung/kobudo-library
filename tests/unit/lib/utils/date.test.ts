@@ -71,6 +71,17 @@ describe("Date Utilities", () => {
     it("should return 'Invalid date' for malformed ISO string", () => {
       expect(formatDate("2024-13-45T99:99:99Z")).toBe("Invalid date")
     })
+
+    it("should return 'Invalid date' when toLocaleString throws", () => {
+      const spy = vi.spyOn(Date.prototype, "toLocaleString").mockImplementation(() => {
+        throw new Error("toLocaleString failed")
+      })
+      try {
+        expect(formatDate("2024-01-15T14:30:00Z")).toBe("Invalid date")
+      } finally {
+        spy.mockRestore()
+      }
+    })
   })
 
   describe("formatShortDate", () => {
@@ -103,6 +114,17 @@ describe("Date Utilities", () => {
 
     it("should return 'Invalid date' for invalid date string", () => {
       expect(formatShortDate("invalid")).toBe("Invalid date")
+    })
+
+    it("should return 'Invalid date' when toLocaleDateString throws", () => {
+      const spy = vi.spyOn(Date.prototype, "toLocaleDateString").mockImplementation(() => {
+        throw new Error("toLocaleDateString failed")
+      })
+      try {
+        expect(formatShortDate("2024-01-15T14:30:00Z")).toBe("Invalid date")
+      } finally {
+        spy.mockRestore()
+      }
     })
   })
 
@@ -160,6 +182,17 @@ describe("Date Utilities", () => {
 
     it("should return 'Invalid date' for invalid date string", () => {
       expect(formatTimeAgo("not-a-date")).toBe("Invalid date")
+    })
+
+    it("should return 'Invalid date' when getTime throws", () => {
+      const spy = vi.spyOn(Date.prototype, "getTime").mockImplementation(() => {
+        throw new Error("getTime failed")
+      })
+      try {
+        expect(formatTimeAgo("2024-01-15T11:45:00Z")).toBe("Invalid date")
+      } finally {
+        spy.mockRestore()
+      }
     })
   })
 

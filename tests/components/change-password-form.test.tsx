@@ -179,6 +179,60 @@ describe("ChangePasswordForm", () => {
     })
   })
 
+  it("should toggle new password visibility", async () => {
+    const user = userEvent.setup({ delay: null })
+    render(<ChangePasswordForm />)
+
+    const newPasswordInput = screen.getByLabelText("New Password") as HTMLInputElement
+    const toggleButton = newPasswordInput.parentElement?.querySelector("button") as HTMLButtonElement
+
+    expect(newPasswordInput.type).toBe("password")
+
+    await user.click(toggleButton)
+    expect(newPasswordInput.type).toBe("text")
+
+    await user.click(toggleButton)
+    expect(newPasswordInput.type).toBe("password")
+  })
+
+  it("should toggle confirm password visibility", async () => {
+    const user = userEvent.setup({ delay: null })
+    render(<ChangePasswordForm />)
+
+    const confirmPasswordInput = screen.getByLabelText("Confirm New Password") as HTMLInputElement
+    const toggleButton = confirmPasswordInput.parentElement?.querySelector("button") as HTMLButtonElement
+
+    expect(confirmPasswordInput.type).toBe("password")
+
+    await user.click(toggleButton)
+    expect(confirmPasswordInput.type).toBe("text")
+
+    await user.click(toggleButton)
+    expect(confirmPasswordInput.type).toBe("password")
+  })
+
+  it("should show unexpected error message when submission throws", async () => {
+    const user = userEvent.setup({ delay: null })
+    mockGetUser.mockRejectedValue(new Error("Network failure"))
+
+    render(<ChangePasswordForm />)
+
+    const currentPasswordInput = screen.getByLabelText("Current Password")
+    const newPasswordInput = screen.getByLabelText("New Password")
+    const confirmPasswordInput = screen.getByLabelText("Confirm New Password")
+
+    await user.type(currentPasswordInput, "oldpass123")
+    await user.type(newPasswordInput, "newpass123")
+    await user.type(confirmPasswordInput, "newpass123")
+
+    const submitButton = screen.getByRole("button", { name: /Update Password/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument()
+    })
+  })
+
   it("should show loading state during submission", async () => {
     const user = userEvent.setup({ delay: null })
     mockGetUser.mockResolvedValue({

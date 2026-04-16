@@ -272,6 +272,33 @@ describe("DonationCheckout", () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1)
   })
 
+  it("should switch back to preset amounts when preset radio is selected after custom", async () => {
+    render(
+      <DonationCheckout
+        email="test@example.com"
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    )
+
+    // Switch to custom first
+    const customRadio = screen.getByLabelText("Custom One-off Amount")
+    fireEvent.click(customRadio)
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Enter amount in AUD")).toBeInTheDocument()
+    })
+
+    // Switch back to preset
+    const presetRadio = screen.getByLabelText("Choose One-off Amount")
+    fireEvent.click(presetRadio)
+
+    await waitFor(() => {
+      expect(screen.queryByPlaceholderText("Enter amount in AUD")).not.toBeInTheDocument()
+      expect(screen.getByText("$10")).toBeInTheDocument()
+    })
+  })
+
   it("should handle API errors gracefully", async () => {
     mockCreateDonationCheckout.mockRejectedValue(new Error("Network error"))
 

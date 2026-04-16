@@ -231,6 +231,27 @@ describe("AuditLogDashboard", () => {
     expect(hasEmptyTarget).toBe(true)
   })
 
+  it("should use default gray icon for unknown action types", async () => {
+    const logsWithUnknownAction = [
+      {
+        ...mockLogs[0],
+        id: "log-unknown",
+        action: "some_unknown_action",
+      },
+    ]
+
+    vi.mocked(actions.fetchAuditLogs).mockResolvedValue(logsWithUnknownAction)
+
+    render(<AuditLogDashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText("admin@example.com")).toBeInTheDocument()
+    })
+
+    // The default branch renders badge with the raw action string as label
+    expect(screen.getByText("some_unknown_action")).toBeInTheDocument()
+  })
+
   it("should handle clear logs errors gracefully", async () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)

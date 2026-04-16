@@ -192,4 +192,28 @@ describe("LoginForm", () => {
     expect(screen.getByText(/End User License Agreement/i)).toBeInTheDocument()
     expect(screen.getByText(/Tony Young/i)).toBeInTheDocument()
   })
+
+  it("should show error when reset form is submitted with empty email", async () => {
+    const user = userEvent.setup({ delay: null })
+    render(<LoginForm />)
+
+    // Show the reset input
+    const resetLink = screen.getByRole("button", { name: /Forgot your password?/i })
+    await user.click(resetLink)
+
+    // Clear the email input to ensure it's empty, then submit
+    const resetEmailInput = screen.getByPlaceholderText("Enter email for reset") as HTMLInputElement
+    // Input starts empty; fire the form submit directly without filling the email
+    const sendButton = screen.getByRole("button", { name: /Send Reset/i })
+
+    // Override required to allow submit with empty value
+    resetEmailInput.removeAttribute("required")
+    await user.click(sendButton)
+
+    await waitFor(() => {
+      expect(screen.getByText("Please enter your email address")).toBeInTheDocument()
+    })
+    // Supabase should NOT have been called
+    expect(mockSupabase.auth.resetPasswordForEmail).not.toHaveBeenCalled()
+  })
 })

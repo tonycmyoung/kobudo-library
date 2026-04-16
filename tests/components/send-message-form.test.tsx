@@ -140,6 +140,25 @@ describe("SendMessageForm", () => {
     })
   })
 
+  it("should show validation error when submitting with empty (whitespace-only) message", async () => {
+    const user = userEvent.setup({ delay: null })
+    render(<SendMessageForm userId="user-123" userName="John Doe" />)
+
+    // Type only whitespace so message.trim() is empty
+    const textarea = screen.getByPlaceholderText(/type your message here/i)
+    await user.type(textarea, "   ")
+
+    // The send button is disabled while message.trim() is empty, so enable it by
+    // directly firing submit on the form element
+    const form = textarea.closest("form")!
+    form.dispatchEvent(new Event("submit", { bubbles: true }))
+
+    await waitFor(() => {
+      expect(screen.getByText("Please enter a message")).toBeInTheDocument()
+    })
+    expect(sendNotificationWithEmail).not.toHaveBeenCalled()
+  })
+
   it("should show error message on failure", async () => {
     const user = userEvent.setup({ delay: null })
     vi.mocked(sendNotificationWithEmail).mockResolvedValue({ error: "Failed to send" })
