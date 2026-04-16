@@ -242,26 +242,30 @@ interface CurriculumSetWithLevels extends CurriculumSet {
   levels: Curriculum[]
 }
 
-export async function getCurriculumSets(): Promise<CurriculumSet[]> {
-  try {
-    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+export const getCurriculumSets = unstable_cache(
+  async (): Promise<CurriculumSet[]> => {
+    try {
+      const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-    const { data: sets, error } = await serviceSupabase
-      .from("curriculum_sets")
-      .select("*")
-      .order("created_at", { ascending: true })
+      const { data: sets, error } = await serviceSupabase
+        .from("curriculum_sets")
+        .select("*")
+        .order("created_at", { ascending: true })
 
-    if (error) {
-      console.error("Error fetching curriculum sets:", error)
+      if (error) {
+        console.error("Error fetching curriculum sets:", error)
+        return []
+      }
+
+      return sets || []
+    } catch (error) {
+      console.error("Error in getCurriculumSets:", error)
       return []
     }
-
-    return sets || []
-  } catch (error) {
-    console.error("Error in getCurriculumSets:", error)
-    return []
-  }
-}
+  },
+  ["curriculum-sets"],
+  { tags: ["curriculum-sets"] },
+)
 
 export async function getCurriculumSetWithLevels(setId: string): Promise<CurriculumSetWithLevels | null> {
   try {
@@ -313,6 +317,7 @@ export async function createCurriculumSet(data: {
       return { error: "Failed to create curriculum set" }
     }
 
+    revalidateTag("curriculum-sets", "max")
     return { success: "Curriculum set created successfully", id: newSet?.id }
   } catch (error) {
     console.error("Error in createCurriculumSet:", error)
@@ -340,6 +345,7 @@ export async function updateCurriculumSet(
       return { error: "Failed to update curriculum set" }
     }
 
+    revalidateTag("curriculum-sets", "max")
     return { success: "Curriculum set updated successfully" }
   } catch (error) {
     console.error("Error in updateCurriculumSet:", error)
@@ -392,6 +398,7 @@ export async function deleteCurriculumSet(setId: string): Promise<{ success?: st
       return { error: "Failed to delete curriculum set" }
     }
 
+    revalidateTag("curriculum-sets", "max")
     return { success: "Curriculum set deleted successfully" }
   } catch (error) {
     console.error("Error in deleteCurriculumSet:", error)

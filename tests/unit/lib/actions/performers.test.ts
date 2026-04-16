@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { addPerformer, updatePerformer, deletePerformer } from "@/lib/actions/performers"
 
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: unknown) => fn,
+  revalidateTag: vi.fn(),
+}))
+
 const mockFrom = vi.fn()
 
 vi.mock("@supabase/supabase-js", () => ({
