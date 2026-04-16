@@ -402,6 +402,23 @@ export async function updateStudentForHeadTeacher(
 
 export async function deleteUserCompletely(userId: string) {
   try {
+    const supabase = await createServerClient()
+    const { data: currentUser } = await supabase.auth.getUser()
+
+    if (!currentUser.user) {
+      return { error: "Not authenticated" }
+    }
+
+    const { data: callerProfile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", currentUser.user.id)
+      .single()
+
+    if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
+      return { error: "Unauthorized - Admin or Head Teacher access required" }
+    }
+
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const { data: userToDelete } = await serviceSupabase
@@ -409,10 +426,6 @@ export async function deleteUserCompletely(userId: string) {
       .select("email, full_name")
       .eq("id", userId)
       .single()
-
-    const supabase = await createServerClient()
-
-    const { data: currentUser } = await supabase.auth.getUser()
 
     let actorName = currentUser.user?.email?.split("@")[0] || "Unknown"
     if (currentUser.user) {
@@ -474,6 +487,25 @@ export async function updateProfile(params: {
   }
 
   try {
+    const supabase = await createServerClient()
+    const { data: currentUser } = await supabase.auth.getUser()
+
+    if (!currentUser.user) {
+      return { error: "Not authenticated", success: false }
+    }
+
+    if (currentUser.user.id !== userId) {
+      const { data: callerProfile } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", currentUser.user.id)
+        .single()
+
+      if (callerProfile?.role !== "Admin") {
+        return { error: "Unauthorized", success: false }
+      }
+    }
+
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const { error } = await serviceSupabase
