@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, getServerUser, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Header from "@/components/header"
 import UserProfile from "@/components/user-profile"
@@ -13,16 +13,15 @@ export default async function ProfilePage() {
     )
   }
 
-  // Get the user from the server
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // getUser is memoized via React.cache — no second JWT call if layout already ran it
+  const user = await getServerUser()
 
   // If no user, redirect to login
   if (!user) {
     redirect("/auth/login")
   }
+
+  const supabase = await createClient()
 
   // Fetch userProfile, favoriteCount, and curriculums in parallel — all independent
   const [{ data: userProfile }, { data: favoriteCount }, { data: curriculums }] = await Promise.all([

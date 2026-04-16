@@ -1,18 +1,16 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getServerUser } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import AdminHeader from "@/components/admin-header"
 import { buildAdminHeaderUser } from "@/lib/utils/admin-header-user"
 
 export default async function AdminLayout({ children }: { readonly children: React.ReactNode }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getServerUser()
 
   if (!user) {
     redirect("/auth/login")
   }
 
+  const supabase = await createClient()
   const { data: userProfile } = await supabase
     .from("users")
     .select("is_approved, full_name, email, profile_image_url, role")
