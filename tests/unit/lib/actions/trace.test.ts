@@ -15,6 +15,7 @@ import { getCurrentUser } from "@/lib/auth"
 // Mock Next.js modules
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }))
 
 // Mock Supabase

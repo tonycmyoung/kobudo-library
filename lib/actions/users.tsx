@@ -3,7 +3,7 @@
 import { cookies } from "next/headers"
 import { createServerClient as createSupabaseServerClient } from "@supabase/ssr"
 import { createClient } from "@supabase/supabase-js"
-import { revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { generateUUID, sanitizeHtml, siteTitle } from "../utils/helpers"
 import { sendEmail } from "./email"
 import { logAuditEvent } from "./audit"
@@ -211,7 +211,7 @@ export async function approveUserServerAction(userId: string, role = "Student") 
       `,
     )
 
-    revalidatePath("/admin")
+    revalidateTag("admin-users", "max")
     return { success: "User approved successfully" }
   } catch (error) {
     console.error("Error in approveUser:", error)
@@ -239,7 +239,7 @@ export async function rejectUserServerAction(userId: string) {
       return { error: "Failed to completely remove user" }
     }
 
-    revalidatePath("/admin")
+    revalidateTag("admin-users", "max")
     return { success: "User rejected successfully" }
   } catch (error) {
     console.error("Error in rejectUser:", error)
@@ -265,7 +265,7 @@ export async function updatePendingUserFields(userId: string, fullName: string, 
       return { error: "Failed to update pending user fields" }
     }
 
-    revalidatePath("/admin")
+    revalidateTag("admin-users", "max")
     return { success: "Pending user fields updated successfully" }
   } catch (error) {
     console.error("Error in updatePendingUserFields:", error)
@@ -300,8 +300,8 @@ export async function updateUserFields(
       return { error: "Failed to update user fields" }
     }
 
-    revalidatePath("/admin/users")
-    revalidatePath("/students")
+    revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
     return { success: "User fields updated successfully" }
   } catch (error) {
     console.error("Error in updateUserFields:", error)
@@ -392,7 +392,7 @@ export async function updateStudentForHeadTeacher(
       return { error: "Failed to update student fields" }
     }
 
-    revalidatePath("/students")
+    revalidateTag("students", "max")
     return { success: "Student updated successfully" }
   } catch (error) {
     console.error("Error in updateStudentForHeadTeacher:", error)
@@ -521,7 +521,7 @@ export async function updateProfile(params: {
       return { error: "Failed to update profile", success: false }
     }
 
-    revalidatePath("/profile")
+    revalidateTag("user-profile", "max")
     return { success: true }
   } catch (error) {
     console.error("Error in updateProfile:", error)
@@ -565,9 +565,9 @@ export async function updateUserBelt(userId: string, beltId: string | null) {
       return { error: "Failed to update belt", success: false }
     }
 
-    revalidatePath("/profile")
-    revalidatePath("/admin/users")
-    revalidatePath("/students")
+    revalidateTag("user-profile", "max")
+    revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
 
     return { success: true }
   } catch (error) {
