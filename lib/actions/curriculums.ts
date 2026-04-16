@@ -28,20 +28,21 @@ export async function getCurriculums(): Promise<Curriculum[]> {
       return []
     }
 
-    // Get video counts for each curriculum
-    const curriculumsWithCounts = await Promise.all(
-      (curriculums || []).map(async (curriculum) => {
-        const { count } = await serviceSupabase
-          .from("video_curriculums")
-          .select("*", { count: "exact", head: true })
-          .eq("curriculum_id", curriculum.id)
+    // Batch-fetch all video-curriculum associations in a single query then count in JS
+    const curriculumIds = (curriculums || []).map((c) => c.id)
+    const { data: videoAssociations } = curriculumIds.length
+      ? await serviceSupabase.from("video_curriculums").select("curriculum_id").in("curriculum_id", curriculumIds)
+      : { data: [] }
 
-        return {
-          ...curriculum,
-          video_count: count || 0,
-        }
-      }),
-    )
+    const countMap = (videoAssociations || []).reduce<Record<string, number>>((acc, row) => {
+      acc[row.curriculum_id] = (acc[row.curriculum_id] || 0) + 1
+      return acc
+    }, {})
+
+    const curriculumsWithCounts = (curriculums || []).map((curriculum) => ({
+      ...curriculum,
+      video_count: countMap[curriculum.id] || 0,
+    }))
 
     return curriculumsWithCounts
   } catch (error) {
