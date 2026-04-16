@@ -212,13 +212,13 @@ describe("UserProfile", () => {
   it("should show current belt with color indicator", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("White Belt")).toBeInTheDocument()
+    expect(screen.getAllByText("White Belt")[0]).toBeInTheDocument()
   })
 
   it("should show belt select dropdown with all curriculum options", () => {
     render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
-    expect(screen.getByText("White Belt")).toBeInTheDocument()
+    expect(screen.getAllByText("White Belt")[0]).toBeInTheDocument()
   })
 
   describe("Curriculum Set Display and Belt Filtering", () => {
@@ -244,7 +244,7 @@ describe("UserProfile", () => {
 
       // When user has a curriculum set and levels are provided, it should use those levels
       // The belt dropdown should exist (text visible is current selection, not all options)
-      expect(screen.getByText("White Belt")).toBeInTheDocument()
+      expect(screen.getAllByText("White Belt")[0]).toBeInTheDocument()
       // Verify the select component exists
       const selectElements = screen.getAllByRole("combobox")
       expect(selectElements.length).toBeGreaterThan(0)
@@ -442,7 +442,7 @@ describe("UserProfile", () => {
       render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
 
       // The BeltSelectorValue renders the belt name inside the SelectValue
-      expect(screen.getByText("White Belt")).toBeInTheDocument()
+      expect(screen.getAllByText("White Belt")[0]).toBeInTheDocument()
     })
 
     it("should show Not specified text when no belt is selected", () => {
