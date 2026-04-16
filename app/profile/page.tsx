@@ -24,39 +24,33 @@ export default async function ProfilePage() {
     redirect("/auth/login")
   }
 
-  const { data: userProfile } = await supabase
-    .from("users")
-    .select(`
-      is_approved,
-      full_name,
-      email,
-      teacher,
-      school,
-      role,
-      created_at,
-      profile_image_url,
-      current_belt_id,
-      curriculum_set_id,
-      current_belt:curriculums!current_belt_id(id, name, color, display_order),
-      curriculum_set:curriculum_sets!curriculum_set_id(id, name)
-    `)
-    .eq("id", user.id)
-    .single()
+  // Fetch userProfile, favoriteCount, and curriculums in parallel — all independent
+  const [{ data: userProfile }, { data: favoriteCount }, { data: curriculums }] = await Promise.all([
+    supabase
+      .from("users")
+      .select(`
+        is_approved,
+        full_name,
+        email,
+        teacher,
+        school,
+        role,
+        created_at,
+        profile_image_url,
+        current_belt_id,
+        curriculum_set_id,
+        current_belt:curriculums!current_belt_id(id, name, color, display_order),
+        curriculum_set:curriculum_sets!curriculum_set_id(id, name)
+      `)
+      .eq("id", user.id)
+      .single(),
+    supabase.from("user_favorites").select("id", { count: "exact" }).eq("user_id", user.id),
+    supabase.from("curriculums").select("id, name, color, display_order").order("display_order", { ascending: true }),
+  ])
 
   if (!userProfile?.is_approved) {
     redirect("/pending-approval")
   }
-
-  // Get user stats
-  const { data: favoriteCount } = await supabase
-    .from("user_favorites")
-    .select("id", { count: "exact" })
-    .eq("user_id", user.id)
-
-  const { data: curriculums } = await supabase
-    .from("curriculums")
-    .select("id, name, color, display_order")
-    .order("display_order", { ascending: true })
 
   // Fetch curriculum levels for user's curriculum set (if assigned)
   let curriculumLevels: Array<{ id: string; name: string; display_name: string; sort_order: number }> = []
