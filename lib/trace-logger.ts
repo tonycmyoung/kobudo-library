@@ -92,12 +92,30 @@ const DEFAULT_PARSE_RESULT: ParsedStackLine = { sourceFile: "unknown", sourceLin
 // Helper to clean webpack prefixes from source file paths (no regex to avoid ReDoS)
 function cleanSourceFile(sourceFile: string): string {
   let result = sourceFile
-  
-  // Remove webpack-internal prefix
+
+  // Remove webpack-internal prefix (dev)
   if (result.startsWith("webpack-internal:///")) {
     result = result.substring(20)
   }
-  
+
+  // Remove webpack:// protocol prefix (production source maps)
+  if (result.startsWith("webpack://")) {
+    result = result.substring(10)
+    // Strip optional package name prefix e.g. "kobudo-library/./"
+    const slashDotSlash = result.indexOf("/./")
+    if (slashDotSlash !== -1) {
+      result = result.substring(slashDotSlash + 3)
+    } else {
+      const firstSlash = result.indexOf("/")
+      if (firstSlash !== -1) result = result.substring(firstSlash + 1)
+    }
+  }
+
+  // Remove Vercel deployment root (production/preview absolute paths)
+  if (result.startsWith("/var/task/")) {
+    result = result.substring(10)
+  }
+
   // Remove common webpack chunk prefixes
   const prefixes = ["(app-pages-browser)/", "(rsc)/", "(ssr)/", "(sc_client)/", "(sc_server)/", "(action-browser)/", "./"]
   for (const prefix of prefixes) {
@@ -105,18 +123,18 @@ function cleanSourceFile(sourceFile: string): string {
       result = result.substring(prefix.length)
     }
   }
-  
+
   // Remove trailing parenthesized content like "(index)"
   const lastParen = result.lastIndexOf("(")
   if (lastParen > 0 && result.endsWith(")")) {
     result = result.substring(0, lastParen)
   }
-  
+
   // Remove leading open paren if present
   if (result.startsWith("(")) {
     result = result.substring(1)
   }
-  
+
   return result.trim()
 }
 
