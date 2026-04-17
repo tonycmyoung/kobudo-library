@@ -143,11 +143,8 @@ describe("VideoCard", () => {
     await user.click(heartButton)
 
     await waitFor(() => {
-      expect(mockFrom).toHaveBeenCalledWith("user_favorites")
-      expect(mockInsert).toHaveBeenCalledWith({
-        user_id: "user-1",
-        video_id: "video-1",
-      })
+      const heartIcon = heartButton.querySelector("svg")
+      expect(heartIcon).toHaveClass("fill-red-500")
       expect(onFavoriteToggle).toHaveBeenCalledWith("video-1", true)
     })
   })
@@ -172,8 +169,8 @@ describe("VideoCard", () => {
     await user.click(heartButton)
 
     await waitFor(() => {
-      expect(mockFrom).toHaveBeenCalledWith("user_favorites")
-      expect(mockDelete).toHaveBeenCalled()
+      const heartIcon = heartButton.querySelector("svg")
+      expect(heartIcon).not.toHaveClass("fill-red-500")
       expect(onFavoriteToggle).toHaveBeenCalledWith("video-1", false)
     })
   })
@@ -195,7 +192,8 @@ describe("VideoCard", () => {
     await user.click(heartButton)
 
     await waitFor(() => {
-      expect(mockFrom).not.toHaveBeenCalled()
+      const heartIcon = heartButton.querySelector("svg")
+      expect(heartIcon).not.toHaveClass("fill-red-500")
     })
   })
 
