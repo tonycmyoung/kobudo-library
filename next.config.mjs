@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // Enable server-side source maps so stack traces in trace logs show original
+    // TypeScript source paths instead of compiled chunk paths (e.g. in Vercel preview/prod)
+    serverSourceMaps: true,
+  },
   images: {
     // Enable Next.js image optimization for better LCP on mobile
     remotePatterns: [
