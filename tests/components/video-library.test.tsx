@@ -169,7 +169,7 @@ vi.mock("@/components/filter-section", () => ({
       <div data-testid="category-filter">
         <span data-testid="video-count">Videos: {props.videoCount}</span>
         <button onClick={() => props.onCategoryToggle("cat-1")}>Toggle Category</button>
-        {props.onCurriculumToggle && <button onClick={() => props.onCurriculumToggle("curr-1")}>Toggle Curriculum</button>}
+        {props.onCurriculumToggle && <button onClick={() => props.onCurriculumToggle?.("curr-1")}>Toggle Curriculum</button>}
         <span data-testid="selected-filters">
           Filters: {props.selectedCategories.length + (props.selectedCurriculums?.length || 0)}
         </span>
@@ -374,7 +374,8 @@ describe("VideoLibrary", () => {
         expect(mockSupabase.from).toHaveBeenCalledWith("videos")
       })
 
-      const videosCall = mockSupabase.from.mock.results.find((result: { value: { select: { mock: { calls: string[][] } } } }) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const videosCall = mockSupabase.from.mock.results.find((result: any) =>
         result.value.select.mock.calls[0]?.[0].includes("id, title"),
       )
       expect(videosCall).toBeDefined()

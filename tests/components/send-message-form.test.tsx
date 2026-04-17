@@ -85,7 +85,7 @@ describe("SendMessageForm", () => {
 
   it("should call sendNotificationWithEmail on submit", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: true })
+    vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: "Message sent" })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
 
@@ -106,7 +106,7 @@ describe("SendMessageForm", () => {
 
   it("should show success message after sending", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: true })
+    vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: "Message sent" })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
 
@@ -125,7 +125,7 @@ describe("SendMessageForm", () => {
 
   it("should clear form after successful send", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: true })
+    vi.mocked(sendNotificationWithEmail).mockResolvedValue({ success: "Message sent" })
 
     render(<SendMessageForm userId="user-123" userName="John Doe" />)
 

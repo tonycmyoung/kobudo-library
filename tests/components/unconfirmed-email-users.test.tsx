@@ -10,7 +10,8 @@ vi.mock("@/lib/actions", () => ({
 }))
 
 describe("UnconfirmedEmailUsers", () => {
-  const mockUsers = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockUsers: any[] = [
     {
       id: "user-1",
       email: "john@example.com",
@@ -111,8 +112,7 @@ describe("UnconfirmedEmailUsers", () => {
   it("should allow resending confirmation email", async () => {
     const user = userEvent.setup({ delay: null })
     vi.mocked(actions.resendConfirmationEmail).mockResolvedValue({
-      success: true,
-      error: null,
+      success: "Confirmation email sent successfully",
     })
 
     render(<UnconfirmedEmailUsers />)
@@ -132,8 +132,7 @@ describe("UnconfirmedEmailUsers", () => {
   it("should show success message after resending email", async () => {
     const user = userEvent.setup({ delay: null })
     vi.mocked(actions.resendConfirmationEmail).mockResolvedValue({
-      success: true,
-      error: null,
+      success: "Confirmation email sent successfully",
     })
 
     render(<UnconfirmedEmailUsers />)
@@ -153,7 +152,6 @@ describe("UnconfirmedEmailUsers", () => {
   it("should show error message when resend fails", async () => {
     const user = userEvent.setup({ delay: null })
     vi.mocked(actions.resendConfirmationEmail).mockResolvedValue({
-      success: false,
       error: "Failed to send email",
     })
 
@@ -181,7 +179,7 @@ describe("UnconfirmedEmailUsers", () => {
 
   it("should handle fetch error gracefully", async () => {
     vi.mocked(actions.fetchUnconfirmedEmailUsers).mockResolvedValue({
-      data: null,
+      data: [],
       error: "Database error",
     })
 

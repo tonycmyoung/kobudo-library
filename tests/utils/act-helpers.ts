@@ -63,7 +63,7 @@ export async function waitForWithAct(
  */
 export async function actAdvanceTimers(ms: number): Promise<void> {
   return actAsync(async () => {
-    const { advanceTimersByTime } = await import('vitest')
-    advanceTimersByTime(ms)
+    const { vi } = await import('vitest')
+    vi.advanceTimersByTime(ms)
   })
 }

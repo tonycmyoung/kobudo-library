@@ -37,7 +37,8 @@ describe("CurriculumManagement", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(curriculumActions.getCurriculums).mockResolvedValue(mockCurriculums)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(curriculumActions.getCurriculums).mockResolvedValue(mockCurriculums as any)
   })
 
   it("should render loading state initially", async () => {
@@ -77,8 +78,8 @@ describe("CurriculumManagement", () => {
     expect(whiteBeltCard).toBeInTheDocument()
     expect(yellowBeltCard).toBeInTheDocument()
 
-    expect(within(whiteBeltCard!).getByText("5 videos")).toBeInTheDocument()
-    expect(within(yellowBeltCard!).getByText("8 videos")).toBeInTheDocument()
+    expect(within(whiteBeltCard as HTMLElement).getByText("5 videos")).toBeInTheDocument()
+    expect(within(yellowBeltCard as HTMLElement).getByText("8 videos")).toBeInTheDocument()
   })
 
   it("should open add curriculum dialog when Add button is clicked", async () => {
@@ -99,14 +100,7 @@ describe("CurriculumManagement", () => {
 
   it("should add new curriculum when form is submitted", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(curriculumActions.addCurriculum).mockResolvedValue({
-      id: "curr-3",
-      name: "Green Belt",
-      description: "Advanced curriculum",
-      color: "#16A34A",
-      display_order: 2,
-      created_at: "2024-01-03",
-    })
+    vi.mocked(curriculumActions.addCurriculum).mockResolvedValue({ success: "Curriculum added successfully" })
 
     render(<CurriculumManagement />)
 
@@ -169,7 +163,7 @@ describe("CurriculumManagement", () => {
 
   it("should update curriculum when edit form is submitted", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(curriculumActions.updateCurriculum).mockResolvedValue(undefined)
+    vi.mocked(curriculumActions.updateCurriculum).mockResolvedValue({ success: "OK" })
 
     render(<CurriculumManagement />)
 
@@ -213,7 +207,7 @@ describe("CurriculumManagement", () => {
     const user = userEvent.setup({ delay: null })
     const confirmSpy = vi.fn(() => true)
     globalThis.confirm = confirmSpy
-    vi.mocked(curriculumActions.deleteCurriculum).mockResolvedValue(undefined)
+    vi.mocked(curriculumActions.deleteCurriculum).mockResolvedValue({ success: "OK" })
 
     render(<CurriculumManagement />)
 
@@ -262,7 +256,7 @@ describe("CurriculumManagement", () => {
 
   it("should move curriculum up when move up is selected", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(curriculumActions.reorderCurriculums).mockResolvedValue(undefined)
+    vi.mocked(curriculumActions.reorderCurriculums).mockResolvedValue({ success: "OK" })
 
     render(<CurriculumManagement />)
 

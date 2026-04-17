@@ -65,7 +65,9 @@ export const createMockSupabaseClient = () => {
     return chain
   }
 
-  const mockFrom = vi.fn((_table: string) => createChainableMock())
+  // Cast to accept partial chain overrides from tests without strict return-type checking
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockFrom = vi.fn((_table: string) => createChainableMock()) as any
 
   const mockAuth = {
     getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),

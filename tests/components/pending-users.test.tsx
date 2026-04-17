@@ -136,8 +136,7 @@ describe("PendingUsers", () => {
       error: null,
     })
     vi.mocked(actions.approveUserServerAction).mockResolvedValue({
-      data: null,
-      error: null,
+      success: "Operation completed successfully",
     })
 
     render(<PendingUsers />)
@@ -180,8 +179,7 @@ describe("PendingUsers", () => {
       error: null,
     })
     vi.mocked(actions.rejectUserServerAction).mockResolvedValue({
-      data: null,
-      error: null,
+      success: "Operation completed successfully",
     })
 
     render(<PendingUsers />)
@@ -224,8 +222,7 @@ describe("PendingUsers", () => {
       error: null,
     })
     vi.mocked(actions.approveUserServerAction).mockResolvedValue({
-      data: null,
-      error: null,
+      success: "Operation completed successfully",
     })
 
     render(<PendingUsers />)
@@ -302,8 +299,7 @@ describe("PendingUsers", () => {
       error: null,
     })
     vi.mocked(actions.updatePendingUserFields).mockResolvedValue({
-      data: null,
-      error: null,
+      success: "Operation completed successfully",
     })
 
     render(<PendingUsers />)
@@ -421,7 +417,7 @@ describe("PendingUsers", () => {
 
   it("should handle fetch errors gracefully", async () => {
     vi.mocked(actions.fetchPendingUsers).mockResolvedValue({
-      data: null,
+      data: [],
       error: "Failed to fetch users",
     })
 

@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import UserManagement from "@/components/user-management"
 import { createClient } from "@/lib/supabase/client"
-import { deleteUserCompletely, updateUserFields, adminResetUserPassword, fetchUsers } from "@/lib/actions"
+import { deleteUserCompletely, updateUserFields, adminResetUserPassword } from "@/lib/actions"
 import { useRouter, useSearchParams } from "next/navigation"
 
 vi.mock("@/lib/supabase/client", () => ({
@@ -14,7 +14,6 @@ vi.mock("@/lib/actions", () => ({
   deleteUserCompletely: vi.fn(),
   updateUserFields: vi.fn(),
   adminResetUserPassword: vi.fn(),
-  fetchUsers: vi.fn(),
 }))
 
 vi.mock("next/navigation", () => ({
@@ -31,7 +30,7 @@ describe("UserManagement", () => {
   }
 
   const mockSearchParams = {
-    get: vi.fn((_param: string) => null),
+    get: vi.fn((_param: string) => null as string | null),
   }
 
   const mockUsers = [
@@ -171,14 +170,9 @@ describe("UserManagement", () => {
     vi.mocked(createClient).mockReturnValue({ from: mockFrom } as unknown as ReturnType<typeof createClient>)
   })
 
-  it("should render loading state initially", async () => {
-    // Use a never-resolving promise to keep component in loading state
-    vi.mocked(fetchUsers).mockReturnValue(new Promise(() => {}))
-    
+  it("should render loading state initially", () => {
     const { unmount } = render(<UserManagement />)
     expect(screen.getByText("Loading users...")).toBeInTheDocument()
-    
-    // Unmount before the promise resolves to prevent act() warnings
     unmount()
   })
 
@@ -298,7 +292,7 @@ describe("UserManagement", () => {
   })
 
   it("should update user fields when save button is clicked in edit mode", async () => {
-    vi.mocked(updateUserFields).mockResolvedValue({ success: true })
+    vi.mocked(updateUserFields).mockResolvedValue({ success: "User fields updated successfully" })
 
     render(<UserManagement />)
 
@@ -410,7 +404,7 @@ describe("UserManagement", () => {
   })
 
   it("should reset password successfully with valid password", async () => {
-    vi.mocked(adminResetUserPassword).mockResolvedValue({ success: true })
+    vi.mocked(adminResetUserPassword).mockResolvedValue({ success: "Password reset successfully" })
 
     render(<UserManagement />)
 
@@ -457,7 +451,7 @@ describe("UserManagement", () => {
 
   it("should delete user when confirmed", async () => {
     vi.mocked(global.confirm).mockReturnValue(true)
-    vi.mocked(deleteUserCompletely).mockResolvedValue({ success: true })
+    vi.mocked(deleteUserCompletely).mockResolvedValue({ success: "User deleted successfully" })
 
     render(<UserManagement />)
 
@@ -835,7 +829,7 @@ describe("UserManagement", () => {
   describe("Delete User Error Handling", () => {
     it("should show error alert when delete fails", async () => {
       vi.mocked(global.confirm).mockReturnValue(true)
-      vi.mocked(deleteUserCompletely).mockResolvedValue({ success: false, error: "Delete failed" })
+      vi.mocked(deleteUserCompletely).mockResolvedValue({ error: "Delete failed" })
 
       render(<UserManagement />)
 
@@ -854,7 +848,7 @@ describe("UserManagement", () => {
 
   describe("Reset Password Error Handling", () => {
     it("should show error message when reset password API fails", async () => {
-      vi.mocked(adminResetUserPassword).mockResolvedValue({ success: false, error: "API error occurred" })
+      vi.mocked(adminResetUserPassword).mockResolvedValue({ error: "API error occurred" })
 
       render(<UserManagement />)
 
@@ -933,7 +927,7 @@ describe("UserManagement", () => {
     })
 
     it("should handle error when updating user fields fails", async () => {
-      vi.mocked(updateUserFields).mockResolvedValue({ success: false, error: "Update failed" })
+      vi.mocked(updateUserFields).mockResolvedValue({ error: "Update failed" })
 
       render(<UserManagement />)
 

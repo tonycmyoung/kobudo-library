@@ -58,7 +58,8 @@ describe("NotificationBell", () => {
     vi.clearAllMocks()
     vi.mocked(useRouter).mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>)
     vi.mocked(fetchNotificationsWithSenders).mockResolvedValue({
-      data: mockNotifications,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: mockNotifications as any,
       error: null,
     })
 
@@ -94,7 +95,8 @@ describe("NotificationBell", () => {
 
   it("should not display badge when no unread notifications", async () => {
     vi.mocked(fetchNotificationsWithSenders).mockResolvedValue({
-      data: mockNotifications.map((n) => ({ ...n, is_read: true })),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: mockNotifications.map((n) => ({ ...n, is_read: true })) as any,
       error: null,
     })
 

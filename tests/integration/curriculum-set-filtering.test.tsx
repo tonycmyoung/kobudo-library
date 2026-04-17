@@ -92,8 +92,8 @@ describe("Curriculum Set Filtering", () => {
     },
   ]
 
-  const mockVideoCategories = []
-  const mockVideoPerformers = []
+  const mockVideoCategories: unknown[] = []
+  const mockVideoPerformers: unknown[] = []
 
   let mockSupabase: { auth: { getUser: ReturnType<typeof vi.fn> }; from: ReturnType<typeof vi.fn> }
 

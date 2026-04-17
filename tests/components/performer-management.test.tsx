@@ -100,8 +100,8 @@ describe("PerformerManagement", () => {
     expect(johnDoeCard).toBeInTheDocument()
     expect(janeSmithCard).toBeInTheDocument()
 
-    expect(within(johnDoeCard!).getByText("5 videos")).toBeInTheDocument()
-    expect(within(janeSmithCard!).getByText("3 videos")).toBeInTheDocument()
+    expect(within(johnDoeCard as HTMLElement).getByText("5 videos")).toBeInTheDocument()
+    expect(within(janeSmithCard as HTMLElement).getByText("3 videos")).toBeInTheDocument()
   })
 
   it("should add new performer when Add button is clicked", async () => {

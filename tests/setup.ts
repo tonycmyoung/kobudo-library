@@ -1,5 +1,6 @@
 // Configure React to support act() in tests - MUST be before any React imports
-globalThis.IS_REACT_ACT_ENVIRONMENT = true
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
 
 import "@testing-library/jest-dom"
 import { afterEach, beforeEach, vi } from "vitest"
