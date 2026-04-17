@@ -2,12 +2,13 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { revalidateTag } from "next/cache"
-import { getCurrentUser } from "../auth"
+import { requireAdmin } from "../auth"
 import { getTotalVideoViews, getVideoViewsInDateRange } from "./videos"
 import { serverTrace } from "../trace-logger"
 
 export async function getTelemetryData() {
   try {
+    await requireAdmin()
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const now = new Date()
@@ -81,10 +82,7 @@ export async function getTelemetryData() {
 }
 
 export async function clearAuthDebugLogs() {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -101,11 +99,7 @@ export async function clearAuthDebugLogs() {
 }
 
 export async function fetchAuthDebugLogs() {
-  const user = await getCurrentUser()
-
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 

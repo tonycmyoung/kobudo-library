@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { requireAdmin } from "@/lib/auth"
 import {
   getCurriculums,
   addCurriculum,
@@ -38,6 +39,10 @@ const mockFrom = vi.fn()
 vi.mock("next/cache", () => ({
   unstable_cache: (fn: unknown) => fn,
   revalidateTag: vi.fn(),
+}))
+
+vi.mock("@/lib/auth", () => ({
+  requireAdmin: vi.fn(),
 }))
 
 vi.mock("@supabase/supabase-js", () => ({
@@ -1057,6 +1062,14 @@ describe("Curriculum Actions", () => {
       const result = await getAvailableVideos()
 
       expect(result).toEqual([])
+    })
+  })
+
+  describe("requireAdmin guard", () => {
+    it("should throw Unauthorized when caller is not admin", async () => {
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
+
+      await expect(addCurriculum({ name: "Test", color: "#000" })).rejects.toThrow("Unauthorized")
     })
   })
 })

@@ -2,7 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { revalidateTag } from "next/cache"
-import { getCurrentUser } from "../auth"
+import { requireAdmin } from "../auth"
 import type { TraceLogEntry, TraceSettings, TraceLevel } from "../trace-logger"
 
 export interface TraceLogsFilter {
@@ -16,10 +16,7 @@ export interface TraceLogsFilter {
 }
 
 export async function fetchTraceLogs(filter: TraceLogsFilter = {}) {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(
     process.env.SUPABASE_URL!,
@@ -69,10 +66,7 @@ export async function fetchTraceLogs(filter: TraceLogsFilter = {}) {
 }
 
 export async function clearTraceLogs(beforeDate?: string) {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(
     process.env.SUPABASE_URL!,
@@ -101,10 +95,7 @@ export async function clearTraceLogs(beforeDate?: string) {
 }
 
 export async function fetchTraceSettings(): Promise<TraceSettings> {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(
     process.env.SUPABASE_URL!,
@@ -132,10 +123,7 @@ export async function fetchTraceSettings(): Promise<TraceSettings> {
 }
 
 export async function updateTraceSettings(settings: Partial<Pick<TraceSettings, "enabled" | "retention_days">>) {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(
     process.env.SUPABASE_URL!,
@@ -159,10 +147,7 @@ export async function updateTraceSettings(settings: Partial<Pick<TraceSettings, 
 }
 
 export async function getTraceCategories(): Promise<string[]> {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(
     process.env.SUPABASE_URL!,
@@ -185,10 +170,7 @@ export async function getTraceCategories(): Promise<string[]> {
 }
 
 export async function getTraceSourceFiles(): Promise<string[]> {
-  const user = await getCurrentUser()
-  if (user?.role !== "Admin") {
-    throw new Error("Unauthorized")
-  }
+  await requireAdmin()
 
   const serviceSupabase = createClient(
     process.env.SUPABASE_URL!,

@@ -2,6 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { unstable_cache, revalidateTag } from "next/cache"
+import { requireAdmin } from "../auth"
 
 interface Curriculum {
   id: string
@@ -77,6 +78,7 @@ export async function addCurriculum(curriculumData: {
   color: string
   display_order?: number
 }): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -122,6 +124,7 @@ export async function updateCurriculum(
     display_order?: number
   },
 ): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -151,6 +154,7 @@ export async function updateCurriculum(
 }
 
 export async function deleteCurriculum(curriculumId: string): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -208,6 +212,7 @@ export async function deleteCurriculum(curriculumId: string): Promise<{ success?
 export async function reorderCurriculums(
   curriculumOrders: { id: string; display_order: number }[],
 ): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -304,6 +309,7 @@ export async function createCurriculumSet(data: {
   name: string
   description?: string
 }): Promise<{ success?: string; error?: string; id?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -332,6 +338,7 @@ export async function updateCurriculumSet(
     description?: string
   },
 ): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -354,6 +361,7 @@ export async function updateCurriculumSet(
 }
 
 export async function deleteCurriculumSet(setId: string): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -415,6 +423,7 @@ export async function addLevelToCurriculumSet(
     display_order?: number
   },
 ): Promise<{ success?: string; error?: string; id?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -462,6 +471,7 @@ export async function updateLevelInCurriculumSet(
     display_order?: number
   },
 ): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -491,6 +501,7 @@ export async function updateLevelInCurriculumSet(
 }
 
 export async function deleteLevelFromCurriculumSet(levelId: string): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -550,6 +561,7 @@ export async function reorderLevelsInCurriculumSet(
   setId: string,
   levelOrders: { id: string; display_order: number }[],
 ): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -595,6 +607,7 @@ export async function getVideosForLevel(levelId: string): Promise<Array<{
 }
 
 export async function addVideoToLevel(levelId: string, videoId: string): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -615,6 +628,7 @@ export async function addVideoToLevel(levelId: string, videoId: string): Promise
 }
 
 export async function removeVideoFromLevel(levelId: string, videoId: string): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 

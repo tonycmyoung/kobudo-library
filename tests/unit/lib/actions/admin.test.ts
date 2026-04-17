@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { getTelemetryData, clearAuthDebugLogs, fetchAuthDebugLogs } from "@/lib/actions/admin"
 import { createClient } from "@supabase/supabase-js"
-import { getCurrentUser } from "@/lib/auth"
+import { requireAdmin } from "@/lib/auth"
 import { getTotalVideoViews, getVideoViewsInDateRange } from "@/lib/actions/videos"
 
 // Mock Next.js modules
@@ -15,9 +15,9 @@ vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(),
 }))
 
-// Mock helper functions
+// Mock auth — requireAdmin resolves by default (admin allowed); override per-test for unauthorized cases
 vi.mock("@/lib/auth", () => ({
-  getCurrentUser: vi.fn(),
+  requireAdmin: vi.fn(),
 }))
 
 vi.mock("@/lib/actions/videos", () => ({
@@ -200,13 +200,6 @@ describe("Admin Actions", () => {
 
   describe("clearAuthDebugLogs", () => {
     it("should successfully clear debug logs for admin user", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "admin-123",
-        email: "admin@test.com",
-        role: "Admin",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
-
       const mockDelete = vi.fn().mockReturnThis()
       const mockNeq = vi.fn().mockResolvedValue({ error: null })
 
@@ -225,12 +218,7 @@ describe("Admin Actions", () => {
     })
 
     it("should throw error for non-admin user", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "user-123",
-        email: "user@test.com",
-        role: "Student",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
 
       await expect(clearAuthDebugLogs()).rejects.toThrow("Unauthorized")
 
@@ -238,13 +226,6 @@ describe("Admin Actions", () => {
     })
 
     it("should throw error when database delete fails", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "admin-123",
-        email: "admin@test.com",
-        role: "Admin",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
-
       const mockDelete = vi.fn().mockReturnThis()
       const mockNeq = vi.fn().mockResolvedValue({ error: { message: "Delete failed" } })
 
@@ -257,23 +238,10 @@ describe("Admin Actions", () => {
 
       await expect(clearAuthDebugLogs()).rejects.toThrow("Failed to clear debug logs")
     })
-
-    it("should throw error when user is null", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue(null)
-
-      await expect(clearAuthDebugLogs()).rejects.toThrow("Unauthorized")
-    })
   })
 
   describe("fetchAuthDebugLogs", () => {
     it("should successfully fetch debug logs for admin user", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "admin-123",
-        email: "admin@test.com",
-        role: "Admin",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
-
       const mockLogs = [
         { id: "log-1", event_type: "login", created_at: new Date().toISOString() },
         { id: "log-2", event_type: "signup", created_at: new Date().toISOString() },
@@ -297,12 +265,7 @@ describe("Admin Actions", () => {
     })
 
     it("should throw error for non-admin user", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "user-123",
-        email: "user@test.com",
-        role: "Student",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
 
       await expect(fetchAuthDebugLogs()).rejects.toThrow("Unauthorized")
 
@@ -310,13 +273,6 @@ describe("Admin Actions", () => {
     })
 
     it("should throw error when database query fails", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "admin-123",
-        email: "admin@test.com",
-        role: "Admin",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
-
       const mockLimit = vi.fn().mockResolvedValue({ data: null, error: { message: "Query failed" } })
       const mockOrder = vi.fn().mockReturnValue({ limit: mockLimit })
       const mockSelect = vi.fn().mockReturnValue({ order: mockOrder })
@@ -328,20 +284,7 @@ describe("Admin Actions", () => {
       await expect(fetchAuthDebugLogs()).rejects.toThrow("Failed to fetch debug logs")
     })
 
-    it("should throw error when user is null", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue(null)
-
-      await expect(fetchAuthDebugLogs()).rejects.toThrow("Unauthorized")
-    })
-
     it("should return empty array when no logs exist", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue({
-        id: "admin-123",
-        email: "admin@test.com",
-        role: "Admin",
-        is_approved: true,
-      } as unknown as Awaited<ReturnType<typeof getCurrentUser>>)
-
       const mockLimit = vi.fn().mockResolvedValue({ data: [], error: null })
       const mockOrder = vi.fn().mockReturnValue({ limit: mockLimit })
       const mockSelect = vi.fn().mockReturnValue({ order: mockOrder })
