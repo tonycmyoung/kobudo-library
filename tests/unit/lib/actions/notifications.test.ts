@@ -33,13 +33,13 @@ vi.mock("@/lib/actions/email", () => ({
 
 describe("Notification Actions", () => {
   const mockServiceClient = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     from: vi.fn((_table: string) => ({
       select: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
       single: vi.fn(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any,
   }
 

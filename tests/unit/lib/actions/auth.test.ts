@@ -52,7 +52,6 @@ describe("Auth Actions", () => {
       updateUser: vi.fn(),
       getUser: vi.fn(),
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     from: vi.fn((_table: string) => ({
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
@@ -60,11 +59,11 @@ describe("Auth Actions", () => {
       delete: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn(),
       single: vi.fn(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any,
   }
 
   const mockServiceClient = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     from: vi.fn((_table: string) => ({
       insert: vi.fn().mockResolvedValue({ error: null }),
       select: vi.fn().mockReturnThis(),
@@ -74,6 +73,7 @@ describe("Auth Actions", () => {
       gte: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn(),
       single: vi.fn().mockResolvedValue({ data: { id: "admin-1", email: "admin@example.com" }, error: null }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any,
   }
 
