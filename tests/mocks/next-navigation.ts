@@ -19,14 +19,3 @@ export const mockUsePathname = vi.fn(() => "/")
 export const mockUseSearchParams = vi.fn(() => new URLSearchParams())
 export const mockUseParams = vi.fn(() => ({}))
 
-/**
- * Setup all navigation mocks
- */
-export const setupNavigationMocks = () => {
-  vi.mock("next/navigation", () => ({
-    useRouter: mockUseRouter,
-    usePathname: mockUsePathname,
-    useSearchParams: mockUseSearchParams,
-    useParams: mockUseParams,
-  }))
-}
