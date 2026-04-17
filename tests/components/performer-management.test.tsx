@@ -185,7 +185,7 @@ describe("PerformerManagement", () => {
     await user.click(saveButton)
 
     await waitFor(() => {
-      expect(updatePerformer).toHaveBeenCalledWith("perf-1", "Updated Name", "")
+      expect(updatePerformer).toHaveBeenCalledWith("perf-1", "Updated Name")
     })
   })
 
