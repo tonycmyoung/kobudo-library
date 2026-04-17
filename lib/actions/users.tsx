@@ -8,6 +8,7 @@ import { generateUUID, sanitizeHtml, siteTitle } from "../utils/helpers"
 import { sendEmail } from "./email"
 import { logAuditEvent } from "./audit"
 import { createServerClient } from "../supabase/server"
+import { requireAdmin } from "../auth"
 
 export async function inviteUser(email: string) {
   try {
@@ -577,6 +578,7 @@ export async function updateUserBelt(userId: string, beltId: string | null) {
 }
 
 export async function fetchPendingUsers() {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -602,6 +604,7 @@ export async function fetchPendingUsers() {
 }
 
 export async function fetchUnconfirmedEmailUsers() {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 

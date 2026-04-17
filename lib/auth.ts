@@ -1,6 +1,19 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
+/**
+ * Asserts the current request is made by an Admin.
+ * Throws "Unauthorized" if not — safe to call at the top of any admin server action.
+ * Defense-in-depth: middleware already blocks non-admins, but this prevents any
+ * middleware misconfiguration from exposing server actions directly.
+ */
+export async function requireAdmin(): Promise<void> {
+  const user = await getCurrentUser()
+  if (user?.role !== "Admin") {
+    throw new Error("Unauthorized")
+  }
+}
+
 export async function getCurrentUser() {
   try {
     const cookieStore = await cookies()

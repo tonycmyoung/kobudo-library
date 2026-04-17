@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@supabase/supabase-js"
+import { requireAdmin } from "../auth"
 import { serverTrace } from "../trace-logger"
 
 interface AuditLogEntry {
@@ -34,6 +35,7 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
 }
 
 export async function fetchAuditLogs() {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -56,6 +58,7 @@ export async function fetchAuditLogs() {
 }
 
 export async function clearAuditLogs() {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 

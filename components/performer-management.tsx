@@ -89,7 +89,7 @@ export default function PerformerManagement() {
     if (!editingPerformer || !editName.trim()) return
 
     try {
-      const result = await updatePerformer(editingPerformer, editName, "")
+      const result = await updatePerformer(editingPerformer, editName)
 
       if (result.error) {
         throw new Error(result.error)

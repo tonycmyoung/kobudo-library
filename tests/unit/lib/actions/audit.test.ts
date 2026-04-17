@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, type MockInstance } from "vitest"
 import { logAuditEvent, fetchAuditLogs, clearAuditLogs } from "@/lib/actions/audit"
 import { createClient } from "@supabase/supabase-js"
+import { requireAdmin } from "@/lib/auth"
+
+vi.mock("@/lib/auth", () => ({
+  requireAdmin: vi.fn(),
+}))
 
 // Mock Supabase client
 vi.mock("@supabase/supabase-js", () => ({
@@ -261,6 +266,20 @@ describe("audit.ts", () => {
         "Error in clearAuditLogs",
         expect.objectContaining({ category: "audit" })
       )
+    })
+  })
+
+  describe("requireAdmin guard", () => {
+    it("should throw Unauthorized on fetchAuditLogs when caller is not admin", async () => {
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
+
+      await expect(fetchAuditLogs()).rejects.toThrow("Unauthorized")
+    })
+
+    it("should throw Unauthorized on clearAuditLogs when caller is not admin", async () => {
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
+
+      await expect(clearAuditLogs()).rejects.toThrow("Unauthorized")
     })
   })
 })

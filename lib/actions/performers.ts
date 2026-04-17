@@ -2,6 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { unstable_cache, revalidateTag } from "next/cache"
+import { requireAdmin } from "../auth"
 
 export const getPerformers = unstable_cache(
   async (): Promise<Array<{ id: string; name: string; bio: string | null }>> => {
@@ -39,6 +40,7 @@ export async function addPerformer(
     return { error: "Name is required" }
   }
 
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -62,12 +64,12 @@ export async function addPerformer(
 export async function updatePerformer(
   performerId: string,
   name: string,
-  bio: string,
 ): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-    const { error } = await serviceSupabase.from("performers").update({ name, bio }).eq("id", performerId)
+    const { error } = await serviceSupabase.from("performers").update({ name }).eq("id", performerId)
 
     if (error) {
       console.error("Error updating performer:", error)
@@ -83,6 +85,7 @@ export async function updatePerformer(
 }
 
 export async function deletePerformer(performerId: string): Promise<{ success?: string; error?: string }> {
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 

@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { addPerformer, updatePerformer, deletePerformer } from "@/lib/actions/performers"
+import { requireAdmin } from "@/lib/auth"
 
 vi.mock("next/cache", () => ({
   unstable_cache: (fn: unknown) => fn,
   revalidateTag: vi.fn(),
+}))
+
+vi.mock("@/lib/auth", () => ({
+  requireAdmin: vi.fn(),
 }))
 
 const mockFrom = vi.fn()
@@ -73,7 +78,7 @@ describe("performers actions", () => {
         }),
       })
 
-      const result = await updatePerformer("perf-123", "Updated Name", "Updated bio")
+      const result = await updatePerformer("perf-123", "Updated Name")
 
       expect(result.success).toBe("Performer updated successfully")
       expect(mockFrom).toHaveBeenCalledWith("performers")
@@ -86,7 +91,7 @@ describe("performers actions", () => {
         }),
       })
 
-      const result = await updatePerformer("perf-123", "Name", "Bio")
+      const result = await updatePerformer("perf-123", "Name")
 
       expect(result.error).toBe("Failed to update performer")
     })
@@ -98,7 +103,7 @@ describe("performers actions", () => {
         }),
       })
 
-      const result = await updatePerformer("perf-123", "Name", "Bio")
+      const result = await updatePerformer("perf-123", "Name")
 
       expect(result.error).toBe("Failed to update performer")
     })
@@ -128,6 +133,15 @@ describe("performers actions", () => {
       const result = await deletePerformer("perf-123")
 
       expect(result.error).toBe("Failed to delete performer")
+    })
+  })
+
+  describe("requireAdmin guard", () => {
+    it("should throw Unauthorized when caller is not admin", async () => {
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
+
+      await expect(addPerformer("Test Performer")).rejects.toThrow("Unauthorized")
+      expect(mockFrom).not.toHaveBeenCalled()
     })
   })
 })

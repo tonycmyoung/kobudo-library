@@ -57,6 +57,10 @@ vi.mock("@/lib/utils/helpers", () => ({
   generateUUID: vi.fn(() => "test-uuid"),
 }))
 
+vi.mock("@/lib/auth", () => ({
+  requireAdmin: vi.fn(),
+}))
+
 describe("User Actions", () => {
   let mockSupabaseClient: ReturnType<typeof createMockSupabaseClient>
   let mockServiceClient: ReturnType<typeof createMockSupabaseClient>
@@ -274,6 +278,13 @@ describe("User Actions", () => {
       const result = await fetchPendingUsers()
 
       expect(result).toEqual({ data: [], error: null })
+    })
+
+    it("should throw Unauthorized when caller is not admin", async () => {
+      const { requireAdmin } = await import("@/lib/auth")
+      vi.mocked(requireAdmin).mockRejectedValueOnce(new Error("Unauthorized"))
+
+      await expect(fetchPendingUsers()).rejects.toThrow("Unauthorized")
     })
   })
 
