@@ -7,7 +7,6 @@ import { fetchNotificationsWithSenders } from "@/lib/actions"
 import { useRouter } from "next/navigation"
 import { traceError } from "@/lib/trace-logger"
 
-vi.mock("@/lib/supabase/client")
 vi.mock("@/lib/actions")
 vi.mock("next/navigation")
 vi.mock("@/lib/utils/date", () => ({

@@ -6,7 +6,6 @@ import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { addPerformer, updatePerformer, deletePerformer } from "@/lib/actions"
 import { within } from "@testing-library/dom"
 
-vi.mock("@/lib/supabase/client")
 vi.mock("@/lib/actions", () => ({
   addPerformer: vi.fn(),
   updatePerformer: vi.fn(),
