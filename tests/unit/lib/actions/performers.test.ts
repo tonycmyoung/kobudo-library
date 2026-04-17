@@ -78,7 +78,7 @@ describe("performers actions", () => {
         }),
       })
 
-      const result = await updatePerformer("perf-123", "Updated Name", "Updated bio")
+      const result = await updatePerformer("perf-123", "Updated Name")
 
       expect(result.success).toBe("Performer updated successfully")
       expect(mockFrom).toHaveBeenCalledWith("performers")
@@ -91,7 +91,7 @@ describe("performers actions", () => {
         }),
       })
 
-      const result = await updatePerformer("perf-123", "Name", "Bio")
+      const result = await updatePerformer("perf-123", "Name")
 
       expect(result.error).toBe("Failed to update performer")
     })
@@ -103,7 +103,7 @@ describe("performers actions", () => {
         }),
       })
 
-      const result = await updatePerformer("perf-123", "Name", "Bio")
+      const result = await updatePerformer("perf-123", "Name")
 
       expect(result.error).toBe("Failed to update performer")
     })

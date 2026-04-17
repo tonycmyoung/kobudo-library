@@ -3,7 +3,6 @@
 import { createClient } from "@supabase/supabase-js"
 import { unstable_cache, revalidateTag } from "next/cache"
 import { requireAdmin } from "../auth"
-import { serverTrace } from "../trace-logger"
 
 export const getPerformers = unstable_cache(
   async (): Promise<Array<{ id: string; name: string; bio: string | null }>> => {
@@ -65,32 +64,21 @@ export async function addPerformer(
 export async function updatePerformer(
   performerId: string,
   name: string,
-  bio: string,
 ): Promise<{ success?: string; error?: string }> {
-  serverTrace.debug("updatePerformer: start", { category: "performers", payload: { performerId, name } })
-  try {
-    await requireAdmin()
-  } catch (authError) {
-    serverTrace.error("updatePerformer: requireAdmin failed", { category: "performers", payload: { error: String(authError) } })
-    throw authError
-  }
-  serverTrace.debug("updatePerformer: requireAdmin passed", { category: "performers" })
+  await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-    const { error } = await serviceSupabase.from("performers").update({ name, bio }).eq("id", performerId)
+    const { error } = await serviceSupabase.from("performers").update({ name }).eq("id", performerId)
 
     if (error) {
-      serverTrace.error("updatePerformer: db error", { category: "performers", payload: { error } })
       console.error("Error updating performer:", error)
       return { error: "Failed to update performer" }
     }
 
     revalidateTag("performers", "max")
-    serverTrace.debug("updatePerformer: success", { category: "performers", payload: { performerId } })
     return { success: "Performer updated successfully" }
   } catch (error) {
-    serverTrace.error("updatePerformer: exception", { category: "performers", payload: { error: String(error) } })
     console.error("Error in updatePerformer:", error)
     return { error: "Failed to update performer" }
   }
