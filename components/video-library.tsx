@@ -550,40 +550,34 @@ export default function VideoLibrary({
 
   useEffect(() => {
     let mounted = true
-    const loadData = async () => {
-      if (!mounted) return
-      setLoading(true)
 
-      if (initialVideos) {
-        // Fast path: video data was pre-fetched server-side; only fetch user-specific data client-side
-        try {
-          const [favoritesResult, viewCounts] = await Promise.all([
-            user
-              ? supabase.from("user_favorites").select("video_id").eq("user_id", user.id)
-              : Promise.resolve({ data: [], error: null }),
-            getBatchVideoViewCounts(initialVideos.map((v) => v.id)),
-          ])
-
-          if (!mounted) return
-
-          const videosWithViewCounts = initialVideos.map((video) => ({
-            ...video,
-            views: viewCounts[video.id] || 0,
-          }))
-
-          if (mounted) {
-            setAllVideos(videosWithViewCounts)
-            setUserFavorites(new Set(favoritesResult.data?.map((f) => f.video_id) || []))
-          }
-        } catch (error) {
-          console.error("Error loading user data:", error)
-        } finally {
-          if (mounted) setLoading(false)
+    // Fast path: video data pre-fetched server-side; only fetch user-specific data client-side
+    const loadUserDataOnly = async () => {
+      try {
+        const [favoritesResult, viewCounts] = await Promise.all([
+          user
+            ? supabase.from("user_favorites").select("video_id").eq("user_id", user.id)
+            : Promise.resolve({ data: [], error: null }),
+          getBatchVideoViewCounts(initialVideos!.map((v) => v.id)),
+        ])
+        if (!mounted) return
+        const videosWithViewCounts = initialVideos!.map((video) => ({
+          ...video,
+          views: viewCounts[video.id] || 0,
+        }))
+        if (mounted) {
+          setAllVideos(videosWithViewCounts)
+          setUserFavorites(new Set(favoritesResult.data?.map((f) => f.video_id) || []))
         }
-        return
+      } catch (error) {
+        console.error("Error loading user data:", error)
+      } finally {
+        if (mounted) setLoading(false)
       }
+    }
 
-      // Standard path: full client-side fetch (used when no initialVideos provided)
+    // Standard path: full client-side fetch (used when no initialVideos provided)
+    const loadAllData = async () => {
       if (isCircuitBreakerOpen()) {
         // eslint-disable-next-line no-console -- intentional diagnostic log for circuit breaker state
         console.log("Circuit breaker is open, using cached data if available")
@@ -591,7 +585,6 @@ export default function VideoLibrary({
         if (mounted) setLoading(false)
         return
       }
-
       try {
         const [videosResult, favoritesResult, categoriesResult, curriculumsResult, performersResult] =
           await Promise.all([
@@ -622,13 +615,8 @@ export default function VideoLibrary({
               performers(id, name)
             `),
           ])
-
         if (!mounted) return
-
-        if (videosResult.error) {
-          throw videosResult.error
-        }
-
+        if (videosResult.error) throw videosResult.error
         const videosWithMetadata = (videosResult.data || []).map((video) =>
           buildVideoWithMetadata(
             video,
@@ -637,18 +625,14 @@ export default function VideoLibrary({
             performersResult.data as unknown as Array<{ video_id: string; performers: Performer }> | null,
           )
         )
-
         const videoIds = videosWithMetadata.map((video) => video.id)
         const viewCounts = await getBatchVideoViewCounts(videoIds)
-
         const videosWithViewCounts = videosWithMetadata.map((video) => ({
           ...video,
           views: viewCounts[video.id] || 0,
         }))
-
         recordCircuitBreakerSuccess()
         saveToCache(videosWithViewCounts)
-
         if (mounted) {
           setAllVideos(videosWithViewCounts)
           setUserFavorites(new Set(favoritesResult.data?.map((f) => f.video_id) || []))
@@ -659,6 +643,16 @@ export default function VideoLibrary({
         loadFromCache()
       } finally {
         if (mounted) setLoading(false)
+      }
+    }
+
+    const loadData = async () => {
+      if (!mounted) return
+      setLoading(true)
+      if (initialVideos) {
+        await loadUserDataOnly()
+      } else {
+        await loadAllData()
       }
     }
 

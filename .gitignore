@@ -32,6 +32,9 @@ next-env.d.ts
 
 # test coverage
 /coverage/
+test-coverage-*.out
+test-coverage-*.txt
+test-output-*.txt
 
 # temporary scripts (working folder - ad-hoc development scripts)
 /scripts/temp-*.sql
