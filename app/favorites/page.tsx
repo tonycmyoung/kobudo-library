@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import Header from "@/components/header"
 import VideoLibrary from "@/components/video-library"
 import type { CurrentBelt } from "@/lib/utils/admin-header-user"
+import { getVideosForLibrary } from "@/lib/actions/videos"
 
 export default async function FavoritesPage() {
   // If Supabase is not configured, show setup message directly
@@ -50,6 +51,8 @@ export default async function FavoritesPage() {
     current_belt: userProfile?.current_belt as unknown as CurrentBelt | null | undefined,
   }
 
+  const initialVideos = await getVideosForLibrary()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-orange-900">
       <Header user={userWithEmail} />
@@ -58,7 +61,7 @@ export default async function FavoritesPage() {
           <h1 className="text-3xl font-bold text-white mb-2">My Favorites</h1>
           <p className="text-gray-300">Videos you&apos;ve saved for later</p>
         </div>
-        <VideoLibrary favoritesOnly={true} userProfile={{ curriculum_set_id: userProfile?.curriculum_set_id }} />
+        <VideoLibrary favoritesOnly={true} userProfile={{ curriculum_set_id: userProfile?.curriculum_set_id }} initialVideos={initialVideos} />
       </div>
     </div>
   )

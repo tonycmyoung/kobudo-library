@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@supabase/supabase-js"
-import { revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { getCurrentUser } from "../auth"
 import type { TraceLogEntry, TraceSettings, TraceLevel } from "../trace-logger"
 
@@ -97,7 +97,7 @@ export async function clearTraceLogs(beforeDate?: string) {
     throw new Error("Failed to clear trace logs")
   }
 
-  revalidatePath("/admin/trace")
+  revalidateTag("admin-trace", "max")
 }
 
 export async function fetchTraceSettings(): Promise<TraceSettings> {
@@ -155,7 +155,7 @@ export async function updateTraceSettings(settings: Partial<Pick<TraceSettings, 
     throw new Error("Failed to update trace settings")
   }
 
-  revalidatePath("/admin/trace")
+  revalidateTag("admin-trace", "max")
 }
 
 export async function getTraceCategories(): Promise<string[]> {

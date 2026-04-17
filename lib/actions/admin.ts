@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@supabase/supabase-js"
-import { revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { getCurrentUser } from "../auth"
 import { getTotalVideoViews, getVideoViewsInDateRange } from "./videos"
 import { serverTrace } from "../trace-logger"
@@ -97,7 +97,7 @@ export async function clearAuthDebugLogs() {
     throw new Error("Failed to clear debug logs")
   }
 
-  revalidatePath("/admin/debug")
+  revalidateTag("admin-debug", "max")
 }
 
 export async function fetchAuthDebugLogs() {

@@ -51,3 +51,13 @@ export const createServerClient = async () => {
 export const createClient = cache(async () => {
   return createServerClient()
 })
+
+// Cached getUser — deduplicates JWT verification within a single server request.
+// Safe to call from multiple server components in the same render tree.
+export const getServerUser = cache(async () => {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user
+})

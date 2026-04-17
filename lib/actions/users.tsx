@@ -3,7 +3,7 @@
 import { cookies } from "next/headers"
 import { createServerClient as createSupabaseServerClient } from "@supabase/ssr"
 import { createClient } from "@supabase/supabase-js"
-import { revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { generateUUID, sanitizeHtml, siteTitle } from "../utils/helpers"
 import { sendEmail } from "./email"
 import { logAuditEvent } from "./audit"
@@ -211,7 +211,7 @@ export async function approveUserServerAction(userId: string, role = "Student") 
       `,
     )
 
-    revalidatePath("/admin")
+    revalidateTag("admin-users", "max")
     return { success: "User approved successfully" }
   } catch (error) {
     console.error("Error in approveUser:", error)
@@ -239,7 +239,7 @@ export async function rejectUserServerAction(userId: string) {
       return { error: "Failed to completely remove user" }
     }
 
-    revalidatePath("/admin")
+    revalidateTag("admin-users", "max")
     return { success: "User rejected successfully" }
   } catch (error) {
     console.error("Error in rejectUser:", error)
@@ -265,7 +265,7 @@ export async function updatePendingUserFields(userId: string, fullName: string, 
       return { error: "Failed to update pending user fields" }
     }
 
-    revalidatePath("/admin")
+    revalidateTag("admin-users", "max")
     return { success: "Pending user fields updated successfully" }
   } catch (error) {
     console.error("Error in updatePendingUserFields:", error)
@@ -300,8 +300,8 @@ export async function updateUserFields(
       return { error: "Failed to update user fields" }
     }
 
-    revalidatePath("/admin/users")
-    revalidatePath("/students")
+    revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
     return { success: "User fields updated successfully" }
   } catch (error) {
     console.error("Error in updateUserFields:", error)
@@ -392,7 +392,7 @@ export async function updateStudentForHeadTeacher(
       return { error: "Failed to update student fields" }
     }
 
-    revalidatePath("/students")
+    revalidateTag("students", "max")
     return { success: "Student updated successfully" }
   } catch (error) {
     console.error("Error in updateStudentForHeadTeacher:", error)
@@ -521,6 +521,7 @@ export async function updateProfile(params: {
       return { error: "Failed to update profile", success: false }
     }
 
+    revalidateTag("user-profile", "max")
     return { success: true }
   } catch (error) {
     console.error("Error in updateProfile:", error)
@@ -564,9 +565,9 @@ export async function updateUserBelt(userId: string, beltId: string | null) {
       return { error: "Failed to update belt", success: false }
     }
 
-    revalidatePath("/profile")
-    revalidatePath("/admin/users")
-    revalidatePath("/students")
+    revalidateTag("user-profile", "max")
+    revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
 
     return { success: true }
   } catch (error) {
@@ -716,37 +717,32 @@ export async function fetchStudentsForHeadTeacher(headTeacherSchool: string, hea
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-    // Use OR filter to match: exact school OR school starting with prefix + space
-    // This prevents "BBMA" from matching "BBMA2" (must be "BBMA" or "BBMA ...")
-    const { data: usersData, error: usersError } = await serviceSupabase
-      .from("users")
-      .select(`
-        id, email, full_name, teacher, school, role, created_at, is_approved, approved_at, profile_image_url, current_belt_id, curriculum_set_id,
-        inviter:invited_by(full_name),
-        current_belt:curriculums!current_belt_id(id, name, color, display_order),
-        curriculum_set:curriculum_sets!curriculum_set_id(id, name)
-      `)
-      .eq("is_approved", true)
-      .or(`school.eq.${headTeacherSchool},school.ilike.${headTeacherSchool} %`)
-      .neq("id", headTeacherId)
-      .order("full_name", { ascending: true })
+    // Fetch users, login stats, and view stats in parallel — all independent
+    const [
+      { data: usersData, error: usersError },
+      { data: loginStats, error: loginError },
+      { data: viewStats, error: viewError },
+    ] = await Promise.all([
+      // Use OR filter to match: exact school OR school starting with prefix + space
+      // This prevents "BBMA" from matching "BBMA2" (must be "BBMA" or "BBMA ...")
+      serviceSupabase
+        .from("users")
+        .select(`
+          id, email, full_name, teacher, school, role, created_at, is_approved, approved_at, profile_image_url, current_belt_id, curriculum_set_id,
+          inviter:invited_by(full_name),
+          current_belt:curriculums!current_belt_id(id, name, color, display_order),
+          curriculum_set:curriculum_sets!curriculum_set_id(id, name)
+        `)
+        .eq("is_approved", true)
+        .or(`school.eq.${headTeacherSchool},school.ilike.${headTeacherSchool} %`)
+        .neq("id", headTeacherId)
+        .order("full_name", { ascending: true }),
+      serviceSupabase.from("user_logins").select("user_id, login_time").order("login_time", { ascending: false }),
+      serviceSupabase.from("user_video_views").select("user_id, viewed_at").order("viewed_at", { ascending: false }),
+    ])
 
     if (usersError) throw usersError
-
-    // Fetch login stats
-    const { data: loginStats, error: loginError } = await serviceSupabase
-      .from("user_logins")
-      .select("user_id, login_time")
-      .order("login_time", { ascending: false })
-
     if (loginError) throw loginError
-
-    // Fetch view stats
-    const { data: viewStats, error: viewError } = await serviceSupabase
-      .from("user_video_views")
-      .select("user_id, viewed_at")
-      .order("viewed_at", { ascending: false })
-
     if (viewError) throw viewError
 
     // Combine data with stats

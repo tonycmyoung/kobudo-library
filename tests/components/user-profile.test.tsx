@@ -5,7 +5,6 @@ import userEvent from "@testing-library/user-event"
 import UserProfile from "@/components/user-profile"
 import { updateProfile } from "@/lib/actions"
 import { updateUserBelt } from "@/lib/actions/users"
-import { useRouter } from "next/navigation"
 
 vi.mock("@/lib/actions", () => ({
   updateProfile: vi.fn(),
@@ -31,20 +30,10 @@ vi.mock("@/components/ui/select", () => ({
   SelectLabel: ({ children }: { children: React.ReactNode }) => <optgroup label={String(children)}>{children}</optgroup>,
 }))
 
-vi.mock("next/navigation", () => ({
-  useRouter: vi.fn(),
-}))
-
 global.fetch = vi.fn()
 global.alert = vi.fn()
 
 describe("UserProfile", () => {
-  const mockRouter = {
-    push: vi.fn(),
-    refresh: vi.fn(),
-    replace: vi.fn(),
-  }
-
   const mockUser = {
     id: "user-1",
     email: "test@example.com",
@@ -81,7 +70,6 @@ describe("UserProfile", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     vi.mocked(updateProfile).mockResolvedValue({ success: true })
   })
 
@@ -157,7 +145,24 @@ describe("UserProfile", () => {
         fullName: "Jane Doe",
         profileImageUrl: "https://example.com/image.jpg",
       })
-      expect(mockRouter.refresh).toHaveBeenCalled()
+      // Optimistic update: displayed name updates immediately without router.refresh()
+      expect(screen.getByText("Jane Doe")).toBeInTheDocument()
+    })
+  })
+
+  it("should update displayed name optimistically after save without page refresh", async () => {
+    const user = userEvent.setup({ delay: null })
+    render(<UserProfile user={mockUser} curriculums={mockCurriculums} />)
+
+    await user.click(screen.getByRole("button", { name: /edit profile/i }))
+    const nameInput = screen.getByDisplayValue("John Doe")
+    await user.clear(nameInput)
+    await user.type(nameInput, "Jane Doe")
+    await user.click(screen.getByRole("button", { name: /save/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText("Jane Doe")).toBeInTheDocument()
+      expect(screen.queryByText("John Doe")).not.toBeInTheDocument()
     })
   })
 
@@ -499,6 +504,24 @@ describe("UserProfile", () => {
 
       await waitFor(() => {
         expect(global.alert).toHaveBeenCalledWith("Failed to update belt. Please try again.")
+      })
+    })
+
+    it("should update displayed belt name optimistically after successful belt change", async () => {
+      vi.mocked(updateUserBelt).mockResolvedValue({ success: true })
+      const user = userEvent.setup({ delay: null })
+
+      render(<UserProfile user={mockUser} curriculums={mockCurriculums} curriculumLevels={mockCurriculumLevels} />)
+
+      // Initially shows White Belt
+      expect(screen.getAllByText("White Belt")[0]).toBeInTheDocument()
+
+      const beltSelect = screen.getByTestId("belt-select")
+      await user.selectOptions(beltSelect, "level-2")
+
+      await waitFor(() => {
+        // Optimistic update: belt display updates from mockCurriculumLevels lookup
+        expect(screen.getAllByText("Yellow Belt")[0]).toBeInTheDocument()
       })
     })
   })

@@ -11,6 +11,11 @@ import {
   getBatchVideoLastViewed,
 } from "@/lib/actions/videos"
 
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: unknown) => fn,
+  revalidateTag: vi.fn(),
+}))
+
 const mockFrom = vi.fn()
 const mockAuthGetUser = vi.fn()
 

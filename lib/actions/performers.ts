@@ -1,4 +1,26 @@
+"use server"
+
 import { createClient } from "@supabase/supabase-js"
+import { unstable_cache, revalidateTag } from "next/cache"
+
+export const getPerformers = unstable_cache(
+  async (): Promise<Array<{ id: string; name: string; bio: string | null }>> => {
+    try {
+      const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+      const { data, error } = await serviceSupabase.from("performers").select("id, name, bio").order("name")
+      if (error) {
+        console.error("Error fetching performers:", error)
+        return []
+      }
+      return data || []
+    } catch (error) {
+      console.error("Error in getPerformers:", error)
+      return []
+    }
+  },
+  ["performers"],
+  { tags: ["performers"] },
+)
 
 export async function addPerformer(
   nameOrFormData: string | FormData,
@@ -29,6 +51,7 @@ export async function addPerformer(
       return { error: "Failed to add performer" }
     }
 
+    revalidateTag("performers", "max")
     return { success: "Performer added successfully" }
   } catch (error) {
     console.error("Error in addPerformer:", error)
@@ -51,6 +74,7 @@ export async function updatePerformer(
       return { error: "Failed to update performer" }
     }
 
+    revalidateTag("performers", "max")
     return { success: "Performer updated successfully" }
   } catch (error) {
     console.error("Error in updatePerformer:", error)
@@ -69,6 +93,7 @@ export async function deletePerformer(performerId: string): Promise<{ success?: 
       return { error: "Failed to delete performer" }
     }
 
+    revalidateTag("performers", "max")
     return { success: "Performer deleted successfully" }
   } catch (error) {
     console.error("Error in deletePerformer:", error)

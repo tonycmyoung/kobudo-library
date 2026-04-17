@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@supabase/supabase-js"
+import { unstable_cache, revalidateTag } from "next/cache"
 
 interface Curriculum {
   id: string
@@ -13,7 +14,23 @@ interface Curriculum {
   video_count?: number
 }
 
-export async function getCurriculums(): Promise<Curriculum[]> {
+// Lightweight cached fetch for server components (profile page, belt selector)
+export const getCurriculumsForDisplay = unstable_cache(
+  async (): Promise<Array<{ id: string; name: string; color: string; display_order: number }>> => {
+    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    const { data } = await serviceSupabase
+      .from("curriculums")
+      .select("id, name, color, display_order")
+      .order("display_order", { ascending: true })
+    return data || []
+  },
+  ["curriculums-display"],
+  { tags: ["curriculums"] },
+)
+
+// Full admin fetch (includes description, created_by, video_count)
+export const getCurriculums = unstable_cache(
+  async (): Promise<Curriculum[]> => {
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -28,27 +45,31 @@ export async function getCurriculums(): Promise<Curriculum[]> {
       return []
     }
 
-    // Get video counts for each curriculum
-    const curriculumsWithCounts = await Promise.all(
-      (curriculums || []).map(async (curriculum) => {
-        const { count } = await serviceSupabase
-          .from("video_curriculums")
-          .select("*", { count: "exact", head: true })
-          .eq("curriculum_id", curriculum.id)
+    // Batch-fetch all video-curriculum associations in a single query then count in JS
+    const curriculumIds = (curriculums || []).map((c) => c.id)
+    const { data: videoAssociations } = curriculumIds.length
+      ? await serviceSupabase.from("video_curriculums").select("curriculum_id").in("curriculum_id", curriculumIds)
+      : { data: [] }
 
-        return {
-          ...curriculum,
-          video_count: count || 0,
-        }
-      }),
-    )
+    const countMap = (videoAssociations || []).reduce<Record<string, number>>((acc, row) => {
+      acc[row.curriculum_id] = (acc[row.curriculum_id] || 0) + 1
+      return acc
+    }, {})
+
+    const curriculumsWithCounts = (curriculums || []).map((curriculum) => ({
+      ...curriculum,
+      video_count: countMap[curriculum.id] || 0,
+    }))
 
     return curriculumsWithCounts
   } catch (error) {
     console.error("Error in getCurriculums:", error)
     return []
   }
-}
+  },
+  ["curriculums-admin"],
+  { tags: ["curriculums"] },
+)
 
 export async function addCurriculum(curriculumData: {
   name: string
@@ -84,6 +105,7 @@ export async function addCurriculum(curriculumData: {
       return { error: "Failed to add curriculum" }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculum added successfully" }
   } catch (error) {
     console.error("Error in addCurriculum:", error)
@@ -120,6 +142,7 @@ export async function updateCurriculum(
       return { error: "Failed to update curriculum" }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculum updated successfully" }
   } catch (error) {
     console.error("Error in updateCurriculum:", error)
@@ -167,14 +190,14 @@ export async function deleteCurriculum(curriculumId: string): Promise<{ success?
       .order("display_order", { ascending: true })
 
     if (curriculumsToUpdate && curriculumsToUpdate.length > 0) {
-      for (const curr of curriculumsToUpdate) {
-        await serviceSupabase
-          .from("curriculums")
-          .update({ display_order: curr.display_order - 1 })
-          .eq("id", curr.id)
-      }
+      await Promise.all(
+        curriculumsToUpdate.map((curr) =>
+          serviceSupabase.from("curriculums").update({ display_order: curr.display_order - 1 }).eq("id", curr.id),
+        ),
+      )
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculum deleted successfully" }
   } catch (error) {
     console.error("Error in deleteCurriculum:", error)
@@ -195,6 +218,7 @@ export async function reorderCurriculums(
 
     await Promise.all(updates)
 
+    revalidateTag("curriculums", "max")
     return { success: "Curriculums reordered successfully" }
   } catch (error) {
     console.error("Error in reorderCurriculums:", error)
@@ -218,26 +242,30 @@ interface CurriculumSetWithLevels extends CurriculumSet {
   levels: Curriculum[]
 }
 
-export async function getCurriculumSets(): Promise<CurriculumSet[]> {
-  try {
-    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+export const getCurriculumSets = unstable_cache(
+  async (): Promise<CurriculumSet[]> => {
+    try {
+      const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-    const { data: sets, error } = await serviceSupabase
-      .from("curriculum_sets")
-      .select("*")
-      .order("created_at", { ascending: true })
+      const { data: sets, error } = await serviceSupabase
+        .from("curriculum_sets")
+        .select("*")
+        .order("created_at", { ascending: true })
 
-    if (error) {
-      console.error("Error fetching curriculum sets:", error)
+      if (error) {
+        console.error("Error fetching curriculum sets:", error)
+        return []
+      }
+
+      return sets || []
+    } catch (error) {
+      console.error("Error in getCurriculumSets:", error)
       return []
     }
-
-    return sets || []
-  } catch (error) {
-    console.error("Error in getCurriculumSets:", error)
-    return []
-  }
-}
+  },
+  ["curriculum-sets"],
+  { tags: ["curriculum-sets"] },
+)
 
 export async function getCurriculumSetWithLevels(setId: string): Promise<CurriculumSetWithLevels | null> {
   try {
@@ -289,6 +317,7 @@ export async function createCurriculumSet(data: {
       return { error: "Failed to create curriculum set" }
     }
 
+    revalidateTag("curriculum-sets", "max")
     return { success: "Curriculum set created successfully", id: newSet?.id }
   } catch (error) {
     console.error("Error in createCurriculumSet:", error)
@@ -316,6 +345,7 @@ export async function updateCurriculumSet(
       return { error: "Failed to update curriculum set" }
     }
 
+    revalidateTag("curriculum-sets", "max")
     return { success: "Curriculum set updated successfully" }
   } catch (error) {
     console.error("Error in updateCurriculumSet:", error)
@@ -368,6 +398,7 @@ export async function deleteCurriculumSet(setId: string): Promise<{ success?: st
       return { error: "Failed to delete curriculum set" }
     }
 
+    revalidateTag("curriculum-sets", "max")
     return { success: "Curriculum set deleted successfully" }
   } catch (error) {
     console.error("Error in deleteCurriculumSet:", error)
@@ -414,6 +445,7 @@ export async function addLevelToCurriculumSet(
       return { error: `Failed to add level: ${error.message}` }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Level added successfully", id: newLevel?.id }
   } catch (error) {
     console.error("Error in addLevelToCurriculumSet:", error)
@@ -450,6 +482,7 @@ export async function updateLevelInCurriculumSet(
       return { error: "Failed to update level" }
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Level updated successfully" }
   } catch (error) {
     console.error("Error in updateLevelInCurriculumSet:", error)
@@ -498,14 +531,14 @@ export async function deleteLevelFromCurriculumSet(levelId: string): Promise<{ s
       .order("display_order", { ascending: true })
 
     if (levelsToUpdate && levelsToUpdate.length > 0) {
-      for (const level of levelsToUpdate) {
-        await serviceSupabase
-          .from("curriculums")
-          .update({ display_order: level.display_order - 1 })
-          .eq("id", level.id)
-      }
+      await Promise.all(
+        levelsToUpdate.map((level) =>
+          serviceSupabase.from("curriculums").update({ display_order: level.display_order - 1 }).eq("id", level.id),
+        ),
+      )
     }
 
+    revalidateTag("curriculums", "max")
     return { success: "Level deleted successfully" }
   } catch (error) {
     console.error("Error in deleteLevelFromCurriculumSet:", error)
@@ -526,6 +559,7 @@ export async function reorderLevelsInCurriculumSet(
 
     await Promise.all(updates)
 
+    revalidateTag("curriculums", "max")
     return { success: "Levels reordered successfully" }
   } catch (error) {
     console.error("Error in reorderLevelsInCurriculumSet:", error)

@@ -35,6 +35,11 @@ const _mockIlike = vi.fn()
 
 const mockFrom = vi.fn()
 
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: unknown) => fn,
+  revalidateTag: vi.fn(),
+}))
+
 vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(() => ({
     from: mockFrom,
@@ -66,11 +71,22 @@ describe("Curriculum Actions", () => {
         { id: "1", name: "White Belt", display_order: 0, color: "#FFFFFF" },
         { id: "2", name: "Yellow Belt", display_order: 1, color: "#FFFF00" },
       ]
+      // 5 videos for curriculum "1", 2 for curriculum "2"
+      const mockAssociations = [
+        { curriculum_id: "1" },
+        { curriculum_id: "1" },
+        { curriculum_id: "1" },
+        { curriculum_id: "1" },
+        { curriculum_id: "1" },
+        { curriculum_id: "2" },
+        { curriculum_id: "2" },
+      ]
 
       let fromCallCount = 0
       mockFrom.mockImplementation((_table: string) => {
         fromCallCount++
         if (fromCallCount === 1) {
+          // getCurriculums: select all curriculums
           return {
             select: vi.fn().mockReturnValue({
               order: vi.fn().mockReturnValue({
@@ -79,9 +95,10 @@ describe("Curriculum Actions", () => {
             }),
           }
         } else {
+          // batch video count: select curriculum_id .in(...)
           return {
             select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockResolvedValue({ count: 5, error: null }),
+              in: vi.fn().mockResolvedValue({ data: mockAssociations, error: null }),
             }),
           }
         }
@@ -92,6 +109,7 @@ describe("Curriculum Actions", () => {
       expect(result).toHaveLength(2)
       expect(result[0].name).toBe("White Belt")
       expect(result[0].video_count).toBe(5)
+      expect(result[1].video_count).toBe(2)
     })
 
     it("should return empty array on error", async () => {

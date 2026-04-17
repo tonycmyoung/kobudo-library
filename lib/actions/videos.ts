@@ -3,11 +3,60 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { unstable_cache, revalidateTag } from "next/cache"
+import type { Video, Category, Curriculum, Performer } from "@/types/video"
 
 // Helper function to create service client
 function getServiceClient() {
   return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
+
+// Cached fetch of all videos with their categories, curriculums, and performers.
+// Used by server page components as initialVideos — avoids redundant client-side fetches.
+// View counts and user favorites are NOT included (they are user/time-sensitive and fetched client-side).
+export const getVideosForLibrary = unstable_cache(
+  async (): Promise<Video[]> => {
+    const serviceSupabase = getServiceClient()
+
+    const [videosResult, categoriesResult, curriculumsResult, performersResult] = await Promise.all([
+      serviceSupabase
+        .from("videos")
+        .select("id, title, description, video_url, thumbnail_url, duration_seconds, created_at, recorded")
+        .order("created_at", { ascending: false }),
+      serviceSupabase.from("video_categories").select("video_id, categories(id, name, color, description)"),
+      serviceSupabase
+        .from("video_curriculums")
+        .select("video_id, curriculums(id, name, color, display_order, description, curriculum_set_id)"),
+      serviceSupabase.from("video_performers").select("video_id, performers(id, name)"),
+    ])
+
+    if (videosResult.error) {
+      console.error("[getVideosForLibrary] Error fetching videos:", videosResult.error)
+      return []
+    }
+
+    const categoriesData = categoriesResult.data as Array<{ video_id: string; categories: Category }> | null
+    const curriculumsData = curriculumsResult.data as Array<{ video_id: string; curriculums: Curriculum }> | null
+    const performersData = performersResult.data as Array<{ video_id: string; performers: Performer }> | null
+
+    return (videosResult.data || []).map((video) => ({
+      id: video.id,
+      title: video.title,
+      description: video.description,
+      video_url: video.video_url,
+      thumbnail_url: video.thumbnail_url,
+      duration_seconds: video.duration_seconds,
+      created_at: video.created_at,
+      recorded: video.recorded,
+      views: 0,
+      categories: (categoriesData || []).filter((vc) => vc.video_id === video.id).map((vc) => vc.categories),
+      curriculums: (curriculumsData || []).filter((vc) => vc.video_id === video.id).map((vc) => vc.curriculums),
+      performers: (performersData || []).filter((vp) => vp.video_id === video.id).map((vp) => vp.performers),
+    }))
+  },
+  ["videos-library"],
+  { tags: ["videos"] },
+)
 
 // Helper to insert video relationships (categories, curriculums, performers)
 async function insertVideoRelationships(
@@ -103,6 +152,7 @@ async function updateExistingVideo(
   await deleteVideoRelationships(serviceSupabase, videoId)
   await insertVideoRelationships(serviceSupabase, videoId, categoryIds, curriculumIds, performerIds)
 
+  revalidateTag("videos", "max")
   return { success: "Video updated successfully" }
 }
 
@@ -146,6 +196,7 @@ async function createNewVideo(
   const newVideoId = videoData.id
   await insertVideoRelationships(serviceSupabase, newVideoId, categoryIds, curriculumIds, performerIds)
 
+  revalidateTag("videos", "max")
   return { success: "Video saved successfully" }
 }
 
