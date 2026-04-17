@@ -50,7 +50,7 @@ describe("ResetPasswordForm", () => {
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
-    let unmount: () => void
+    let unmount!: () => void
     await act(async () => {
       const result = render(<ResetPasswordForm />)
       unmount = result.unmount
@@ -83,7 +83,7 @@ describe("ResetPasswordForm", () => {
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
-    let unmount: () => void
+    let unmount!: () => void
     await act(async () => {
       const result = render(<ResetPasswordForm />)
       unmount = result.unmount
@@ -109,7 +109,7 @@ describe("ResetPasswordForm", () => {
   it("should show loading state initially", async () => {
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
 
-    let unmount: () => void
+    let unmount!: () => void
     await act(async () => {
       const result = render(<ResetPasswordForm />)
       unmount = result.unmount
@@ -148,7 +148,7 @@ describe("ResetPasswordForm", () => {
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
-    let unmount: () => void
+    let unmount!: () => void
     await act(async () => {
       const result = render(<ResetPasswordForm />)
       unmount = result.unmount

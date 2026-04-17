@@ -71,7 +71,7 @@ describe("Middleware: updateSession", () => {
     }
 
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient)
-    vi.mocked(validateReturnTo).mockImplementation((path: string) => path)
+    vi.mocked(validateReturnTo).mockImplementation((path: string | null | undefined) => path ?? null)
 
     vi.mocked(AuthCookieService.createAuthErrorResponse).mockImplementation(
       (request: NextRequest, type: string, message: string) => {
@@ -395,7 +395,7 @@ describe("Middleware: updateSession", () => {
       }
 
       vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient)
-      vi.mocked(validateReturnTo).mockImplementation((path: string) => path)
+      vi.mocked(validateReturnTo).mockImplementation((path: string | null | undefined) => path ?? null)
 
       vi.mocked(AuthCookieService.createAuthErrorResponse).mockImplementation(
         (request: NextRequest, type: string, message: string) => {

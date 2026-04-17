@@ -36,7 +36,6 @@ vi.mock("next/navigation", () => ({
   useSearchParams: vi.fn(),
 }))
 
-global.confirm = vi.fn()
 
 describe("StudentManagement", () => {
   const mockRouter = {
@@ -49,7 +48,8 @@ describe("StudentManagement", () => {
     get: vi.fn((_param: string) => null),
   }
 
-  const mockStudents = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockStudents: any[] = [
     {
       id: "student-1",
       email: "john@example.com",
@@ -127,6 +127,7 @@ describe("StudentManagement", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubGlobal("confirm", vi.fn())
     vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     vi.mocked(useSearchParams).mockReturnValue(mockSearchParams as unknown as ReturnType<typeof useSearchParams>)
 
@@ -434,7 +435,7 @@ describe("StudentManagement", () => {
 
   it("should delete user when confirmed", async () => {
     vi.mocked(global.confirm).mockReturnValue(true)
-    vi.mocked(deleteUserCompletely).mockResolvedValue({ success: true })
+    vi.mocked(deleteUserCompletely).mockResolvedValue({ success: "User deleted successfully" })
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
@@ -527,7 +528,8 @@ describe("StudentManagement", () => {
         },
       },
     ]
-    vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch, error: null })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch as any, error: null })
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
 
@@ -578,7 +580,8 @@ describe("StudentManagement", () => {
         inviter: null,
       },
     ]
-    vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch, error: null })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch as any, error: null })
     vi.mocked(updateStudentForHeadTeacher).mockResolvedValue({ success: "Student updated successfully" })
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
@@ -638,7 +641,8 @@ describe("StudentManagement", () => {
         inviter: null,
       },
     ]
-    vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch, error: null })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: studentWithBranch as any, error: null })
     vi.mocked(updateStudentForHeadTeacher).mockResolvedValue({ success: "Student updated successfully" })
 
     render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
@@ -836,7 +840,7 @@ describe("StudentManagement", () => {
     it("deleteUser: shows error toast when result.success is false", async () => {
       const { toast } = await import("react-toastify")
       vi.mocked(global.confirm).mockReturnValue(true)
-      vi.mocked(deleteUserCompletely).mockResolvedValue({ success: false, error: "Server error" })
+      vi.mocked(deleteUserCompletely).mockResolvedValue({ error: "Server error" })
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
       render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)

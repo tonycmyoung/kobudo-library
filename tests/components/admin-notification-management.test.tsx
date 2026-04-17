@@ -108,8 +108,8 @@ describe("AdminNotificationManagement", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(createClient).mockReturnValue(makeSupabaseMock() as ReturnType<typeof createClient>)
-    vi.mocked(actions.sendNotificationWithEmail).mockResolvedValue({ error: null })
+    vi.mocked(createClient).mockReturnValue(makeSupabaseMock() as unknown as ReturnType<typeof createClient>)
+    vi.mocked(actions.sendNotificationWithEmail).mockResolvedValue({ success: "Notification sent successfully" })
   })
 
   it("should render Send Message card with message type buttons", async () => {
@@ -192,7 +192,7 @@ describe("AdminNotificationManagement", () => {
   })
 
   it("should display success message after sending", async () => {
-    vi.mocked(actions.sendNotificationWithEmail).mockResolvedValue({ error: null })
+    vi.mocked(actions.sendNotificationWithEmail).mockResolvedValue({ success: "Notification sent successfully" })
 
     render(<AdminNotificationManagement />)
 
@@ -333,7 +333,7 @@ describe("AdminNotificationManagement", () => {
   describe("fetchNotifications error paths", () => {
     it("renders gracefully when fetchNotifications returns an error", async () => {
       vi.mocked(createClient).mockReturnValue(
-        makeSupabaseMock({ notificationsError: { message: "db error" }, notificationsData: null }) as ReturnType<typeof createClient>
+        makeSupabaseMock({ notificationsError: { message: "db error" }, notificationsData: null }) as unknown as ReturnType<typeof createClient>
       )
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       render(<AdminNotificationManagement />)
@@ -350,7 +350,7 @@ describe("AdminNotificationManagement", () => {
 
     it("renders gracefully when fetchUsers returns an error", async () => {
       vi.mocked(createClient).mockReturnValue(
-        makeSupabaseMock({ usersError: { message: "users error" }, usersData: null }) as ReturnType<typeof createClient>
+        makeSupabaseMock({ usersError: { message: "users error" }, usersData: null }) as unknown as ReturnType<typeof createClient>
       )
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       render(<AdminNotificationManagement />)
@@ -403,7 +403,7 @@ describe("AdminNotificationManagement", () => {
 
     it("handles toggleReadStatus error gracefully", async () => {
       vi.mocked(createClient).mockReturnValue(
-        makeSupabaseMock({ updateError: { message: "update error" } }) as ReturnType<typeof createClient>
+        makeSupabaseMock({ updateError: { message: "update error" } }) as unknown as ReturnType<typeof createClient>
       )
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       render(<AdminNotificationManagement />)
@@ -425,7 +425,7 @@ describe("AdminNotificationManagement", () => {
 
     it("handles deleteNotification error gracefully", async () => {
       vi.mocked(createClient).mockReturnValue(
-        makeSupabaseMock({ deleteError: { message: "delete error" } }) as ReturnType<typeof createClient>
+        makeSupabaseMock({ deleteError: { message: "delete error" } }) as unknown as ReturnType<typeof createClient>
       )
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       render(<AdminNotificationManagement />)
@@ -451,14 +451,9 @@ describe("AdminNotificationManagement", () => {
     it("returns '?' when both email and name are empty", async () => {
       vi.mocked(createClient).mockReturnValue(
         makeSupabaseMock({
-          notificationsData: [
-            {
-              ...defaultNotifications[0],
-              sender: { full_name: null, email: "" },
-              recipient: { full_name: null, email: "" },
-            },
-          ],
-        }) as ReturnType<typeof createClient>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          notificationsData: [{ ...defaultNotifications[0], sender: { full_name: null, email: "" }, recipient: { full_name: null, email: "" } }] as any,
+        }) as unknown as ReturnType<typeof createClient>
       )
       render(<AdminNotificationManagement />)
       await waitFor(() => {

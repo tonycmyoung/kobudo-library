@@ -99,7 +99,7 @@ describe("AuthCookieService", () => {
 
       const calls = mockResponse.cookies.set.mock.calls
       calls.forEach((call: unknown[]) => {
-        const options = call[2]
+        const options = call[2] as { expires: Date; httpOnly: boolean; sameSite: string; path: string; maxAge: number }
         expect(options.expires).toBeInstanceOf(Date)
         expect(options.expires.getTime()).toBeLessThan(Date.now())
       })
@@ -114,7 +114,7 @@ describe("AuthCookieService", () => {
 
       // Verify all calls have correct options structure
       calls.forEach((call: unknown[]) => {
-        const options = call[2]
+        const options = call[2] as { expires: Date; httpOnly: boolean; sameSite: string; path: string; maxAge: number }
         expect(options).toHaveProperty("httpOnly", true)
         expect(options).toHaveProperty("sameSite", "lax")
         expect(options).toHaveProperty("path", "/")

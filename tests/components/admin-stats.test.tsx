@@ -29,6 +29,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 150,
+        pendingUsers: 0,
         totalViews: 5000,
         thisWeekViews: 300,
         lastWeekViews: 250,
@@ -72,6 +73,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 100,
+        pendingUsers: 0,
         totalViews: 2000,
         thisWeekViews: 200,
         lastWeekViews: 150,
@@ -98,6 +100,7 @@ describe("AdminStats", () => {
         success: true,
         data: {
           totalUsers: 100,
+        pendingUsers: 0,
           totalViews: 2000,
           thisWeekViews: 200,
           lastWeekViews: 150,
@@ -109,6 +112,7 @@ describe("AdminStats", () => {
         success: true,
         data: {
           totalUsers: 120,
+        pendingUsers: 0,
           totalViews: 2500,
           thisWeekViews: 250,
           lastWeekViews: 200,
@@ -136,7 +140,15 @@ describe("AdminStats", () => {
   it("should handle unsuccessful fetch response", async () => {
     vi.mocked(actions.getTelemetryData).mockResolvedValue({
       success: false,
-      error: "Database error",
+      data: {
+        totalUsers: 0,
+        pendingUsers: 0,
+        totalViews: 0,
+        thisWeekViews: 0,
+        lastWeekViews: 0,
+        thisWeekUserLogins: 0,
+        lastWeekUserLogins: 0,
+      },
     })
 
     render(<AdminStats />)
@@ -155,6 +167,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 100,
+        pendingUsers: 0,
         totalViews: 2000,
         thisWeekViews: 200,
         lastWeekViews: 150,
@@ -181,6 +194,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 100,
+        pendingUsers: 0,
         totalViews: 2000,
         thisWeekViews: 200,
         lastWeekViews: 150,
@@ -205,6 +219,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 100,
+        pendingUsers: 0,
         totalViews: 2000,
         thisWeekViews: 200,
         lastWeekViews: 150,
@@ -229,6 +244,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 100,
+        pendingUsers: 0,
         totalViews: 2000,
         thisWeekViews: 200,
         lastWeekViews: 150,
@@ -256,6 +272,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 42,
+        pendingUsers: 0,
         totalViews: 0,
         thisWeekViews: 0,
         lastWeekViews: 0,
@@ -294,6 +311,7 @@ describe("AdminStats", () => {
       success: true,
       data: {
         totalUsers: 5,
+        pendingUsers: 0,
         totalViews: 0,
         thisWeekViews: 0,
         lastWeekViews: 0,

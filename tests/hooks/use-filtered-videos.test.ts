@@ -43,8 +43,9 @@ const createTestVideo = (overrides: Partial<SortableVideo> = {}): SortableVideo 
   id: `video-${Math.random().toString(36).slice(2)}`,
   title: "Test Video",
   description: "Test description",
-  youtube_id: "abc123",
   created_at: new Date().toISOString(),
+  recorded: null,
+  views: null,
   categories: [],
   curriculums: [],
   performers: [],
@@ -110,8 +111,8 @@ describe("useFilteredVideos", () => {
 
     it("filters by categories", () => {
       const videos = [
-        createTestVideo({ id: "1", title: "Video 1", categories: [{ id: "cat-1", name: "Guard" }] }),
-        createTestVideo({ id: "2", title: "Video 2", categories: [{ id: "cat-2", name: "Mount" }] }),
+        createTestVideo({ id: "1", title: "Video 1", categories: [{ id: "cat-1", name: "Guard", color: "" }] }),
+        createTestVideo({ id: "2", title: "Video 2", categories: [{ id: "cat-2", name: "Mount", color: "" }] }),
       ]
 
       const { result } = renderHook(() =>
@@ -135,8 +136,8 @@ describe("useFilteredVideos", () => {
 
     it("filters by curriculums", () => {
       const videos = [
-        createTestVideo({ id: "1", title: "Video 1", curriculums: [{ id: "curr-1", name: "White Belt" }] }),
-        createTestVideo({ id: "2", title: "Video 2", curriculums: [{ id: "curr-2", name: "Blue Belt" }] }),
+        createTestVideo({ id: "1", title: "Video 1", curriculums: [{ id: "curr-1", name: "White Belt", color: "", display_order: 0 }] }),
+        createTestVideo({ id: "2", title: "Video 2", curriculums: [{ id: "curr-2", name: "Blue Belt", color: "", display_order: 1 }] }),
       ]
 
       const { result } = renderHook(() =>
@@ -367,17 +368,17 @@ describe("useFilteredVideos", () => {
         createTestVideo({
           id: "1",
           title: "Guard Pass",
-          categories: [{ id: "cat-1", name: "Guard" }],
+          categories: [{ id: "cat-1", name: "Guard", color: "" }],
         }),
         createTestVideo({
           id: "2",
           title: "Guard Recovery",
-          categories: [{ id: "cat-2", name: "Other" }],
+          categories: [{ id: "cat-2", name: "Other", color: "" }],
         }),
         createTestVideo({
           id: "3",
           title: "Mount Escape",
-          categories: [{ id: "cat-1", name: "Guard" }],
+          categories: [{ id: "cat-1", name: "Guard", color: "" }],
         }),
       ]
 

@@ -283,7 +283,7 @@ describe("VideoModal", () => {
 
   it("should call saveVideo when form is submitted", async () => {
     const user = userEvent.setup({ delay: null })
-    vi.mocked(saveVideo).mockResolvedValue({ success: true })
+    vi.mocked(saveVideo).mockResolvedValue({ success: "Video saved" })
 
     render(
       <VideoModal

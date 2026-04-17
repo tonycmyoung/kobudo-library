@@ -46,8 +46,10 @@ describe("CurriculumSetsManagement", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useToast).mockReturnValue({ toast: mockToast, dismiss: vi.fn(), toasts: [] })
-    vi.mocked(getCurriculumSets).mockResolvedValue(mockSets)
-    vi.mocked(getCurriculumSetWithLevels).mockResolvedValue(mockSetWithLevels)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(getCurriculumSets).mockResolvedValue(mockSets as any)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(getCurriculumSetWithLevels).mockResolvedValue(mockSetWithLevels as any)
     vi.mocked(createCurriculumSet).mockResolvedValue({ success: "Created", id: "new-set" })
     vi.mocked(updateCurriculumSet).mockResolvedValue({ success: "Updated" })
     vi.mocked(deleteCurriculumSet).mockResolvedValue({ success: "Deleted" })
@@ -244,10 +246,10 @@ describe("CurriculumSetsManagement", () => {
   it("should call deleteLevelFromCurriculumSet action", async () => {
     vi.mocked(deleteLevelFromCurriculumSet).mockResolvedValue({ success: "Level deleted" })
     
-    const result = await deleteLevelFromCurriculumSet("set-1", "level-1")
-    
+    const result = await deleteLevelFromCurriculumSet("level-1")
+
     expect(result.success).toBe("Level deleted")
-    expect(deleteLevelFromCurriculumSet).toHaveBeenCalledWith("set-1", "level-1")
+    expect(deleteLevelFromCurriculumSet).toHaveBeenCalledWith("level-1")
   })
 
   it("should call updateLevelInCurriculumSet action", async () => {
@@ -546,7 +548,8 @@ describe("CurriculumSetsManagement", () => {
 
     it("should show 'No levels' message when selected set has no levels", async () => {
       vi.mocked(getCurriculumSetWithLevels).mockResolvedValue({
-        ...mockSetWithLevels,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...mockSetWithLevels as any,
         levels: [],
       })
 
@@ -577,7 +580,7 @@ describe("CurriculumSetsManagement", () => {
 
     it("should fetch videos when opening video management panel", async () => {
       const mockVideos = [
-        { id: "vid-1", title: "Technique Demo", thumbnail_url: "https://example.com/thumb.jpg", duration_seconds: 300 },
+        { id: "vid-1", title: "Technique Demo", thumbnail_url: "https://example.com/thumb.jpg", duration_seconds: 300, recorded: null },
       ]
 
       vi.mocked(getVideosForLevel).mockResolvedValue(mockVideos)
@@ -614,7 +617,7 @@ describe("CurriculumSetsManagement", () => {
 
     it("should search available videos with search term", async () => {
       const mockSearchResults = [
-        { id: "vid-2", title: "Punching Techniques", thumbnail_url: null, duration_seconds: 420 },
+        { id: "vid-2", title: "Punching Techniques", thumbnail_url: null, duration_seconds: 420, recorded: null },
       ]
 
       vi.mocked(getAvailableVideos).mockResolvedValue(mockSearchResults)

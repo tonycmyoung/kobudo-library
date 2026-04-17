@@ -862,7 +862,7 @@ describe("Curriculum Actions", () => {
         }),
       })
 
-      const result = await createCurriculumSet("Test Set", "Description")
+      const result = await createCurriculumSet({ name: "Test Set", description: "Description" })
       expect(result.error).toBe("Failed to create curriculum set")
     })
   })
@@ -875,7 +875,7 @@ describe("Curriculum Actions", () => {
         }),
       })
 
-      const result = await deleteLevelFromCurriculumSet("set-1", "level-1")
+      const result = await deleteLevelFromCurriculumSet("level-1")
       expect(result.error).toBe("Failed to delete level")
     })
 
@@ -888,7 +888,7 @@ describe("Curriculum Actions", () => {
         }),
       })
 
-      const result = await deleteLevelFromCurriculumSet("set-1", "nonexistent-level")
+      const result = await deleteLevelFromCurriculumSet("nonexistent-level")
       expect(result.error).toBe("Level not found")
     })
 
@@ -916,7 +916,7 @@ describe("Curriculum Actions", () => {
         }
       })
 
-      const result = await deleteLevelFromCurriculumSet("set-1", "level-1")
+      const result = await deleteLevelFromCurriculumSet("level-1")
       expect(result.error).toBe("Failed to delete level")
     })
   })

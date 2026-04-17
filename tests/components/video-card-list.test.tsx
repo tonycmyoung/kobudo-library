@@ -293,7 +293,7 @@ describe("VideoCardList", () => {
     const videoWithBadColor = {
       ...mockVideo,
       curriculums: [
-        { id: "cur-1", name: "No Color Curriculum", color: "invalid", display_order: 1, curriculum_set_id: null },
+        { id: "cur-1", name: "No Color Curriculum", color: "invalid", display_order: 1 },
       ],
       categories: [],
     }

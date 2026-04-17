@@ -45,7 +45,7 @@ describe("audit.ts", () => {
       neq: vi.fn().mockReturnThis(),
     }
 
-    vi.mocked(createClient).mockReturnValue(mockSupabaseClient)
+    vi.mocked(createClient).mockReturnValue(mockSupabaseClient as unknown as ReturnType<typeof createClient>)
   })
 
   describe("logAuditEvent", () => {

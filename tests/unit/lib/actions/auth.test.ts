@@ -2,15 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { signUp, createAdminUser, signOutServerAction, updatePassword, signIn } from "@/lib/actions/auth"
 import { createServerClient } from "@supabase/ssr"
 import { createClient } from "@supabase/supabase-js"
+import { cookies } from "next/headers"
 
-// Mock Next.js modules - cookies() is now async in Next.js 15
-// Create a stable mock object so methods remain callable after await
-const mockCookieStore = {
-  getAll: vi.fn(() => []),
-  set: vi.fn(),
-}
 vi.mock("next/headers", () => ({
-  cookies: vi.fn(() => Promise.resolve(mockCookieStore)),
+  cookies: vi.fn(),
 }))
 
 vi.mock("next/navigation", () => ({
@@ -57,18 +52,19 @@ describe("Auth Actions", () => {
       updateUser: vi.fn(),
       getUser: vi.fn(),
     },
-    from: vi.fn(() => ({
+    from: vi.fn((_table: string) => ({
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       delete: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn(),
       single: vi.fn(),
-    })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    })) as any,
   }
 
   const mockServiceClient = {
-    from: vi.fn(() => ({
+    from: vi.fn((_table: string) => ({
       insert: vi.fn().mockResolvedValue({ error: null }),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
@@ -77,11 +73,17 @@ describe("Auth Actions", () => {
       gte: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn(),
       single: vi.fn().mockResolvedValue({ data: { id: "admin-1", email: "admin@example.com" }, error: null }),
-    })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    })) as any,
   }
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Fresh cookie store per test — prevents implementation overrides leaking between tests
+    vi.mocked(cookies).mockResolvedValue({
+      getAll: vi.fn(() => []),
+      set: vi.fn(),
+    } as unknown as Awaited<ReturnType<typeof cookies>>)
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as ReturnType<typeof createServerClient>)
     vi.mocked(createClient).mockReturnValue(mockServiceClient as unknown as ReturnType<typeof createClient>)
   })

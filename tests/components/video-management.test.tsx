@@ -8,7 +8,6 @@ import VideoManagement from "@/components/video-management"
 import { createClient } from "@/lib/supabase/client"
 import { getBatchVideoViewCounts, getBatchVideoLastViewed } from "@/lib/actions/videos"
 
-vi.mock("@/lib/supabase/client")
 vi.mock("@/lib/actions/videos")
 vi.mock("@/components/video-modal", () => ({
   default: ({ isOpen, onClose, onSave }: { isOpen: boolean; onClose: () => void; onSave: () => void }) =>

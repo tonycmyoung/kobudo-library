@@ -39,7 +39,7 @@ describe("VideoPlayer", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(incrementVideoViews).mockResolvedValue(undefined)
+    vi.mocked(incrementVideoViews).mockResolvedValue({})
 
     const mockEq2 = vi.fn().mockResolvedValue({ data: null, error: null })
     mockEq.mockReturnValue({ eq: mockEq2 })

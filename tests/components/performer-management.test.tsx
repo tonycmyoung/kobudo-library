@@ -6,7 +6,6 @@ import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { addPerformer, updatePerformer, deletePerformer } from "@/lib/actions"
 import { within } from "@testing-library/dom"
 
-vi.mock("@/lib/supabase/client")
 vi.mock("@/lib/actions", () => ({
   addPerformer: vi.fn(),
   updatePerformer: vi.fn(),
@@ -101,8 +100,8 @@ describe("PerformerManagement", () => {
     expect(johnDoeCard).toBeInTheDocument()
     expect(janeSmithCard).toBeInTheDocument()
 
-    expect(within(johnDoeCard!).getByText("5 videos")).toBeInTheDocument()
-    expect(within(janeSmithCard!).getByText("3 videos")).toBeInTheDocument()
+    expect(within(johnDoeCard as HTMLElement).getByText("5 videos")).toBeInTheDocument()
+    expect(within(janeSmithCard as HTMLElement).getByText("3 videos")).toBeInTheDocument()
   })
 
   it("should add new performer when Add button is clicked", async () => {

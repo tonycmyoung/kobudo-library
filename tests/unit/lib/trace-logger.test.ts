@@ -38,7 +38,7 @@ describe("Trace Logger", () => {
     vi.spyOn(console, "error").mockImplementation(() => {})
 
     // Reset environment
-    process.env = { ...mockEnv }
+    process.env = { ...mockEnv } as NodeJS.ProcessEnv
 
     // Setup default mock chain
     mockSingle.mockResolvedValue({ data: { enabled: true, retention_days: 7 }, error: null })

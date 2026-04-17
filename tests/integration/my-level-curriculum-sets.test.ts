@@ -13,7 +13,7 @@ describe("My Level Page with Curriculum Sets", () => {
         getUser: vi.fn(),
       },
     }
-    vi.mocked(createClient).mockReturnValue(mockSupabase)
+    vi.mocked(createClient).mockReturnValue(mockSupabase as unknown as ReturnType<typeof createClient>)
   })
 
   describe("getUserData", () => {
@@ -128,7 +128,8 @@ describe("My Level Page with Curriculum Sets", () => {
         eq: vi.fn().mockResolvedValue({ data: null, error: { message: "Database error" } }),
       })
 
-      const result = await mockSupabase.from("users").select("*").eq("id", "user-123")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await (mockSupabase.from as any)("users").select("*").eq("id", "user-123")
 
       expect(result.error).not.toBeNull()
       expect(result.error?.message).toBe("Database error")
@@ -141,7 +142,8 @@ describe("My Level Page with Curriculum Sets", () => {
         eq: vi.fn().mockResolvedValue({ data: null, error: null }),
       })
 
-      const result = await mockSupabase.from("users").select("*").eq("id", "nonexistent")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await (mockSupabase.from as any)("users").select("*").eq("id", "nonexistent")
 
       expect(result.data).toBeNull()
     })

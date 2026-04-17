@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event"
 import CategoryManagement from "@/components/category-management"
 import { createClient } from "@/lib/supabase/client"
 
-vi.mock("@/lib/supabase/client")
 vi.mock("@/lib/utils/date", () => ({
   formatShortDate: (date: string) => new Date(date).toLocaleDateString(),
 }))
