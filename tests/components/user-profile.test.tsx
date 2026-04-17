@@ -30,8 +30,6 @@ vi.mock("@/components/ui/select", () => ({
   SelectLabel: ({ children }: { children: React.ReactNode }) => <optgroup label={String(children)}>{children}</optgroup>,
 }))
 
-global.fetch = vi.fn()
-global.alert = vi.fn()
 
 describe("UserProfile", () => {
   const mockUser = {
@@ -70,6 +68,8 @@ describe("UserProfile", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubGlobal("fetch", vi.fn())
+    vi.stubGlobal("alert", vi.fn())
     vi.mocked(updateProfile).mockResolvedValue({ success: true })
   })
 

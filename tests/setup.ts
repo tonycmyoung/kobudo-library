@@ -5,11 +5,12 @@ import "@testing-library/jest-dom"
 import { afterEach, beforeEach, vi } from "vitest"
 import { cleanup } from "@testing-library/react"
 
-// Suppress console.error output globally — intentional error-path tests should not pollute output.
-// Tests that need to assert on console.error can still do so: vi.spyOn in the test body wraps
-// this global spy, and toHaveBeenCalledWith assertions on that inner spy work correctly.
+// Spy on console.error so individual tests can assert on expected errors with
+// expect(console.error).toHaveBeenCalledWith(...). Does NOT suppress output —
+// real errors remain visible. Tests that intentionally trigger errors and want
+// clean output should mock console.error locally within that test.
 beforeEach(() => {
-  vi.spyOn(console, "error").mockImplementation(() => {})
+  vi.spyOn(console, "error")
 })
 
 // Cleanup after each test — restoreAllMocks cleans up the global console.error spy above

@@ -22,8 +22,6 @@ vi.mock("next/navigation", () => ({
   useSearchParams: vi.fn(),
 }))
 
-global.alert = vi.fn()
-global.confirm = vi.fn()
 
 describe("UserManagement", () => {
   const mockRouter = {
@@ -114,6 +112,8 @@ describe("UserManagement", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubGlobal("alert", vi.fn())
+    vi.stubGlobal("confirm", vi.fn())
     vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     // Reset mockSearchParams.get to return null for all params
     mockSearchParams.get = vi.fn((_param: string) => null)
