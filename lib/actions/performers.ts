@@ -3,7 +3,6 @@
 import { createClient } from "@supabase/supabase-js"
 import { unstable_cache, revalidateTag } from "next/cache"
 import { requireAdmin } from "../auth"
-import { serverTrace } from "../trace-logger"
 
 export const getPerformers = unstable_cache(
   async (): Promise<Array<{ id: string; name: string; bio: string | null }>> => {
@@ -66,7 +65,6 @@ export async function updatePerformer(
   performerId: string,
   name: string,
 ): Promise<{ success?: string; error?: string }> {
-  serverTrace.debug("updatePerformer called", { category: "performers", payload: { performerId } })
   await requireAdmin()
   try {
     const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
