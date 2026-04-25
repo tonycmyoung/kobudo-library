@@ -209,6 +209,7 @@ describe("AdminNotificationManagement", () => {
   })
 
   it("should display error message when sending fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(actions.sendNotificationWithEmail).mockResolvedValue({ error: "Failed to send" })
 
     render(<AdminNotificationManagement />)

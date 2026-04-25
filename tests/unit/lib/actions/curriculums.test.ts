@@ -54,6 +54,7 @@ vi.mock("@supabase/supabase-js", () => ({
 describe("Curriculum Actions", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
 
     // Setup default mock chain
     mockSelect.mockReturnValue({ order: mockOrder, eq: mockEq })

@@ -27,6 +27,7 @@ describe("VideoManagementPanel", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(useToast).mockReturnValue({ toast: mockToast, dismiss: vi.fn(), toasts: [] })
     vi.mocked(getVideosForLevel).mockResolvedValue(mockAssignedVideos)
     vi.mocked(getAvailableVideos).mockResolvedValue(mockAvailableVideos)

@@ -111,6 +111,7 @@ describe("UserManagement", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.stubGlobal("alert", vi.fn())
     vi.stubGlobal("confirm", vi.fn())
     vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
@@ -827,6 +828,10 @@ describe("UserManagement", () => {
   })
 
   describe("Delete User Error Handling", () => {
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+    })
+
     it("should show error alert when delete fails", async () => {
       vi.mocked(global.confirm).mockReturnValue(true)
       vi.mocked(deleteUserCompletely).mockResolvedValue({ error: "Delete failed" })
@@ -927,6 +932,7 @@ describe("UserManagement", () => {
     })
 
     it("should handle error when updating user fields fails", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
       vi.mocked(updateUserFields).mockResolvedValue({ error: "Update failed" })
 
       render(<UserManagement />)
@@ -1020,6 +1026,10 @@ describe("UserManagement", () => {
   })
 
   describe("Update User Role Error", () => {
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+    })
+
     it("should show error alert when role update fails", async () => {
       
       mockUpdate.mockReturnValue({
@@ -1048,6 +1058,10 @@ describe("UserManagement", () => {
   })
 
   describe("Toggle Approval Error", () => {
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+    })
+
     it("should handle error when toggling approval fails", async () => {
 
       render(<UserManagement />)

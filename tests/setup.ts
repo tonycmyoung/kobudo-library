@@ -6,12 +6,20 @@ import "@testing-library/jest-dom"
 import { afterEach, beforeEach, vi } from "vitest"
 import { cleanup } from "@testing-library/react"
 
-// Spy on console.error so individual tests can assert on expected errors with
-// expect(console.error).toHaveBeenCalledWith(...). Does NOT suppress output —
-// real errors remain visible. Tests that intentionally trigger errors and want
-// clean output should mock console.error locally within that test.
+// Fail fast on unexpected console output. Tests that deliberately trigger error
+// paths must install a local spy that suppresses output — the local spy takes
+// precedence over this global one.
 beforeEach(() => {
-  vi.spyOn(console, "error")
+  vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
+    throw new Error(
+      `Unexpected console.error — install a local spy if this is intentional.\n${args.map(String).join(" ")}`
+    )
+  })
+  vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+    throw new Error(
+      `Unexpected console.warn — install a local spy if this is intentional.\n${args.map(String).join(" ")}`
+    )
+  })
 })
 
 // Cleanup after each test — restoreAllMocks cleans up the global console.error spy above
@@ -20,7 +28,7 @@ beforeEach(() => {
 // worker threads are reused across files (vitest maxWorkers > 1).
 afterEach(() => {
   cleanup()
-  localStorage.clear()
+  if (typeof localStorage !== "undefined") localStorage.clear()
   vi.restoreAllMocks()
   vi.useRealTimers()
 })

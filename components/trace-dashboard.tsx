@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Fragment } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -403,9 +403,8 @@ export default function TraceDashboard() {
             </thead>
             <tbody>
               {logs.map((log) => (
-                <>
+                <Fragment key={log.id}>
                   <tr
-                    key={log.id}
                     className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
                     onClick={() => toggleRow(log.id)}
                   >
@@ -503,7 +502,7 @@ export default function TraceDashboard() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>

@@ -45,6 +45,7 @@ vi.mock("next/headers", () => ({
 describe("videos actions", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     mockAuthGetUser.mockResolvedValue({ data: { user: { id: "test-user-id" } }, error: null })
   })
 

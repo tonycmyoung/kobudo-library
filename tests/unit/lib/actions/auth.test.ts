@@ -79,6 +79,7 @@ describe("Auth Actions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     // Fresh cookie store per test — prevents implementation overrides leaking between tests
     vi.mocked(cookies).mockResolvedValue({
       getAll: vi.fn(() => []),

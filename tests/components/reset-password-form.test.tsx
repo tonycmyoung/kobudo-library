@@ -239,42 +239,19 @@ describe("ResetPasswordForm", () => {
     })
   })
 
-  it("should have Return to Login button in error state", async () => {
+  it("should have Return to Login link in error state pointing to /auth/login", async () => {
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
 
     render(<ResetPasswordForm />)
 
     await waitFor(
       () => {
-        const returnButton = screen.getByRole("button", { name: /return to login/i })
-        expect(returnButton).toBeInTheDocument()
+        const returnLink = screen.getByRole("link", { name: /return to login/i })
+        expect(returnLink).toBeInTheDocument()
+        expect(returnLink).toHaveAttribute("href", "/auth/login")
       },
       { timeout: 7000 },
     )
-  }, 10000) // Add test timeout as parameter to it() function
-
-  it("should navigate to login when Return to Login is clicked", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
-
-    const assignMock = vi.fn()
-    Object.defineProperty(globalThis, "location", {
-      value: { href: "" },
-      writable: true,
-      configurable: true,
-    })
-
-    render(<ResetPasswordForm />)
-
-    await waitFor(
-      () => {
-        const returnButton = screen.getByRole("button", { name: /return to login/i })
-        returnButton.click()
-        expect(globalThis.location.href).toBe("/auth/login")
-      },
-      { timeout: 7000 },
-    )
-
-    void assignMock
   }, 10000)
 
   it("should toggle confirm password visibility when form is shown", async () => {

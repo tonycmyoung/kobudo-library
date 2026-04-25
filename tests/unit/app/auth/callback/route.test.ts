@@ -23,6 +23,7 @@ describe("Auth Callback Route", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as ReturnType<typeof createServerClient>)
   })
 

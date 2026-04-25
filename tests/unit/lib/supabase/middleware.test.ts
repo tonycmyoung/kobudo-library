@@ -51,6 +51,7 @@ describe("Middleware: updateSession", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
 
     // Store and set up environment
     originalEnv = { ...process.env }

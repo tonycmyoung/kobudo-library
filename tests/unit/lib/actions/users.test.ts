@@ -67,6 +67,8 @@ describe("User Actions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Action error-handlers call console.error — suppress so the guard doesn't throw
+    vi.spyOn(console, "error").mockImplementation(() => {})
     mockSupabaseClient = createMockSupabaseClient()
     mockServiceClient = createMockSupabaseClient()
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as ReturnType<typeof createServerClient>)

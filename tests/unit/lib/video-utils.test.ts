@@ -75,54 +75,49 @@ describe("video-utils", () => {
 
   describe("extractVideoMetadata", () => {
     beforeEach(() => {
-      // Mock document.createElement for video element
-      global.document = {
-        createElement: vi.fn((tag: string) => {
-          if (tag === "video") {
-            const listeners: { [key: string]: ((...args: unknown[]) => unknown)[] } = {}
-            const video = {
-              crossOrigin: "",
-              preload: "",
-              src: "",
-              currentTime: 0,
-              duration: 120,
-              videoWidth: 640,
-              videoHeight: 480,
-              addEventListener: vi.fn((event: string, callback: (...args: unknown[]) => unknown, _options?: unknown) => {
-                if (!listeners[event]) listeners[event] = []
-                listeners[event].push(callback)
-
-                // Trigger loadedmetadata immediately
-                if (event === "loadedmetadata") {
-                  setTimeout(() => callback(), 0)
-                }
-                // Trigger seeked event after loadedmetadata
-                if (event === "seeked") {
-                  setTimeout(() => callback(), 10)
-                }
-              }),
-              removeEventListener: vi.fn((event: string, callback: (...args: unknown[]) => unknown) => {
-                if (listeners[event]) {
-                  listeners[event] = listeners[event].filter((cb) => cb !== callback)
-                }
-              }),
-              load: vi.fn(),
-            }
-            return video
+      vi.spyOn(console, "error").mockImplementation(() => {})
+      vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+        if (tag === "video") {
+          const listeners: { [key: string]: ((...args: unknown[]) => unknown)[] } = {}
+          const video = {
+            crossOrigin: "",
+            preload: "",
+            src: "",
+            currentTime: 0,
+            duration: 120,
+            videoWidth: 640,
+            videoHeight: 480,
+            addEventListener: vi.fn((event: string, callback: (...args: unknown[]) => unknown, _options?: unknown) => {
+              if (!listeners[event]) listeners[event] = []
+              listeners[event].push(callback)
+              if (event === "loadedmetadata") {
+                setTimeout(() => callback(), 0)
+              }
+              if (event === "seeked") {
+                setTimeout(() => callback(), 10)
+              }
+            }),
+            removeEventListener: vi.fn((event: string, callback: (...args: unknown[]) => unknown) => {
+              if (listeners[event]) {
+                listeners[event] = listeners[event].filter((cb) => cb !== callback)
+              }
+            }),
+            load: vi.fn(),
           }
-          if (tag === "canvas") {
-            return {
-              width: 0,
-              height: 0,
-              getContext: vi.fn(() => ({
-                drawImage: vi.fn(),
-              })),
-              toDataURL: vi.fn(() => "data:image/jpeg;base64,mockdata"),
-            }
-          }
-          return {}
-        }),
-      } as unknown as typeof global.document
+          return video as unknown as HTMLVideoElement
+        }
+        if (tag === "canvas") {
+          return {
+            width: 0,
+            height: 0,
+            getContext: vi.fn(() => ({
+              drawImage: vi.fn(),
+            })),
+            toDataURL: vi.fn(() => "data:image/jpeg;base64,mockdata"),
+          } as unknown as HTMLCanvasElement
+        }
+        return {} as HTMLElement
+      })
     })
 
     afterEach(() => {

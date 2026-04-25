@@ -173,6 +173,7 @@ describe("CurriculumSetsManagement", () => {
   })
 
   it("should handle API error when fetching sets", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(getCurriculumSets).mockRejectedValue(new Error("API Error"))
 
     render(<CurriculumSetsManagement />)
@@ -748,6 +749,10 @@ describe("CurriculumSetsManagement", () => {
   })
 
   describe("Error handling", () => {
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+    })
+
     it("should show error toast when createCurriculumSet throws", async () => {
       vi.mocked(createCurriculumSet).mockRejectedValue(new Error("Network error"))
       const user = userEvent.setup({ delay: null })

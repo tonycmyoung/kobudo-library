@@ -15,6 +15,7 @@ describe("ChangePasswordForm", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
 
     const mockSupabaseClient = {
       auth: {

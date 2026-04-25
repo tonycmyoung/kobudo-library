@@ -112,12 +112,12 @@ export default function ResetPasswordForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button
-            onClick={() => (globalThis.location.href = "/auth/login")}
-            className="w-full bg-red-600 hover:bg-red-700 text-white"
+          <a
+            href="/auth/login"
+            className="flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
           >
             Return to Login
-          </Button>
+          </a>
         </CardContent>
       </Card>
     )

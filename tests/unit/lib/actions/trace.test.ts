@@ -76,6 +76,7 @@ describe("Trace Actions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(createClient).mockReturnValue(mockServiceClient as unknown as ReturnType<typeof createClient>)
   })
 

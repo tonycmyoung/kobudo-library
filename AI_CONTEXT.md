@@ -130,6 +130,18 @@ console.log("[v0] Description:", variable)
 - **Mocks:** `/tests/mocks` (Supabase, Next.js navigation, etc.)
 - **After changes:** Consider if tests need updates
 
+### Running tests
+
+Always redirect test output to a file, then filter from that file. Never rerun the suite just to grep output:
+
+```bash
+npm test -- --reporter=verbose 2>&1 | tee /tmp/test-out.txt
+# then filter without rerunning:
+grep -E "FAIL|Error|✗" /tmp/test-out.txt
+```
+
+This avoids unnecessary reruns when output needs to be inspected from multiple angles.
+
 ---
 
 ## Common Mistakes to Avoid

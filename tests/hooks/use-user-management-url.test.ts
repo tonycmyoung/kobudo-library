@@ -29,19 +29,9 @@ describe("useUserManagementUrl", () => {
     vi.clearAllMocks()
     vi.useFakeTimers()
     mockSearchParams.clear()
-    // Mock window.location
-    Object.defineProperty(window, "location", {
-      value: { pathname: "/admin/users", search: "" },
-      writable: true,
-    })
-    // Mock window.history.replaceState for shallow routing
-    Object.defineProperty(window, "history", {
-      value: {
-        state: {},
-        replaceState: mockHistoryReplaceState,
-      },
-      writable: true,
-    })
+    // Use history API to set URL — Object.defineProperty(window.location) is non-configurable in vmThreads
+    window.history.pushState({}, "", "/admin/users")
+    vi.spyOn(window.history, "replaceState").mockImplementation(mockHistoryReplaceState)
   })
 
   afterEach(() => {
@@ -327,11 +317,8 @@ describe("useUserManagementUrl", () => {
       expect(result.current.urlState.role).toBe("Teacher")
       expect(result.current.urlState.school).toBe("School A")
 
-      // Simulate browser back navigation by changing window.location.search and firing popstate
-      Object.defineProperty(window, "location", {
-        value: { pathname: "/admin/users", search: "?role=Student&belt=Yellow" },
-        writable: true,
-      })
+      // Simulate browser back navigation by changing URL and firing popstate
+      window.history.pushState({}, "", "/admin/users?role=Student&belt=Yellow")
 
       // Fire popstate event to simulate browser navigation
       act(() => {

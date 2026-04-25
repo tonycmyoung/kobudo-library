@@ -33,6 +33,7 @@ const mockLogs = [
 describe("DebugDashboard", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
   })
 
   it("should display loading state initially", () => {

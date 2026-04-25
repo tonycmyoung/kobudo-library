@@ -114,6 +114,7 @@ const mockCategories = ["auth", "video"]
 describe("TraceDashboard", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(traceActions.fetchTraceLogs).mockResolvedValue(mockLogs)
     vi.mocked(traceActions.fetchTraceSettings).mockResolvedValue(mockSettings)
     vi.mocked(traceActions.getTraceCategories).mockResolvedValue(mockCategories)
