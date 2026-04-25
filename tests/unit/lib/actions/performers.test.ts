@@ -22,6 +22,7 @@ vi.mock("@supabase/supabase-js", () => ({
 describe("performers actions", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
   })
 
   describe("addPerformer", () => {

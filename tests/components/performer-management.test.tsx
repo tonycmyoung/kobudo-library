@@ -289,6 +289,7 @@ describe("PerformerManagement", () => {
   })
 
   it("should display error message when add fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.mocked(addPerformer).mockResolvedValue({ error: "Database error" } as unknown as Awaited<ReturnType<typeof addPerformer>>)
 
     render(<PerformerManagement />)
@@ -309,6 +310,7 @@ describe("PerformerManagement", () => {
   })
 
   it("should handle fetch error gracefully", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     mockOrder.mockResolvedValue({ data: null, error: { message: "Fetch failed" } })
 
     render(<PerformerManagement />)

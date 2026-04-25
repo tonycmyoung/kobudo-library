@@ -265,16 +265,13 @@ describe("Trace Logger", () => {
 
       traceInfo("Should not be logged to DB")
 
+      // Wait until both the console log and the settings DB check have completed
       await vi.waitFor(() => {
         expect(consoleLogSpy).toHaveBeenCalled()
+        expect(mockSingle).toHaveBeenCalled()
       })
 
-      // Give time for async to complete
-      await new Promise((resolve) => setTimeout(resolve, 50))
-
-      // Should still log to console in dev, but insert should not be called
-      // after settings check returns enabled: false
-      expect(consoleLogSpy).toHaveBeenCalled()
+      expect(mockInsert).not.toHaveBeenCalled()
     })
   })
 

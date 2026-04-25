@@ -22,19 +22,9 @@ describe("useVideoLibraryUrl", () => {
     vi.clearAllMocks()
     vi.useFakeTimers()
     mockSearchParams.clear()
-    // Mock window.location
-    Object.defineProperty(window, "location", {
-      value: { pathname: "/", search: "" },
-      writable: true,
-    })
-    // Mock window.history.replaceState for shallow routing
-    Object.defineProperty(window, "history", {
-      value: {
-        state: {},
-        replaceState: mockHistoryReplaceState,
-      },
-      writable: true,
-    })
+    // Use history API to set URL — Object.defineProperty(window.location) is non-configurable in vmThreads
+    window.history.pushState({}, "", "/")
+    vi.spyOn(window.history, "replaceState").mockImplementation(mockHistoryReplaceState)
   })
 
   afterEach(() => {
@@ -86,6 +76,7 @@ describe("useVideoLibraryUrl", () => {
     })
 
     it("should handle invalid filters JSON gracefully", () => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
       mockSearchParams.set("filters", "invalid-json")
 
       const { result } = renderHook(() => useVideoLibraryUrl())
@@ -309,11 +300,8 @@ describe("useVideoLibraryUrl", () => {
       expect(result.current.urlState.filters).toEqual(["cat-1", "cat-2"])
       expect(result.current.urlState.page).toBe(2)
 
-      // Simulate browser back navigation by changing window.location.search and firing popstate
-      Object.defineProperty(window, "location", {
-        value: { pathname: "/", search: "?filters=%5B%22cat-3%22%5D&page=1" },
-        writable: true,
-      })
+      // Simulate browser back navigation by changing URL and firing popstate
+      window.history.pushState({}, "", "/?filters=%5B%22cat-3%22%5D&page=1")
 
       // Fire popstate event to simulate browser navigation
       act(() => {

@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, fireEvent } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import InviteUserModal from "@/components/invite-user-modal"
 import { inviteUser } from "@/lib/actions"
@@ -217,7 +217,7 @@ describe("InviteUserModal", () => {
     emailInput.removeAttribute("required")
 
     const form = emailInput.closest("form")!
-    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }))
+    fireEvent.submit(form)
 
     await waitFor(() => {
       expect(screen.getByText("Please enter an email address")).toBeInTheDocument()
@@ -226,6 +226,7 @@ describe("InviteUserModal", () => {
   })
 
   it("should handle unexpected errors gracefully", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     const user = userEvent.setup({ delay: null })
     vi.mocked(inviteUser).mockRejectedValue(new Error("Network error"))
 

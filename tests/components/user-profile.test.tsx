@@ -68,6 +68,7 @@ describe("UserProfile", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     vi.stubGlobal("fetch", vi.fn())
     vi.stubGlobal("alert", vi.fn())
     vi.mocked(updateProfile).mockResolvedValue({ success: true })
@@ -183,6 +184,7 @@ describe("UserProfile", () => {
   })
 
   it("should show error alert when profile update fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     const user = userEvent.setup({ delay: null })
     vi.mocked(updateProfile).mockResolvedValue({ success: false, error: "Update failed" })
 
@@ -343,6 +345,7 @@ describe("UserProfile", () => {
     })
 
     it("should show alert when upload fails", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
       const user = userEvent.setup({ delay: null })
       vi.mocked(global.fetch).mockResolvedValue({
         ok: false,
@@ -494,6 +497,7 @@ describe("UserProfile", () => {
     })
 
     it("should show alert when belt update fails", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
       vi.mocked(updateUserBelt).mockResolvedValue({ success: false, error: "Belt update failed" })
       const user = userEvent.setup({ delay: null })
 

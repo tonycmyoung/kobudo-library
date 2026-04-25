@@ -590,6 +590,10 @@ describe("VideoManagement", () => {
   })
 
   describe("Delete Video Error Handling", () => {
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+    })
+
     it("should show error alert when delete fails", async () => {
       mockSupabaseClient.select.mockImplementation((query: string) => {
         if (query.includes("video_categories")) {

@@ -79,6 +79,7 @@ import { createDonationCheckout, createSubscriptionCheckout, createCustomerPorta
 describe("Donation Actions - createDonationCheckout", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     // Reset default mock behavior
     mockGetDonationPreset.mockImplementation((id: string) => {
       const presets: Record<string, { id: string; name: string; amountCents: number }> = {
@@ -296,6 +297,7 @@ describe("Donation Actions - createDonationCheckout", () => {
 describe("Donation Actions - createCustomerPortalSession", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
   })
 
   describe("with valid customer and subscription", () => {
@@ -540,6 +542,7 @@ describe("Donation Actions - createCustomerPortalSession", () => {
 describe("Donation Actions - checkExistingSubscription", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
   })
 
   describe("user with active subscriptions", () => {
@@ -732,6 +735,7 @@ describe("Donation Actions - checkExistingSubscription", () => {
 describe("Donation Actions - createSubscriptionCheckout", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
     // Reset default mock behavior
     mockGetSubscriptionTier.mockImplementation((id: string) => {
       const tiers: Record<

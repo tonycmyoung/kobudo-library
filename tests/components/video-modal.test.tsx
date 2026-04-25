@@ -255,6 +255,7 @@ describe("VideoModal", () => {
   })
 
   it("should show error when auto-fill fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     const user = userEvent.setup({ delay: null })
     vi.mocked(extractVideoMetadata).mockRejectedValue(new Error("Failed to extract metadata"))
 

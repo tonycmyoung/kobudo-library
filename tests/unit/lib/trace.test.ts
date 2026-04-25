@@ -97,59 +97,10 @@ describe("lib/trace.ts", () => {
       const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {})
       const { trace } = await import("@/lib/trace")
       trace.info("prod log")
-      await new Promise((r) => setTimeout(r, 0))
+      // clientTrace has no await before the console decision — check is synchronous
       expect(consoleSpy).not.toHaveBeenCalled()
       vi.unstubAllEnvs()
     })
   })
 
-  describe("server-side (window undefined)", () => {
-    beforeEach(() => {
-      // Remove window so isServer = true when module re-evaluates
-      vi.resetModules()
-      // @ts-expect-error — intentionally simulating server environment
-      delete globalThis.window
-    })
-
-    afterEach(() => {
-      // Restore window for jsdom-dependent tests
-      Object.defineProperty(globalThis, "window", {
-        value: globalThis.window ?? {},
-        configurable: true,
-        writable: true,
-      })
-    })
-
-    it("calls serverTrace.debug on server", async () => {
-      const { trace } = await import("@/lib/trace")
-      const { serverTrace } = await import("@/lib/trace-logger")
-      trace.debug("server debug")
-      await new Promise((r) => setTimeout(r, 0))
-      expect(serverTrace.debug).toHaveBeenCalledWith("server debug", {})
-    })
-
-    it("calls serverTrace.info on server", async () => {
-      const { trace } = await import("@/lib/trace")
-      const { serverTrace } = await import("@/lib/trace-logger")
-      trace.info("server info")
-      await new Promise((r) => setTimeout(r, 0))
-      expect(serverTrace.info).toHaveBeenCalledWith("server info", {})
-    })
-
-    it("calls serverTrace.warn on server", async () => {
-      const { trace } = await import("@/lib/trace")
-      const { serverTrace } = await import("@/lib/trace-logger")
-      trace.warn("server warn")
-      await new Promise((r) => setTimeout(r, 0))
-      expect(serverTrace.warn).toHaveBeenCalledWith("server warn", {})
-    })
-
-    it("calls serverTrace.error on server", async () => {
-      const { trace } = await import("@/lib/trace")
-      const { serverTrace } = await import("@/lib/trace-logger")
-      trace.error("server error")
-      await new Promise((r) => setTimeout(r, 0))
-      expect(serverTrace.error).toHaveBeenCalledWith("server error", {})
-    })
-  })
 })

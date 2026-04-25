@@ -12,6 +12,7 @@ describe("sendEmail", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {})
 
     mockSend = vi.fn()
     vi.mocked(Resend).mockImplementation(function () {

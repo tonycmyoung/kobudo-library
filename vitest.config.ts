@@ -8,7 +8,8 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     globals: true,
-    maxWorkers: 4,
+    pool: "vmThreads",
+    maxWorkers: 3,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],

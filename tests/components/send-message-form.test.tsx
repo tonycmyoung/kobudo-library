@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, fireEvent } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import SendMessageForm from "@/components/send-message-form"
 
@@ -151,7 +151,7 @@ describe("SendMessageForm", () => {
     // The send button is disabled while message.trim() is empty, so enable it by
     // directly firing submit on the form element
     const form = textarea.closest("form")!
-    form.dispatchEvent(new Event("submit", { bubbles: true }))
+    fireEvent.submit(form)
 
     await waitFor(() => {
       expect(screen.getByText("Please enter a message")).toBeInTheDocument()
@@ -160,6 +160,7 @@ describe("SendMessageForm", () => {
   })
 
   it("should show error message on failure", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
     const user = userEvent.setup({ delay: null })
     vi.mocked(sendNotificationWithEmail).mockResolvedValue({ error: "Failed to send" })
 
