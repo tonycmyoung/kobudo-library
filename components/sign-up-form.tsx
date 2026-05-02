@@ -48,7 +48,7 @@ export default function SignUpForm() {
   })
 
   const [legalAgreements, setLegalAgreements] = useState({
-    eulaAccepted: false,
+    termsAccepted: false,
     privacyAccepted: false,
   })
 
@@ -95,7 +95,7 @@ export default function SignUpForm() {
 
   const handleFormAction = (formData: FormData) => {
     // Prevent submission if legal agreements aren't accepted
-    if (!legalAgreements.eulaAccepted || !legalAgreements.privacyAccepted) {
+    if (!legalAgreements.termsAccepted || !legalAgreements.privacyAccepted) {
       return
     }
 
@@ -103,7 +103,7 @@ export default function SignUpForm() {
       formData.append("invitationToken", invitationToken)
     }
 
-    formData.append("eulaAccepted", legalAgreements.eulaAccepted.toString())
+    formData.append("termsAccepted", legalAgreements.termsAccepted.toString())
     formData.append("privacyAccepted", legalAgreements.privacyAccepted.toString())
 
     // Store current form values before submission
@@ -120,7 +120,7 @@ export default function SignUpForm() {
     formAction(formData)
   }
 
-  const isFormValid = legalAgreements.eulaAccepted && legalAgreements.privacyAccepted
+  const isFormValid = legalAgreements.termsAccepted && legalAgreements.privacyAccepted
 
   return (
     <Card className="w-full max-w-md bg-black/80 border-red-800/50 backdrop-blur-sm">
@@ -251,18 +251,18 @@ export default function SignUpForm() {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <input
-                  id="eulaAccepted"
-                  name="eulaAccepted"
+                  id="termsAccepted"
+                  name="termsAccepted"
                   type="checkbox"
-                  checked={legalAgreements.eulaAccepted}
+                  checked={legalAgreements.termsAccepted}
                   onChange={handleLegalAgreementChange}
                   className="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-600 rounded bg-gray-900"
                   required
                 />
-                <label htmlFor="eulaAccepted" className="text-sm text-gray-300 leading-5">
-                  I agree to the{" "}
-                  <Link href="/eula" target="_blank" className="text-red-400 hover:text-red-300 underline">
-                    End User License Agreement (EULA)
+                <label htmlFor="termsAccepted" className="text-sm text-gray-300 leading-5">
+                  I have read and agree to the{" "}
+                  <Link href="/terms" target="_blank" className="text-red-400 hover:text-red-300 underline">
+                    Terms of Service
                   </Link>
                 </label>
               </div>
@@ -288,7 +288,7 @@ export default function SignUpForm() {
 
             {!isFormValid && (
               <div className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/50 px-3 py-2 rounded">
-                You must accept both the EULA and Privacy Policy to create an account.
+                You must accept both the Terms of Service and Privacy Policy to create an account.
               </div>
             )}
           </div>

@@ -61,7 +61,7 @@ describe("SignUpForm", () => {
   it("should render legal agreement checkboxes", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByLabelText(/End User License Agreement/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Terms of Service/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Privacy Policy/i)).toBeInTheDocument()
   })
 
@@ -76,10 +76,10 @@ describe("SignUpForm", () => {
     const user = userEvent.setup({ delay: null })
     render(<SignUpForm />)
 
-    const eulaCheckbox = screen.getByLabelText(/End User License Agreement/i)
+    const termsCheckbox = screen.getByLabelText(/Terms of Service/i)
     const privacyCheckbox = screen.getByLabelText(/Privacy Policy/i)
 
-    await user.click(eulaCheckbox)
+    await user.click(termsCheckbox)
     await user.click(privacyCheckbox)
 
     const submitButton = screen.getByRole("button", { name: /Create Account/i })
@@ -89,20 +89,20 @@ describe("SignUpForm", () => {
   it("should show warning when legal agreements are not accepted", () => {
     render(<SignUpForm />)
 
-    expect(screen.getByText(/You must accept both the EULA and Privacy Policy/i)).toBeInTheDocument()
+    expect(screen.getByText(/You must accept both the Terms of Service and Privacy Policy/i)).toBeInTheDocument()
   })
 
   it("should hide warning when legal agreements are accepted", async () => {
     const user = userEvent.setup({ delay: null })
     render(<SignUpForm />)
 
-    const eulaCheckbox = screen.getByLabelText(/End User License Agreement/i)
+    const termsCheckbox = screen.getByLabelText(/Terms of Service/i)
     const privacyCheckbox = screen.getByLabelText(/Privacy Policy/i)
 
-    await user.click(eulaCheckbox)
+    await user.click(termsCheckbox)
     await user.click(privacyCheckbox)
 
-    expect(screen.queryByText(/You must accept both the EULA and Privacy Policy/i)).toBeNull()
+    expect(screen.queryByText(/You must accept both the Terms of Service and Privacy Policy/i)).toBeNull()
   })
 
   it("should toggle password visibility", async () => {
@@ -167,14 +167,14 @@ describe("SignUpForm", () => {
     expect(signInLink).toHaveAttribute("href", "/auth/login")
   })
 
-  it("should render EULA and Privacy Policy links", () => {
+  it("should render Terms of Service and Privacy Policy links", () => {
     render(<SignUpForm />)
 
-    const eulaLink = screen.getByRole("link", { name: /End User License Agreement.*EULA/i })
+    const termsLink = screen.getByRole("link", { name: /Terms of Service/i })
     const privacyLink = screen.getByRole("link", { name: /Privacy Policy/i })
 
-    expect(eulaLink).toBeInTheDocument()
-    expect(eulaLink).toHaveAttribute("href", "/eula")
+    expect(termsLink).toBeInTheDocument()
+    expect(termsLink).toHaveAttribute("href", "/terms")
     expect(privacyLink).toBeInTheDocument()
     expect(privacyLink).toHaveAttribute("href", "/privacy-policy")
   })
@@ -188,7 +188,7 @@ describe("SignUpForm", () => {
       render(<SignUpForm />)
 
       // Accept legal agreements
-      await user.click(screen.getByLabelText(/End User License Agreement/i))
+      await user.click(screen.getByLabelText(/Terms of Service/i))
       await user.click(screen.getByLabelText(/Privacy Policy/i))
 
       // Fill required fields
@@ -216,7 +216,7 @@ describe("SignUpForm", () => {
 
       render(<SignUpForm />)
 
-      await user.click(screen.getByLabelText(/End User License Agreement/i))
+      await user.click(screen.getByLabelText(/Terms of Service/i))
       await user.click(screen.getByLabelText(/Privacy Policy/i))
       await user.type(screen.getByLabelText("Full Name"), "John Doe")
       await user.type(screen.getByLabelText("Email"), "john@example.com")
