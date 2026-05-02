@@ -7,10 +7,6 @@ const mockEnv = {
   NODE_ENV: "development",
 }
 
-vi.stubGlobal("process", {
-  env: mockEnv,
-})
-
 // Mock Supabase client
 const mockInsert = vi.fn()
 const mockSelect = vi.fn()
@@ -37,8 +33,7 @@ describe("Trace Logger", () => {
     consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {})
     vi.spyOn(console, "error").mockImplementation(() => {})
 
-    // Reset environment
-    process.env = { ...mockEnv } as NodeJS.ProcessEnv
+    vi.stubGlobal("process", { env: { ...mockEnv } })
 
     // Setup default mock chain
     mockSingle.mockResolvedValue({ data: { enabled: true, retention_days: 7 }, error: null })

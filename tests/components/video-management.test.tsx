@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, fireEvent } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import VideoManagement from "@/components/video-management"
 import { createClient } from "@/lib/supabase/client"
@@ -160,7 +160,7 @@ describe("VideoManagement", () => {
     })
 
     const searchInput = screen.getByPlaceholderText("Search videos...")
-    await user.type(searchInput, "Test Video 1")
+    fireEvent.change(searchInput, { target: { value: "Test Video 1" } })
 
     await waitFor(() => {
       expect(screen.getByText("Test Video 1")).toBeInTheDocument()
@@ -186,7 +186,7 @@ describe("VideoManagement", () => {
     })
 
     const searchInput = screen.getByPlaceholderText("Search videos...")
-    await user.type(searchInput, "Test Video 1")
+    fireEvent.change(searchInput, { target: { value: "Test Video 1" } })
 
     // Find the clear button (X icon) inside the search input container
     const clearButton = document.querySelector("svg.lucide-x")?.closest("button")
@@ -754,7 +754,7 @@ describe("VideoManagement", () => {
       })
 
       const searchInput = screen.getByPlaceholderText("Search videos...")
-      await user.type(searchInput, "Description 1")
+      fireEvent.change(searchInput, { target: { value: "Description 1" } })
 
       await waitFor(() => {
         expect(screen.getByText("Test Video 1")).toBeInTheDocument()
@@ -781,7 +781,7 @@ describe("VideoManagement", () => {
       })
 
       const searchInput = screen.getByPlaceholderText("Search videos...")
-      await user.type(searchInput, "John Doe")
+      fireEvent.change(searchInput, { target: { value: "John Doe" } })
 
       await waitFor(() => {
         expect(screen.getByText("Test Video 1")).toBeInTheDocument()
@@ -810,7 +810,7 @@ describe("VideoManagement", () => {
 
       // Add search query
       const searchInput = screen.getByPlaceholderText("Search videos...")
-      await user.type(searchInput, "test")
+      fireEvent.change(searchInput, { target: { value: "test" } })
 
       // Open filters and add category filter
       const filtersButton = screen.getByText("Filters")

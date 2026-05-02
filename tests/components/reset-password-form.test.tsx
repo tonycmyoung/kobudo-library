@@ -167,18 +167,18 @@ describe("ResetPasswordForm", () => {
   })
 
   it("should show error when no session after timeout", async () => {
+    vi.useFakeTimers()
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
 
     render(<ResetPasswordForm />)
 
-    await waitFor(
-      () => {
-        expect(screen.getByText(/auth session missing/i)).toBeInTheDocument()
-        expect(screen.getByText(/unable to verify password reset link/i)).toBeInTheDocument()
-      },
-      { timeout: 7000 },
-    )
-  }, 10000) // Add test timeout as parameter to it() function
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5100)
+    })
+
+    expect(screen.getByText(/auth session missing/i)).toBeInTheDocument()
+    expect(screen.getByText(/unable to verify password reset link/i)).toBeInTheDocument()
+  })
 
   it("should toggle password visibility", async () => {
     const user = userEvent.setup({ delay: null })
@@ -240,19 +240,19 @@ describe("ResetPasswordForm", () => {
   })
 
   it("should have Return to Login link in error state pointing to /auth/login", async () => {
+    vi.useFakeTimers()
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null })
 
     render(<ResetPasswordForm />)
 
-    await waitFor(
-      () => {
-        const returnLink = screen.getByRole("link", { name: /return to login/i })
-        expect(returnLink).toBeInTheDocument()
-        expect(returnLink).toHaveAttribute("href", "/auth/login")
-      },
-      { timeout: 7000 },
-    )
-  }, 10000)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5100)
+    })
+
+    const returnLink = screen.getByRole("link", { name: /return to login/i })
+    expect(returnLink).toBeInTheDocument()
+    expect(returnLink).toHaveAttribute("href", "/auth/login")
+  })
 
   it("should toggle confirm password visibility when form is shown", async () => {
     const user = userEvent.setup({ delay: null })
