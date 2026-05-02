@@ -148,8 +148,10 @@ describe("LoadingProvider", () => {
         </LoadingProvider>,
       )
 
+      const link = screen.getByText("Email")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(screen.getByText("Email"))
+        fireEvent.click(link)
       })
 
       expect(screen.getByTestId("loading-state")).toHaveTextContent("idle")
@@ -163,8 +165,10 @@ describe("LoadingProvider", () => {
         </LoadingProvider>,
       )
 
+      const link = screen.getByText("Call")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(screen.getByText("Call"))
+        fireEvent.click(link)
       })
 
       expect(screen.getByTestId("loading-state")).toHaveTextContent("idle")
@@ -178,8 +182,10 @@ describe("LoadingProvider", () => {
         </LoadingProvider>,
       )
 
+      const link = screen.getByText("Jump")
+      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(screen.getByText("Jump"))
+        fireEvent.click(link)
       })
 
       expect(screen.getByTestId("loading-state")).toHaveTextContent("idle")
@@ -284,7 +290,7 @@ describe("LoadingProvider", () => {
       render(
         <LoadingProvider>
           <ContextReader />
-          <a href="/page-a">Go</a>
+          <button type="button" data-navigate>Go</button>
         </LoadingProvider>,
       )
 
@@ -294,10 +300,8 @@ describe("LoadingProvider", () => {
         vi.advanceTimersByTime(0)
       })
 
-      const link = screen.getByText("Go")
-      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(link)
+        fireEvent.click(screen.getByText("Go"))
       })
 
       expect(screen.queryByText("Loading...")).toBeNull()
@@ -313,14 +317,12 @@ describe("LoadingProvider", () => {
       render(
         <LoadingProvider>
           <ContextReader />
-          <a href="/page-b">Go</a>
+          <button type="button" data-navigate>Go</button>
         </LoadingProvider>,
       )
 
-      const link = screen.getByText("Go")
-      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(link)
+        fireEvent.click(screen.getByText("Go"))
       })
 
       expect(screen.getByTestId("loading-state")).toHaveTextContent("loading")
@@ -340,14 +342,12 @@ describe("LoadingProvider", () => {
       const { rerender } = render(
         <LoadingProvider>
           <ContextReader />
-          <a href="/new">Navigate</a>
+          <button type="button" data-navigate>Navigate</button>
         </LoadingProvider>,
       )
 
-      const link = screen.getByText("Navigate")
-      link.addEventListener("click", (e) => e.preventDefault(), { once: true })
       act(() => {
-        fireEvent.click(link)
+        fireEvent.click(screen.getByText("Navigate"))
       })
       expect(screen.getByTestId("loading-state")).toHaveTextContent("loading")
 
@@ -356,7 +356,7 @@ describe("LoadingProvider", () => {
       rerender(
         <LoadingProvider>
           <ContextReader />
-          <a href="/new">Navigate</a>
+          <button type="button" data-navigate>Navigate</button>
         </LoadingProvider>,
       )
 
