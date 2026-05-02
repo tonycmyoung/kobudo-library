@@ -185,18 +185,25 @@ Office of the Australian Information Commissioner: oaic.gov.au
 |--------|------|-------|
 | Create | `app/terms/page.tsx` | New Terms of Service page |
 | Delete | `app/eula/page.tsx` | Replaced by `/terms` |
-| Update | `next.config.ts` | Add `redirects()` entry: `/eula` → `/terms` (permanent) |
+| Update | `next.config.mjs` | Add `redirects()` entry: `/eula` → `/terms` (permanent) |
 | Rewrite | `app/privacy-policy/page.tsx` | Full content rewrite |
 | Update | `components/legal-footer.tsx` | Link href `/eula` → `/terms`; label "EULA" → "Terms of Service" |
 | Update | `components/sign-up-form.tsx` | Checkbox link href + label; error strings referencing "EULA" |
 | Update | `components/login-form.tsx` | Contains "End User License Agreement" text — update to "Terms of Service" |
-| Update | `middleware.ts` | Add `/terms` to public route allowlist; `/eula` redirect will be handled by next.config so can be removed from allowlist |
+| Update | `lib/supabase/middleware.ts` | Add `/terms` to public route allowlist; `/eula` can be removed (redirect handled by next.config) |
 | Update | `tests/components/legal-footer.test.tsx` | Update href and label text assertions |
 | Update | `tests/components/sign-up-form.test.tsx` | Update href, label, and error string assertions |
 | Update | `tests/unit/lib/actions/auth.test.ts` | Update error string assertion referencing "EULA" |
+| Update | `tests/components/login-form.test.tsx` | Update "End User License Agreement" text assertion |
 
 ### Database schema
-No migration required. The `user_consents` table columns (`eula_accepted_at`, `privacy_accepted_at`) retain their existing names — these are internal column identifiers, not user-visible text. The Privacy Policy page will refer to "Terms of Service and Privacy Policy acceptance timestamps" in prose; the column name is an implementation detail.
+One migration required: rename `user_consents.eula_accepted_at` → `terms_accepted_at` for consistency with the renamed document. `privacy_accepted_at` is unchanged.
+
+| Action | Detail |
+|--------|--------|
+| Create migration | `ALTER TABLE user_consents RENAME COLUMN eula_accepted_at TO terms_accepted_at` |
+| Update | `lib/actions/auth.tsx` — `storeUserConsent()` column reference |
+| Update | Any TypeScript types / generated Supabase types that reference `eula_accepted_at` |
 
 ### Out of scope
 - Any change to the acceptance checkbox logic or `storeUserConsent()` function behaviour
