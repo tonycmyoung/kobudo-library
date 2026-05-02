@@ -335,10 +335,9 @@ describe("UserProfile", () => {
       await user.click(editButton)
 
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
-      // Create a file that's 6MB (over the 5MB limit)
-      const largeContent = "x".repeat(6 * 1024 * 1024)
-      const file = new File([largeContent], "large-photo.jpg", { type: "image/jpeg" })
-      Object.defineProperty(file, "size", { value: 6 * 1024 * 1024 })
+      // Mock size so we don't allocate 6MB of string data to test a size check
+      const file = new File(["x"], "large-photo.jpg", { type: "image/jpeg" })
+      Object.defineProperty(file, "size", { value: 6 * 1024 * 1024, configurable: true })
       await user.upload(fileInput, file)
 
       expect(global.alert).toHaveBeenCalledWith("File size must be less than 5MB")

@@ -1,11 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import AdminRefreshButton from "@/components/admin-refresh-button"
 
 describe("AdminRefreshButton", () => {
+  const eventSpy = vi.fn()
+
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    globalThis.removeEventListener("admin-refresh-pending-users", eventSpy)
+    globalThis.removeEventListener("admin-refresh-unconfirmed-users", eventSpy)
+    globalThis.removeEventListener("admin-refresh-stats", eventSpy)
   })
 
   it("should render button with correct initial text", () => {
@@ -16,7 +24,6 @@ describe("AdminRefreshButton", () => {
 
   it("should dispatch three custom events when clicked", async () => {
     const user = userEvent.setup({ delay: null })
-    const eventSpy = vi.fn()
 
     globalThis.addEventListener("admin-refresh-pending-users", eventSpy)
     globalThis.addEventListener("admin-refresh-unconfirmed-users", eventSpy)
@@ -30,10 +37,6 @@ describe("AdminRefreshButton", () => {
     await waitFor(() => {
       expect(eventSpy).toHaveBeenCalledTimes(3)
     })
-
-    globalThis.removeEventListener("admin-refresh-pending-users", eventSpy)
-    globalThis.removeEventListener("admin-refresh-unconfirmed-users", eventSpy)
-    globalThis.removeEventListener("admin-refresh-stats", eventSpy)
   })
 
   it("should show refreshing state with spinning icon", async () => {

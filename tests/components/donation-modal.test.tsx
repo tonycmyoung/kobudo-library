@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
 import DonationModal from "@/components/donation-modal"
 import { createClient } from "@/lib/supabase/client"
@@ -66,6 +66,7 @@ vi.mock("@/lib/trace", () => ({
 describe("DonationModal", () => {
   const mockOnClose = vi.fn()
   const testPayId = "test-payid@example.com"
+  let originalClipboard: Clipboard
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -80,14 +81,20 @@ describe("DonationModal", () => {
 
     // Set up environment variable
     process.env.NEXT_PUBLIC_DONATE_PAYID = testPayId
-    // Mock window.open
+    // Mock window.open — cleaned up by vi.unstubAllGlobals() in global afterEach
     vi.stubGlobal("open", vi.fn())
-    // Mock navigator.clipboard
+    // Mock navigator.clipboard — save original for restore in afterEach
+    originalClipboard = navigator.clipboard
     Object.assign(navigator, {
       clipboard: {
         writeText: vi.fn().mockResolvedValue(undefined),
       },
     })
+  })
+
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_DONATE_PAYID
+    Object.assign(navigator, { clipboard: originalClipboard })
   })
 
   it("should not render when isOpen is false", () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, waitFor, cleanup, within } from "@testing-library/react"
+import { render, screen, waitFor, cleanup, within, fireEvent } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import CurriculumSetsManagement from "@/components/curriculum-sets-management"
 import {
@@ -116,7 +116,7 @@ describe("CurriculumSetsManagement", () => {
     // Find the name input by its id
     const nameInput = document.getElementById("set-name") as HTMLInputElement
     expect(nameInput).toBeInTheDocument()
-    await user.type(nameInput, "New Curriculum Set")
+    fireEvent.change(nameInput, { target: { value: "New Curriculum Set" } })
 
     // Find create button within the dialog form
     const createButton = screen.getByRole("button", { name: /^create$/i })
@@ -143,7 +143,7 @@ describe("CurriculumSetsManagement", () => {
     await user.click(addButton)
 
     const nameInput = document.getElementById("set-name") as HTMLInputElement
-    await user.type(nameInput, "New Set")
+    fireEvent.change(nameInput, { target: { value: "New Set" } })
 
     const createButton = screen.getByRole("button", { name: /^create$/i })
     await user.click(createButton)
@@ -205,7 +205,7 @@ describe("CurriculumSetsManagement", () => {
     // Find the level name input by its id
     const nameInput = document.getElementById("level-name") as HTMLInputElement
     expect(nameInput).toBeInTheDocument()
-    await user.type(nameInput, "Yellow Belt")
+    fireEvent.change(nameInput, { target: { value: "Yellow Belt" } })
 
     // The Add Level dialog has an "Add" button, not "Save"
     const addButton = screen.getByRole("button", { name: /^add$/i })
@@ -315,8 +315,7 @@ describe("CurriculumSetsManagement", () => {
 
       // Change the name and submit
       const nameInput = document.getElementById("set-name") as HTMLInputElement
-      await user.clear(nameInput)
-      await user.type(nameInput, "Updated Set Name")
+      fireEvent.change(nameInput, { target: { value: "Updated Set Name" } })
 
       await user.click(screen.getByRole("button", { name: /^update$/i }))
 
@@ -698,7 +697,7 @@ describe("CurriculumSetsManagement", () => {
 
       const descTextarea = document.getElementById("set-description") as HTMLTextAreaElement
       expect(descTextarea).toBeInTheDocument()
-      await user.type(descTextarea, "A test description")
+      fireEvent.change(descTextarea, { target: { value: "A test description" } })
       expect(descTextarea).toHaveValue("A test description")
     })
 
@@ -718,7 +717,7 @@ describe("CurriculumSetsManagement", () => {
 
       const descTextarea = document.getElementById("level-description") as HTMLTextAreaElement
       expect(descTextarea).toBeInTheDocument()
-      await user.type(descTextarea, "Level description")
+      fireEvent.change(descTextarea, { target: { value: "Level description" } })
       expect(descTextarea).toHaveValue("Level description")
     })
 
@@ -764,7 +763,7 @@ describe("CurriculumSetsManagement", () => {
 
       await user.click(screen.getByRole("button", { name: /new curriculum set/i }))
       const nameInput = document.getElementById("set-name") as HTMLInputElement
-      await user.type(nameInput, "Test Set")
+      fireEvent.change(nameInput, { target: { value: "Test Set" } })
       await user.click(screen.getByRole("button", { name: /^create$/i }))
 
       await waitFor(() => {
@@ -798,8 +797,7 @@ describe("CurriculumSetsManagement", () => {
       })
 
       const nameInput = document.getElementById("set-name") as HTMLInputElement
-      await user.clear(nameInput)
-      await user.type(nameInput, "Updated Name")
+      fireEvent.change(nameInput, { target: { value: "Updated Name" } })
       await user.click(screen.getByRole("button", { name: /^update$/i }))
 
       await waitFor(() => {
