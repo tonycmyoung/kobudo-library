@@ -12,7 +12,7 @@ const PUBLIC_ROUTES = new Set([
   "/pending-approval",
   "/setup-admin",
   "/privacy-policy",
-  "/eula",
+  "/terms",
   "/auth/confirm",
   "/auth/confirm/callback",
   "/auth/reset-password",
