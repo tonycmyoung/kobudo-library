@@ -103,11 +103,11 @@ function cleanSourceFile(sourceFile: string): string {
     result = result.substring(10)
     // Strip optional package name prefix e.g. "kobudo-library/./"
     const slashDotSlash = result.indexOf("/./")
-    if (slashDotSlash !== -1) {
-      result = result.substring(slashDotSlash + 3)
-    } else {
+    if (slashDotSlash === -1) {
       const firstSlash = result.indexOf("/")
       if (firstSlash !== -1) result = result.substring(firstSlash + 1)
+    } else {
+      result = result.substring(slashDotSlash + 3)
     }
   }
 
