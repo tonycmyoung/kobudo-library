@@ -60,7 +60,7 @@ All video, written, and photographic content is owned by TY Kobudo or licensed t
 All performances depicted in the platform's videos have been recorded and published with the explicit consent of the individuals featured.
 
 #### 8. Minors
-Membership is currently restricted to adults. Admission of members under 18 is at the discretion of a head teacher. Where a head teacher registers a minor member, the head teacher is responsible for having obtained appropriate parental or guardian consent before registration. TY Kobudo does not verify member age.
+Membership is generally restricted to adults. A head teacher may register a member under 18 at their discretion; in that case, the head teacher is responsible for having obtained appropriate parental or guardian consent before registration. TY Kobudo does not verify member age.
 
 #### 9. Free Service & Donations
 The platform is currently free to access. Voluntary donations are supported via Stripe. Stripe processes donation payments under its own Terms of Service and Privacy Policy; TY Kobudo does not store card or payment details.
@@ -108,7 +108,7 @@ Okinawa Kobudo Library is operated by TY Kobudo, a sole-trader software business
 | School/dojo affiliation | Membership verification |
 | Teacher/sensei name | Membership verification |
 | Belt/grade level (optional, if set by user) | Profile personalisation |
-| EULA and Privacy Policy acceptance timestamps | Consent recording |
+| Terms of Service and Privacy Policy acceptance timestamps | Consent recording |
 | Browser type, device, and usage data | Platform improvement and analytics |
 | Standard server request logs: IP address, request path, timestamp | Security monitoring and error diagnosis |
 
@@ -153,7 +153,7 @@ The platform currently does not admit members under 18. If a head teacher regist
 The platform uses session and authentication cookies necessary for the service to function. Usage analytics may be collected to improve the platform. No advertising cookies, tracking pixels, or third-party analytics are used. You may disable cookies in your browser settings; some features may not function as a result.
 
 #### 9. Data Retention
-Data is retained while your account is active or as required by applicable law. To request deletion of your account and associated data, contact admin@tykobudo.com.au. Requests will be actioned within a reasonable time.
+Data is retained while your account is active or as required by applicable law. To request deletion of your account and associated data, contact admin@tykobudo.com.au. Requests will be actioned within 30 days.
 
 #### 10. Your Rights (Australian Users)
 Under the Australian Privacy Act 1988 you may:
@@ -167,7 +167,7 @@ To exercise any of these rights, contact admin@tykobudo.com.au.
 #### 11. International Users & GDPR
 This service is operated from Australia and is governed by Australian privacy law. If you are located in the European Union or European Economic Area, the General Data Protection Regulation (GDPR) may apply to you and may grant additional rights, including the right to data portability, the right to object to processing, and the right to lodge a complaint with your local supervisory authority.
 
-We are not yet actively marketing to EU residents. Before doing so, this Privacy Policy will be updated to fully address GDPR requirements, including lawful basis for processing and data subject rights fulfilment.
+EU/EEA residents may use the platform. Where GDPR applies, the lawful basis for processing your personal data is legitimate interests (operating a private educational platform for authorised members) and, where required, your explicit consent given at registration. We are not yet actively marketing to EU residents; before doing so, this Privacy Policy will be updated to fully address GDPR requirements including appointment of an EU representative where required.
 
 #### 12. Changes & Contact
 The "Last updated" date at the top of this page reflects the current version. We will post a notice when material changes are made.
@@ -181,17 +181,23 @@ Office of the Australian Information Commissioner: oaic.gov.au
 
 ### Files to create / modify
 
-| Action | File |
-|--------|------|
-| Create | `app/terms/page.tsx` — new Terms of Service page |
-| Delete | `app/eula/page.tsx` — replaced by `/terms` |
-| Add redirect | `app/eula/page.tsx` or `next.config` — redirect `/eula` → `/terms` |
-| Rewrite | `app/privacy-policy/page.tsx` — full content rewrite |
-| Update | `components/legal-footer.tsx` — update link from `/eula` to `/terms` |
-| Update | `components/sign-up-form.tsx` — update EULA link text/href to Terms of Service / `/terms` |
-| Update | `lib/actions/auth.tsx` — verify `storeUserConsent()` label is still appropriate |
+| Action | File | Notes |
+|--------|------|-------|
+| Create | `app/terms/page.tsx` | New Terms of Service page |
+| Delete | `app/eula/page.tsx` | Replaced by `/terms` |
+| Update | `next.config.ts` | Add `redirects()` entry: `/eula` → `/terms` (permanent) |
+| Rewrite | `app/privacy-policy/page.tsx` | Full content rewrite |
+| Update | `components/legal-footer.tsx` | Link href `/eula` → `/terms`; label "EULA" → "Terms of Service" |
+| Update | `components/sign-up-form.tsx` | Checkbox link href + label; error strings referencing "EULA" |
+| Update | `components/login-form.tsx` | Contains "End User License Agreement" text — update to "Terms of Service" |
+| Update | `middleware.ts` | Add `/terms` to public route allowlist; `/eula` redirect will be handled by next.config so can be removed from allowlist |
+| Update | `tests/components/legal-footer.test.tsx` | Update href and label text assertions |
+| Update | `tests/components/sign-up-form.test.tsx` | Update href, label, and error string assertions |
+| Update | `tests/unit/lib/actions/auth.test.ts` | Update error string assertion referencing "EULA" |
+
+### Database schema
+No migration required. The `user_consents` table columns (`eula_accepted_at`, `privacy_accepted_at`) retain their existing names — these are internal column identifiers, not user-visible text. The Privacy Policy page will refer to "Terms of Service and Privacy Policy acceptance timestamps" in prose; the column name is an implementation detail.
 
 ### Out of scope
-- Database schema changes (consent recording mechanism is unchanged)
-- Routing infrastructure beyond the single redirect
-- Any change to the acceptance checkbox logic
+- Any change to the acceptance checkbox logic or `storeUserConsent()` function behaviour
+- Analytics cookie consent banner (current analytics are session/auth cookies only — no third-party analytics in use)
