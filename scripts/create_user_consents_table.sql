@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS user_consents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  eula_accepted_at TIMESTAMP WITH TIME ZONE,
+  terms_accepted_at TIMESTAMP WITH TIME ZONE,
   privacy_accepted_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
