@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/eula",
+        destination: "/terms",
+        permanent: true,
+      },
+    ]
+  },
   images: {
     // Enable Next.js image optimization for better LCP on mobile
     remotePatterns: [

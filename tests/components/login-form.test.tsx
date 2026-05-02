@@ -186,10 +186,10 @@ describe("LoginForm", () => {
     expect(returnToInput).toHaveAttribute("value", "/dashboard")
   })
 
-  it("should render EULA text", () => {
+  it("should render Terms of Service text", () => {
     render(<LoginForm />)
 
-    expect(screen.getByText(/End User License Agreement/i)).toBeInTheDocument()
+    expect(screen.getByText(/Terms of Service/i)).toBeInTheDocument()
     expect(screen.getByText(/Tony Young/i)).toBeInTheDocument()
   })
 

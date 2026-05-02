@@ -49,14 +49,14 @@ function validateSignupFields(
   fullName: string,
   school: string,
   teacher: string,
-  eulaAccepted: boolean,
+  termsAccepted: boolean,
   privacyAccepted: boolean,
 ): string | null {
   if (!email || !password || !fullName || !school || !teacher) {
     return "All fields are required"
   }
-  if (!eulaAccepted || !privacyAccepted) {
-    return "You must accept both the EULA and Privacy Policy to create an account"
+  if (!termsAccepted || !privacyAccepted) {
+    return "You must accept both the Terms of Service and Privacy Policy to create an account"
   }
   return null
 }
@@ -116,14 +116,14 @@ async function createUserProfile(
 // Helper to store user consent
 async function storeUserConsent(
   userId: string,
-  eulaAccepted: boolean,
+  termsAccepted: boolean,
   privacyAccepted: boolean,
 ): Promise<{ error: string | null }> {
   const serviceSupabase = getServiceClient()
   const now = new Date().toISOString()
   const { error: consentError } = await serviceSupabase.from("user_consents").insert({
     user_id: userId,
-    eula_accepted_at: eulaAccepted ? now : null,
+    terms_accepted_at: termsAccepted ? now : null,
     privacy_accepted_at: privacyAccepted ? now : null,
   })
 
@@ -348,11 +348,11 @@ export async function signUp(prevState: { error?: string } | null, formData: For
   const fullName = formData.get("fullName") as string
   const school = formData.get("school") as string
   const teacher = formData.get("teacher") as string
-  const eulaAccepted = formData.get("eulaAccepted") === "true" || formData.get("eulaAccepted") === "on"
+  const termsAccepted = formData.get("termsAccepted") === "true" || formData.get("termsAccepted") === "on"
   const privacyAccepted = formData.get("privacyAccepted") === "true" || formData.get("privacyAccepted") === "on"
 
   // Validate fields using helper (reduces nested conditionals)
-  const validationError = validateSignupFields(email, password, fullName, school, teacher, eulaAccepted, privacyAccepted)
+  const validationError = validateSignupFields(email, password, fullName, school, teacher, termsAccepted, privacyAccepted)
   if (validationError) {
     return { error: validationError }
   }
@@ -412,7 +412,7 @@ export async function signUp(prevState: { error?: string } | null, formData: For
   }
 
   // Store consent
-  const consentResult = await storeUserConsent(data.user.id, eulaAccepted, privacyAccepted)
+  const consentResult = await storeUserConsent(data.user.id, termsAccepted, privacyAccepted)
   if (consentResult.error) {
     return { error: consentResult.error }
   }

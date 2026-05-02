@@ -97,7 +97,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -140,19 +140,19 @@ describe("Auth Actions", () => {
       expect(mockSupabaseClient.auth.signUp).not.toHaveBeenCalled()
     })
 
-    it("should return error when EULA or Privacy Policy not accepted", async () => {
+    it("should return error when Terms of Service or Privacy Policy not accepted", async () => {
       const formData = new FormData()
       formData.append("email", "test@example.com")
       formData.append("password", "password123")
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "false")
+      formData.append("termsAccepted", "false")
       formData.append("privacyAccepted", "true")
 
       const result = await signUp(null, formData)
 
-      expect(result).toEqual({ error: "You must accept both the EULA and Privacy Policy to create an account" })
+      expect(result).toEqual({ error: "You must accept both the Terms of Service and Privacy Policy to create an account" })
       expect(mockSupabaseClient.auth.signUp).not.toHaveBeenCalled()
     })
 
@@ -163,7 +163,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -183,7 +183,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -227,7 +227,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -265,7 +265,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Invited User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -322,7 +322,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Invited User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -374,7 +374,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({
@@ -397,7 +397,7 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Test User")
       formData.append("school", "Test School")
       formData.append("teacher", "Test Teacher")
-      formData.append("eulaAccepted", "true")
+      formData.append("termsAccepted", "true")
       formData.append("privacyAccepted", "true")
 
       mockSupabaseClient.auth.signUp.mockResolvedValue({

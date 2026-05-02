@@ -9,12 +9,12 @@ export function LegalFooter() {
 
           <div className="flex items-center gap-6 text-sm">
             <a
-              href="/eula"
+              href="/terms"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-200 hover:text-white transition-colors underline"
             >
-              End User License Agreement
+              Terms of Service
             </a>
             <a
               href="/privacy-policy"

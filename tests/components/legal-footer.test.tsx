@@ -13,14 +13,14 @@ describe("LegalFooter", () => {
     expect(screen.getByText(`© ${currentYear} Tony Young. All rights reserved.`)).toBeInTheDocument()
   })
 
-  it("should render EULA link with correct attributes", () => {
+  it("should render Terms of Service link with correct attributes", () => {
     render(<LegalFooter />)
 
-    const eulaLink = screen.getByRole("link", { name: /end user license agreement/i })
+    const termsLink = screen.getByRole("link", { name: /terms of service/i })
 
-    expect(eulaLink).toHaveAttribute("href", "/eula")
-    expect(eulaLink).toHaveAttribute("target", "_blank")
-    expect(eulaLink).toHaveAttribute("rel", "noopener noreferrer")
+    expect(termsLink).toHaveAttribute("href", "/terms")
+    expect(termsLink).toHaveAttribute("target", "_blank")
+    expect(termsLink).toHaveAttribute("rel", "noopener noreferrer")
   })
 
   it("should render Privacy Policy link with correct attributes", () => {
