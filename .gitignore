@@ -38,3 +38,6 @@ test-output-*.txt
 
 # temporary scripts (working folder - ad-hoc development scripts)
 /scripts/temp-*.sql
+
+# Compound Engineering local config
+.compound-engineering/*.local.yaml
