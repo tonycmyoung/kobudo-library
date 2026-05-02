@@ -39,7 +39,9 @@ A new `toggleStudentApproval` function is added, mirroring the shape of `deleteU
 
 ### 3. Pending Approval Page
 
-**`app/pending-approval/page.tsx`** is refactored from a client component to a thin server component wrapper. It reads `process.env.ADMIN_EMAIL` and passes it as a prop to the existing client component (renamed to `PendingApprovalClient` or similar).
+**`app/pending-approval/page.tsx`** is refactored from a thin server component wrapper. It reads `process.env.ADMIN_EMAIL` and passes it as a prop to the existing client component (renamed to `PendingApprovalClient` or similar).
+
+**Note:** The existing client component already has multiple conditional UI states (email confirmation, approval pending, approved, error states). The refactor must preserve all existing states — only the "awaiting approval while `is_approved: false`" case is split into two: null `approved_at` (new signup) vs set `approved_at` (revoked).
 
 The client component gains a new UI state based on `approved_at`:
 
@@ -56,7 +58,9 @@ The `approved_at` field must be included in the Supabase query on the pending pa
 
 ### Fallback: NEXT_PUBLIC_ADMIN_EMAIL rename (Option B)
 
-If the server wrapper approach causes issues with the existing pending-approval client component (which has had prior implementation complexity), an alternative is to rename `ADMIN_EMAIL` to `NEXT_PUBLIC_ADMIN_EMAIL` throughout the codebase. References to update: `env.template`, `lib/actions/email.tsx`, `lib/actions/notifications.tsx`, `README.md`, `docs/DEPLOYMENT_AND_TESTING_GUIDE.md`, `docs/DEPLOYMENT_CHECKLIST.md`, `.env.local`, and `tests/unit/lib/actions/email.test.ts`.
+Option A (server wrapper) is the primary path. Fall back to Option B only if the server wrapper introduces a test-isolation problem that cannot be resolved cleanly.
+
+Option B: rename `ADMIN_EMAIL` to `NEXT_PUBLIC_ADMIN_EMAIL` throughout the codebase. References to update: `env.template`, `lib/actions/email.tsx`, `lib/actions/notifications.tsx`, `README.md`, `docs/DEPLOYMENT_AND_TESTING_GUIDE.md`, `docs/DEPLOYMENT_CHECKLIST.md`, `.env.local`, and `tests/unit/lib/actions/email.test.ts`.
 
 ## Data Integrity
 
