@@ -191,8 +191,7 @@ export default function PrivacyPolicyPage() {
                   of your account and associated data, contact{" "}
                   <a href="mailto:admin@tykobudo.com.au" className="text-gray-200 hover:text-white underline">
                     admin@tykobudo.com.au
-                  </a>
-                  . Requests will be actioned within 30 days.
+                  </a>. Requests will be actioned within 30 days.
                 </p>
               </section>
 
@@ -204,24 +203,19 @@ export default function PrivacyPolicyPage() {
                   <li>Request correction of inaccurate or out-of-date information</li>
                   <li>Request deletion of your data, subject to legal obligations</li>
                   <li>
-                    Complain to the Office of the Australian Information Commissioner (
-                    <a
+                    Complain to the Office of the Australian Information Commissioner (<a
                       href="https://www.oaic.gov.au"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-200 hover:text-white underline"
-                    >
-                      oaic.gov.au
-                    </a>
-                    ) if you believe your privacy rights have been breached
+                    >oaic.gov.au</a>) if you believe your privacy rights have been breached
                   </li>
                 </ul>
                 <p className="mt-2">
                   To exercise any of these rights, contact{" "}
                   <a href="mailto:admin@tykobudo.com.au" className="text-gray-200 hover:text-white underline">
                     admin@tykobudo.com.au
-                  </a>
-                  .
+                  </a>.
                 </p>
               </section>
 

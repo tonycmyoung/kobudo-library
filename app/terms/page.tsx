@@ -37,8 +37,7 @@ export default function TermsPage() {
                   by TY Kobudo (sole trader, New South Wales, Australia). Contact:{" "}
                   <a href="mailto:admin@tykobudo.com.au" className="text-gray-200 hover:text-white underline">
                     admin@tykobudo.com.au
-                  </a>
-                  .
+                  </a>.
                 </p>
               </section>
 
