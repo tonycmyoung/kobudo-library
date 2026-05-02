@@ -147,7 +147,7 @@ Data may also be disclosed to comply with legal obligations or in the event of a
 Your account data is stored in Supabase's ap-southeast-2 region (Sydney, Australia). For Australian members, this means your data remains onshore. International members' data is also stored in Sydney; transfer protections appropriate to the destination country apply where required.
 
 #### 7. Minors
-The platform currently does not admit members under 18. If a head teacher registers a minor member at their discretion, that teacher is responsible for having obtained appropriate parental or guardian consent prior to registration. TY Kobudo does not independently verify member age.
+Membership is generally restricted to adults. A head teacher may register a member under 18 at their discretion; in that case, the head teacher is responsible for having obtained appropriate parental or guardian consent before registration. TY Kobudo does not independently verify member age.
 
 #### 8. Cookies & Tracking
 The platform uses session and authentication cookies necessary for the service to function. Usage analytics may be collected to improve the platform. No advertising cookies, tracking pixels, or third-party analytics are used. You may disable cookies in your browser settings; some features may not function as a result.
@@ -199,11 +199,12 @@ Office of the Australian Information Commissioner: oaic.gov.au
 ### Database schema
 One migration required: rename `user_consents.eula_accepted_at` → `terms_accepted_at` for consistency with the renamed document. `privacy_accepted_at` is unchanged.
 
-| Action | Detail |
-|--------|--------|
-| Create migration | `ALTER TABLE user_consents RENAME COLUMN eula_accepted_at TO terms_accepted_at` |
-| Update | `lib/actions/auth.tsx` — `storeUserConsent()` column reference |
-| Update | Any TypeScript types / generated Supabase types that reference `eula_accepted_at` |
+| Action | File | Detail |
+|--------|------|--------|
+| Create | `migrations/NNNN-rename-eula-to-terms.sql` | `ALTER TABLE user_consents RENAME COLUMN eula_accepted_at TO terms_accepted_at` |
+| Update | `lib/actions/auth.tsx` | `storeUserConsent()` column reference |
+| Update | `scripts/create_user_consents_table.sql` | Stale `eula_accepted_at` reference |
+| Update | Any generated Supabase types | Files referencing `eula_accepted_at` |
 
 ### Out of scope
 - Any change to the acceptance checkbox logic or `storeUserConsent()` function behaviour
