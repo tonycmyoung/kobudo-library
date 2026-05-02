@@ -152,7 +152,6 @@ describe("VideoManagement", () => {
       return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
     })
 
-    const user = userEvent.setup({ delay: null })
     render(<VideoManagement />)
 
     await waitFor(() => {
@@ -745,7 +744,6 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
@@ -772,7 +770,6 @@ describe("VideoManagement", () => {
         return { order: vi.fn().mockResolvedValue({ data: [], error: null }) }
       })
 
-      const user = userEvent.setup({ delay: null })
       render(<VideoManagement />)
 
       await waitFor(() => {
