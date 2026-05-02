@@ -114,3 +114,22 @@ Temporary `console.log` statements should be prefixed `[v0]` and removed after d
 ## Testing
 
 Tests live in `/tests` mirroring source structure. Mocks for Supabase and Next.js navigation are in `/tests/mocks`. Coverage threshold is 50% across all metrics.
+
+## Workflow
+
+### Planning & Execution (Superpowers)
+Use Superpowers for all planning and execution:
+1. `brainstorming` skill — refine requirements before any code
+2. `writing-plans` skill — detailed, task-level implementation plan
+3. `subagent-driven-development` skill — execute with two-stage review
+
+TDD is mandatory throughout: RED-GREEN-REFACTOR, no exceptions.
+Do not use /ce-brainstorm, /ce-plan, or /ce-work.
+
+### Review & Compounding (Compound Engineering)
+After implementation is complete and a PR exists:
+1. `/ce-code-review` — parallel specialist review of the PR
+2. `/ce-compound` — document the solved problem for future sessions
+
+The `docs/solutions/` folder is CE's knowledge store and will grow over time.
+The `docs/superpowers/` folder is Superpowers' store — do not mix them.
