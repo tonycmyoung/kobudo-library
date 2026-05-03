@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createBrowserClient } from "@supabase/ssr"
+import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Clock, Mail, CheckCircle, AlertCircle, ShieldOff } from "lucide-react"
@@ -9,7 +9,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 
 interface Props {
-  adminEmail: string
+  readonly adminEmail: string
 }
 
 interface UserStatus {
@@ -28,12 +28,11 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
   const fromSignup = searchParams.get("from") === "signup" // Check if user came from signup
 
   useEffect(() => {
+    let cancelled = false
+
     const checkUserStatus = async () => {
       try {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        )
+        const supabase = createBrowserClient()
 
         // Get current session
         const {
@@ -42,12 +41,14 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
 
         if (!session?.user) {
           if (fromSignup) {
+            if (cancelled) return
             setUserStatus(null)
             setLoading(false)
             return
           }
           // No session - sign out and show generic message
           await supabase.auth.signOut()
+          if (cancelled) return
           setUserStatus(null)
           setLoading(false)
           return
@@ -62,11 +63,13 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
 
         if (userError) {
           console.error("Error fetching user data:", userError)
+          if (cancelled) return
           setError("Unable to check account status")
           setLoading(false)
           return
         }
 
+        if (cancelled) return
         setUserStatus({
           email_confirmed: !!session.user.email_confirmed_at,
           is_approved: userData?.is_approved || false,
@@ -75,14 +78,19 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
           full_name: userData?.full_name,
         })
       } catch (err) {
-        console.error("Status check error:", err)
-        setError("Unable to check account status")
+        if (!cancelled) {
+          console.error("Status check error:", err)
+          setError("Unable to check account status")
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
 
     checkUserStatus()
+    return () => { cancelled = true }
   }, [fromSignup]) // Add fromSignup to dependency array
 
   const getStatusContent = () => {
@@ -131,7 +139,7 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
       }
     }
 
-    if (userStatus.approved_at) {
+    if (!userStatus.is_approved && userStatus.approved_at !== null) {
       return {
         icon: <ShieldOff className="w-8 h-8 text-white" />,
         iconBg: "bg-red-700",
@@ -149,6 +157,7 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
   }
 
   const statusContent = getStatusContent()
+  const isAccessRevoked = !!(userStatus && userStatus.approved_at && !userStatus.is_approved)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-900 via-orange-900 to-yellow-900 px-4 py-12 sm:px-6 lg:px-8">
@@ -296,7 +305,7 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
           {/* Action buttons */}
           {!fromSignup && (
             <div className="flex flex-col space-y-3">
-              {!(userStatus && userStatus.approved_at && !userStatus.is_approved) && (
+              {!isAccessRevoked && (
                 <Button
                   asChild
                   variant="outline"

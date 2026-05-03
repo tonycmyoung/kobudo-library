@@ -134,12 +134,14 @@ describe("audit.ts", () => {
     it("should support all action types", async () => {
       mockSupabaseClient.insert.mockResolvedValue({ data: null, error: null })
 
-      const actions: Array<"user_signup" | "user_approval" | "user_deletion" | "user_invitation" | "password_reset"> = [
+      const actions: Array<"user_signup" | "user_approval" | "user_deletion" | "user_invitation" | "password_reset" | "user_revoke" | "user_restore"> = [
         "user_signup",
         "user_approval",
         "user_deletion",
         "user_invitation",
         "password_reset",
+        "user_revoke",
+        "user_restore",
       ]
 
       for (const action of actions) {

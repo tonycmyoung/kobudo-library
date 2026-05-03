@@ -475,7 +475,7 @@ export async function deleteUserCompletely(userId: string) {
   }
 }
 
-export async function revokeUserAccess(userId: string) {
+export async function revokeUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
   try {
     const supabase = await createServerClient()
     const { data: currentUser } = await supabase.auth.getUser()
@@ -527,7 +527,7 @@ export async function revokeUserAccess(userId: string) {
   }
 }
 
-export async function restoreUserAccess(userId: string) {
+export async function restoreUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
   try {
     const supabase = await createServerClient()
     const { data: currentUser } = await supabase.auth.getUser()

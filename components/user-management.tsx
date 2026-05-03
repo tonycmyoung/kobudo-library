@@ -329,7 +329,7 @@ const PasswordResetDialog = ({
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose() }}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span>
+          <span tabIndex={-1}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
                 <Key className={STYLES.iconSmall} />
@@ -490,7 +490,7 @@ const ViewModeButtons = ({
     <>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span>
+          <span tabIndex={-1}>
             <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
           </span>
         </TooltipTrigger>
@@ -512,7 +512,7 @@ const ViewModeButtons = ({
       />
       <Tooltip>
         <TooltipTrigger asChild>
-          <span>
+          <span tabIndex={-1}>
             <IconButton
               onClick={() => toggleUserApproval(user.id, user.is_approved)}
               disabled={isProcessing}
@@ -527,7 +527,7 @@ const ViewModeButtons = ({
       </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span>
+          <span tabIndex={-1}>
             <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
           </span>
         </TooltipTrigger>
@@ -1102,6 +1102,7 @@ export default function UserManagement() {
       )
     } catch (error) {
       console.error("Error updating user approval:", error)
+      alert("Failed to update user access. Please try again.")
     } finally {
       setProcessingUsers((prev) => {
         const newSet = new Set(prev)

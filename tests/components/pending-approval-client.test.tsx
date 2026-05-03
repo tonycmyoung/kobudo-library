@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { Suspense } from "react"
 import PendingApprovalClient from "@/app/pending-approval/pending-approval-client"
 
-vi.mock("@supabase/ssr", () => ({
-  createBrowserClient: vi.fn(() => ({
+vi.mock("@/lib/supabase/client", () => ({
+  createClient: vi.fn(() => ({
     auth: {
       getSession: vi.fn().mockResolvedValue({
         data: {
@@ -17,6 +17,7 @@ vi.mock("@supabase/ssr", () => ({
           },
         },
       }),
+      signOut: vi.fn().mockResolvedValue({}),
     },
     from: vi.fn(() => ({
       select: vi.fn().mockReturnThis(),
@@ -53,8 +54,8 @@ describe("PendingApprovalClient", () => {
   })
 
   it("shows 'Account on Hold' when email confirmed and approved_at is set but is_approved is false", async () => {
-    const { createBrowserClient } = await import("@supabase/ssr")
-    vi.mocked(createBrowserClient).mockReturnValue({
+    const { createClient } = await import("@/lib/supabase/client")
+    vi.mocked(createClient).mockReturnValue({
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: {
@@ -67,6 +68,7 @@ describe("PendingApprovalClient", () => {
             },
           },
         }),
+        signOut: vi.fn().mockResolvedValue({}),
       },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
@@ -85,8 +87,8 @@ describe("PendingApprovalClient", () => {
   })
 
   it("shows 'see contact below' in on-hold card and admin email in footer", async () => {
-    const { createBrowserClient } = await import("@supabase/ssr")
-    vi.mocked(createBrowserClient).mockReturnValue({
+    const { createClient } = await import("@/lib/supabase/client")
+    vi.mocked(createClient).mockReturnValue({
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: {
@@ -99,6 +101,7 @@ describe("PendingApprovalClient", () => {
             },
           },
         }),
+        signOut: vi.fn().mockResolvedValue({}),
       },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
@@ -118,8 +121,8 @@ describe("PendingApprovalClient", () => {
   })
 
   it("does not show Sign In button on 'Account on Hold' card", async () => {
-    const { createBrowserClient } = await import("@supabase/ssr")
-    vi.mocked(createBrowserClient).mockReturnValue({
+    const { createClient } = await import("@/lib/supabase/client")
+    vi.mocked(createClient).mockReturnValue({
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: {
@@ -132,6 +135,7 @@ describe("PendingApprovalClient", () => {
             },
           },
         }),
+        signOut: vi.fn().mockResolvedValue({}),
       },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
@@ -151,8 +155,8 @@ describe("PendingApprovalClient", () => {
   })
 
   it("shows 'Account Approved!' when is_approved is true", async () => {
-    const { createBrowserClient } = await import("@supabase/ssr")
-    vi.mocked(createBrowserClient).mockReturnValue({
+    const { createClient } = await import("@/lib/supabase/client")
+    vi.mocked(createClient).mockReturnValue({
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: {
@@ -165,6 +169,7 @@ describe("PendingApprovalClient", () => {
             },
           },
         }),
+        signOut: vi.fn().mockResolvedValue({}),
       },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),

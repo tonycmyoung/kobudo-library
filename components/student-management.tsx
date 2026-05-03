@@ -381,7 +381,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
         ? await revokeUserAccess(userId)
         : await restoreUserAccess(userId)
 
-      if (!result.success) throw new Error(result.error || "Failed to update approval")
+      if (result.error) throw new Error(result.error)
 
       setUsers((prev) =>
         prev.map((user) =>
@@ -971,7 +971,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                             {userRole === "Head Teacher" && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span>
+                                  <span tabIndex={-1}>
                                     <Button
                                       size="sm"
                                       variant="outline"
@@ -990,7 +990,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                             {userRole === "Head Teacher" && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span>
+                                  <span tabIndex={-1}>
                                     <Button
                                       size="sm"
                                       variant="outline"
@@ -1013,7 +1013,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                             {userRole === "Head Teacher" && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span>
+                                  <span tabIndex={-1}>
                                     <Button
                                       size="sm"
                                       variant="outline"
