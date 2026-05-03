@@ -2153,13 +2153,13 @@ describe("User Actions", () => {
       mockSupabaseClient.from.mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({ data: { role: "Head Teacher" } }),
+        single: vi.fn().mockResolvedValue({ data: { role: "Head Teacher", school: "TestSchool" } }),
       })
       const updateMock = vi.fn().mockReturnThis()
       mockServiceClient.from.mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User" } }),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User", school: "TestSchool" } }),
       })
       mockServiceClient.from.mockReturnValue({
         update: updateMock,

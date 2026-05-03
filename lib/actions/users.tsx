@@ -483,7 +483,7 @@ export async function revokeUserAccess(userId: string): Promise<{ success?: stri
 
     const { data: callerProfile } = await supabase
       .from("users")
-      .select("role")
+      .select("role, school")
       .eq("id", currentUser.user.id)
       .single()
 
@@ -495,9 +495,18 @@ export async function revokeUserAccess(userId: string): Promise<{ success?: stri
 
     const { data: targetUser } = await serviceSupabase
       .from("users")
-      .select("email, full_name")
+      .select("email, full_name, school")
       .eq("id", userId)
       .single()
+
+    if (callerProfile?.role === "Head Teacher") {
+      const callerSchool = callerProfile.school || ""
+      const targetSchool = targetUser?.school || ""
+      const isInSchool = targetSchool === callerSchool || targetSchool.startsWith(callerSchool + " ")
+      if (!callerSchool || !isInSchool) {
+        return { error: "Cannot revoke access for students from other schools" }
+      }
+    }
 
     const { error } = await serviceSupabase
       .from("users")
@@ -535,7 +544,7 @@ export async function restoreUserAccess(userId: string): Promise<{ success?: str
 
     const { data: callerProfile } = await supabase
       .from("users")
-      .select("role")
+      .select("role, school")
       .eq("id", currentUser.user.id)
       .single()
 
@@ -547,9 +556,18 @@ export async function restoreUserAccess(userId: string): Promise<{ success?: str
 
     const { data: targetUser } = await serviceSupabase
       .from("users")
-      .select("email, full_name")
+      .select("email, full_name, school")
       .eq("id", userId)
       .single()
+
+    if (callerProfile?.role === "Head Teacher") {
+      const callerSchool = callerProfile.school || ""
+      const targetSchool = targetUser?.school || ""
+      const isInSchool = targetSchool === callerSchool || targetSchool.startsWith(callerSchool + " ")
+      if (!callerSchool || !isInSchool) {
+        return { error: "Cannot restore access for students from other schools" }
+      }
+    }
 
     const { error } = await serviceSupabase
       .from("users")
