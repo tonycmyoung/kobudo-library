@@ -139,7 +139,7 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
       }
     }
 
-    if (!userStatus.is_approved && userStatus.approved_at !== null) {
+    if (isAccessRevoked) {
       return {
         icon: <ShieldOff className="w-8 h-8 text-white" />,
         iconBg: "bg-red-700",
@@ -156,8 +156,8 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
     }
   }
 
+  const isAccessRevoked = !!(userStatus?.approved_at && !userStatus.is_approved)
   const statusContent = getStatusContent()
-  const isAccessRevoked = !!(userStatus && userStatus.approved_at && !userStatus.is_approved)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-900 via-orange-900 to-yellow-900 px-4 py-12 sm:px-6 lg:px-8">

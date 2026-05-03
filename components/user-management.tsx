@@ -1095,7 +1095,7 @@ export default function UserManagement() {
             ? {
                 ...user,
                 is_approved: !currentStatus,
-                approved_at: !currentStatus ? new Date().toISOString() : user.approved_at,
+                approved_at: currentStatus ? user.approved_at : new Date().toISOString(),
               }
             : user,
         ),

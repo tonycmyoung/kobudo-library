@@ -113,7 +113,7 @@ function StudentActivityStats({
       <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
         <LogIn className="w-3 h-3 flex-shrink-0" />
         <span>
-          {loginCount} login{loginCount !== 1 ? "s" : ""}
+          {loginCount} login{loginCount === 1 ? "" : "s"}
         </span>
       </div>
       <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
@@ -123,7 +123,7 @@ function StudentActivityStats({
       <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
         <Eye className="w-3 h-3 flex-shrink-0" />
         <span>
-          {viewCount} view{viewCount !== 1 ? "s" : ""}
+          {viewCount} view{viewCount === 1 ? "" : "s"}
         </span>
       </div>
     </>
@@ -540,7 +540,7 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
             ? {
                 ...user,
                 is_approved: !currentStatus,
-                approved_at: !currentStatus ? new Date().toISOString() : user.approved_at,
+                approved_at: currentStatus ? user.approved_at : new Date().toISOString(),
               }
             : user,
         ),
