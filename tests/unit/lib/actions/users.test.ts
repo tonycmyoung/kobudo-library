@@ -2173,5 +2173,24 @@ describe("User Actions", () => {
         expect.objectContaining({ is_approved: true, approved_at: expect.any(String) }),
       )
     })
+
+    it("returns error when database update fails", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: { message: "DB error" } }),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User" } }),
+      })
+      const result = await restoreUserAccess("user-123")
+      expect(result).toEqual({ error: "Failed to restore user access" })
+    })
   })
 })
