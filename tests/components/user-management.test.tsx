@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import UserManagement from "@/components/user-management"
 import { createClient } from "@/lib/supabase/client"
-import { deleteUserCompletely, updateUserFields, adminResetUserPassword } from "@/lib/actions"
+import { deleteUserCompletely, updateUserFields, adminResetUserPassword, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { useRouter, useSearchParams } from "next/navigation"
 
 vi.mock("@/lib/supabase/client", () => ({
@@ -14,6 +14,8 @@ vi.mock("@/lib/actions", () => ({
   deleteUserCompletely: vi.fn(),
   updateUserFields: vi.fn(),
   adminResetUserPassword: vi.fn(),
+  revokeUserAccess: vi.fn().mockResolvedValue({ success: "User access revoked" }),
+  restoreUserAccess: vi.fn().mockResolvedValue({ success: "User access restored" }),
 }))
 
 vi.mock("next/navigation", () => ({
@@ -252,8 +254,7 @@ describe("UserManagement", () => {
     await user.click(approveButtons[0])
 
     await waitFor(() => {
-      expect(mockUpdate).toHaveBeenCalled()
-      expect(mockEq).toHaveBeenCalledWith("id", "user-2")
+      expect(restoreUserAccess).toHaveBeenCalledWith("user-2")
     })
   })
 
@@ -1071,7 +1072,7 @@ describe("UserManagement", () => {
       })
 
       // Set up mock to fail on approval toggle after initial render
-      mockEq.mockResolvedValue({ data: null, error: { message: "Approval failed" } })
+      vi.mocked(restoreUserAccess).mockRejectedValueOnce(new Error("Approval failed"))
 
       const approveButtons = screen.getAllByLabelText("Approve user")
       await user.click(approveButtons[0])

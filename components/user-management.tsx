@@ -31,7 +31,7 @@ import {
 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { createClient } from "@/lib/supabase/client"
-import { deleteUserCompletely, updateUserFields, adminResetUserPassword } from "@/lib/actions"
+import { deleteUserCompletely, updateUserFields, adminResetUserPassword, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
 import { matchesSearch } from "@/lib/utils/search"
 import UserSortControl from "@/components/user-sort-control"
@@ -1054,15 +1054,11 @@ export default function UserManagement() {
     setProcessingUsers((prev) => new Set(prev).add(userId))
 
     try {
-      const updateData = {
-        is_approved: !currentStatus,
-        approved_at: !currentStatus ? new Date().toISOString() : null,
-      }
+      const result = currentStatus
+        ? await revokeUserAccess(userId)
+        : await restoreUserAccess(userId)
 
-      const supabase = createClient()
-      const { error } = await supabase.from("users").update(updateData).eq("id", userId).select()
-
-      if (error) throw error
+      if (result.error) throw new Error(result.error)
 
       setUsers((prev) =>
         prev.map((user) =>
@@ -1070,7 +1066,7 @@ export default function UserManagement() {
             ? {
                 ...user,
                 is_approved: !currentStatus,
-                approved_at: !currentStatus ? new Date().toISOString() : null,
+                approved_at: !currentStatus ? new Date().toISOString() : user.approved_at,
               }
             : user,
         ),
