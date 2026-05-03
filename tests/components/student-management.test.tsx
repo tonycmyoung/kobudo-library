@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event"
 import StudentManagement from "@/components/student-management"
 import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { fetchStudentsForHeadTeacher, updateStudentForHeadTeacher } from "@/lib/actions/users"
+import { revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { deleteUserCompletely } from "@/lib/actions"
 import { useRouter, useSearchParams } from "next/navigation"
 import { within } from "@testing-library/react"
@@ -29,6 +30,8 @@ vi.mock("@/lib/actions/users", () => ({
 
 vi.mock("@/lib/actions", () => ({
   deleteUserCompletely: vi.fn(),
+  revokeUserAccess: vi.fn(),
+  restoreUserAccess: vi.fn(),
 }))
 
 vi.mock("next/navigation", () => ({
@@ -910,6 +913,61 @@ describe("StudentManagement", () => {
         expect(toast.error).toHaveBeenCalledWith("Failed to update user fields. Please try again.")
       })
       consoleSpy.mockRestore()
+    })
+  })
+
+  describe("toggleStudentApproval", () => {
+    it("calls revokeUserAccess and updates state when revoking an approved student", async () => {
+      const { toast } = await import("react-toastify")
+      vi.mocked(revokeUserAccess).mockResolvedValue({ success: "User access revoked" })
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const revokeButton = johnCard?.querySelector('button[aria-label="Revoke access"]') as HTMLButtonElement
+      await user.click(revokeButton)
+
+      await waitFor(() => {
+        expect(revokeUserAccess).toHaveBeenCalledWith("student-1")
+        expect(toast.success).toHaveBeenCalledWith("User access revoked")
+      })
+    })
+
+    it("calls restoreUserAccess and updates state when restoring a revoked student", async () => {
+      const { toast } = await import("react-toastify")
+      const revokedStudent = { ...mockStudents[0], is_approved: false }
+      vi.mocked(fetchStudentsForHeadTeacher).mockResolvedValue({ data: [revokedStudent, mockStudents[1]], error: null })
+      vi.mocked(restoreUserAccess).mockResolvedValue({ success: "User access restored" })
+
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const restoreButton = johnCard?.querySelector('button[aria-label="Restore access"]') as HTMLButtonElement
+      await user.click(restoreButton)
+
+      await waitFor(() => {
+        expect(restoreUserAccess).toHaveBeenCalledWith("student-1")
+        expect(toast.success).toHaveBeenCalledWith("User access restored")
+      })
+    })
+
+    it("shows error toast when revokeUserAccess returns an error", async () => {
+      const { toast } = await import("react-toastify")
+      vi.mocked(revokeUserAccess).mockResolvedValue({ error: "Cannot revoke access for students from other schools" })
+      render(<StudentManagement headTeacherSchool="Test Dojo" headTeacherId="teacher-1" userRole="Head Teacher" />)
+
+      await waitFor(() => { expect(screen.getByText("John Doe")).toBeInTheDocument() })
+
+      const johnCard = screen.getByText("John Doe").closest(".flex.flex-col")
+      const revokeButton = johnCard?.querySelector('button[aria-label="Revoke access"]') as HTMLButtonElement
+      await user.click(revokeButton)
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Failed to update user access. Please try again.")
+      })
     })
   })
 
