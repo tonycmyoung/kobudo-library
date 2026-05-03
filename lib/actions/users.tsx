@@ -518,14 +518,18 @@ export async function revokeUserAccess(userId: string): Promise<{ success?: stri
       return { error: "Failed to revoke user access" }
     }
 
-    await logAuditEvent({
-      actor_id: currentUser.user.id,
-      actor_email: currentUser.user.email!,
-      action: "user_revoke",
-      target_id: userId,
-      target_email: targetUser?.email || "",
-      additional_data: { target_name: targetUser?.full_name },
-    })
+    try {
+      await logAuditEvent({
+        actor_id: currentUser.user.id,
+        actor_email: currentUser.user.email!,
+        action: "user_revoke",
+        target_id: userId,
+        target_email: targetUser?.email || "",
+        additional_data: { target_name: targetUser?.full_name },
+      })
+    } catch (auditError) {
+      console.error("Failed to log audit event for user_revoke:", auditError)
+    }
 
     revalidateTag("admin-users", "max")
     revalidateTag("students", "max")
@@ -579,14 +583,18 @@ export async function restoreUserAccess(userId: string): Promise<{ success?: str
       return { error: "Failed to restore user access" }
     }
 
-    await logAuditEvent({
-      actor_id: currentUser.user.id,
-      actor_email: currentUser.user.email!,
-      action: "user_restore",
-      target_id: userId,
-      target_email: targetUser?.email || "",
-      additional_data: { target_name: targetUser?.full_name },
-    })
+    try {
+      await logAuditEvent({
+        actor_id: currentUser.user.id,
+        actor_email: currentUser.user.email!,
+        action: "user_restore",
+        target_id: userId,
+        target_email: targetUser?.email || "",
+        additional_data: { target_name: targetUser?.full_name },
+      })
+    } catch (auditError) {
+      console.error("Failed to log audit event for user_restore:", auditError)
+    }
 
     revalidateTag("admin-users", "max")
     revalidateTag("students", "max")
