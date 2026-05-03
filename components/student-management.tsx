@@ -93,6 +93,157 @@ interface UserInterface {
   }
 }
 
+function StudentActivityStats({
+  lastLogin,
+  loginCount,
+  lastView,
+  viewCount,
+}: {
+  readonly lastLogin: string | null
+  readonly loginCount: number
+  readonly lastView: string | null
+  readonly viewCount: number
+}) {
+  return (
+    <>
+      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
+        <Clock className="w-3 h-3 flex-shrink-0" />
+        <span>{lastLogin ? formatDate(lastLogin) : "Never"}</span>
+      </div>
+      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
+        <LogIn className="w-3 h-3 flex-shrink-0" />
+        <span>
+          {loginCount} login{loginCount !== 1 ? "s" : ""}
+        </span>
+      </div>
+      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
+        <Play className="w-3 h-3 flex-shrink-0" />
+        <span>{lastView ? formatDate(lastView) : "Never"}</span>
+      </div>
+      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
+        <Eye className="w-3 h-3 flex-shrink-0" />
+        <span>
+          {viewCount} view{viewCount !== 1 ? "s" : ""}
+        </span>
+      </div>
+    </>
+  )
+}
+
+function StudentActionButtons({
+  isEditing,
+  isProcessing,
+  isApproved,
+  userRole,
+  onSave,
+  onCancel,
+  onEdit,
+  onToggleApproval,
+  onDelete,
+}: {
+  readonly isEditing: boolean
+  readonly isProcessing: boolean
+  readonly isApproved: boolean
+  readonly userRole: string
+  readonly onSave: () => void
+  readonly onCancel: () => void
+  readonly onEdit: () => void
+  readonly onToggleApproval: () => void
+  readonly onDelete: () => void
+}) {
+  if (isEditing) {
+    return (
+      <>
+        <Button
+          size="sm"
+          onClick={onSave}
+          disabled={isProcessing}
+          className="bg-green-600 hover:bg-green-700 text-white p-1 h-6 w-6"
+          aria-label="Save changes"
+        >
+          <Save className="w-3 h-3" />
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isProcessing}
+          className="border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-white p-1 h-6 w-6 bg-transparent"
+          aria-label="Cancel editing"
+        >
+          <X className="w-3 h-3" />
+        </Button>
+      </>
+    )
+  }
+
+  return (
+    <>
+      {userRole === "Head Teacher" && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span tabIndex={-1}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onEdit}
+                disabled={isProcessing}
+                className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white p-1 h-6 w-6"
+                aria-label="Edit user"
+              >
+                <Edit2 className="w-3 h-3" />
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>Edit student</TooltipContent>
+        </Tooltip>
+      )}
+      {userRole === "Head Teacher" && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span tabIndex={-1}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onToggleApproval}
+                disabled={isProcessing}
+                className={
+                  isApproved
+                    ? "border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
+                    : "border-green-600 text-green-400 hover:bg-green-600 hover:text-white p-1 h-6 w-6"
+                }
+                aria-label={isApproved ? "Revoke access" : "Restore access"}
+              >
+                {isApproved ? <UserX className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{isApproved ? "Revoke access" : "Restore access"}</TooltipContent>
+        </Tooltip>
+      )}
+      {userRole === "Head Teacher" && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span tabIndex={-1}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onDelete}
+                disabled={isProcessing}
+                className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
+                aria-label="Delete user"
+              >
+                <Trash2 className="w-3 h-3" />
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>Delete student</TooltipContent>
+        </Tooltip>
+      )}
+    </>
+  )
+}
+
 interface StudentManagementProps {
   readonly headTeacherSchool: string
   readonly headTeacherId: string
@@ -766,29 +917,12 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                         {student.is_approved ? "Approved" : "Pending"}
                       </Badge>
 
-                      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
-                        <Clock className="w-3 h-3 flex-shrink-0" />
-                        <span>{student.last_login ? formatDate(student.last_login) : "Never"}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
-                        <LogIn className="w-3 h-3 flex-shrink-0" />
-                        <span>
-                          {student.login_count} login{student.login_count !== 1 ? "s" : ""}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
-                        <Play className="w-3 h-3 flex-shrink-0" />
-                        <span>{student.last_view ? formatDate(student.last_view) : "Never"}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
-                        <Eye className="w-3 h-3 flex-shrink-0" />
-                        <span>
-                          {student.view_count} view{student.view_count !== 1 ? "s" : ""}
-                        </span>
-                      </div>
+                      <StudentActivityStats
+                        lastLogin={student.last_login}
+                        loginCount={student.login_count}
+                        lastView={student.last_view}
+                        viewCount={student.view_count}
+                      />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-400">
@@ -944,93 +1078,17 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                       </select>
 
                       <div className="flex gap-1">
-                        {isEditing ? (
-                          <>
-                            <Button
-                              size="sm"
-                              onClick={saveEditing}
-                              disabled={isProcessing}
-                              className="bg-green-600 hover:bg-green-700 text-white p-1 h-6 w-6"
-                              aria-label="Save changes"
-                            >
-                              <Save className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={cancelEditing}
-                              disabled={isProcessing}
-                              className="border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-white p-1 h-6 w-6 bg-transparent"
-                              aria-label="Cancel editing"
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            {userRole === "Head Teacher" && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span tabIndex={-1}>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => startEditing(student)}
-                                      disabled={isProcessing}
-                                      className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white p-1 h-6 w-6"
-                                      aria-label="Edit user"
-                                    >
-                                      <Edit2 className="w-3 h-3" />
-                                    </Button>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>Edit student</TooltipContent>
-                              </Tooltip>
-                            )}
-                            {userRole === "Head Teacher" && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span tabIndex={-1}>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => toggleStudentApproval(student.id, student.is_approved)}
-                                      disabled={isProcessing}
-                                      className={
-                                        student.is_approved
-                                          ? "border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
-                                          : "border-green-600 text-green-400 hover:bg-green-600 hover:text-white p-1 h-6 w-6"
-                                      }
-                                      aria-label={student.is_approved ? "Revoke access" : "Restore access"}
-                                    >
-                                      {student.is_approved ? <UserX className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
-                                    </Button>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>{student.is_approved ? "Revoke access" : "Restore access"}</TooltipContent>
-                              </Tooltip>
-                            )}
-                            {userRole === "Head Teacher" && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span tabIndex={-1}>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => deleteUser(student.id, student.email)}
-                                      disabled={isProcessing}
-                                      className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
-                                      aria-label="Delete user"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>Delete student</TooltipContent>
-                              </Tooltip>
-                            )}
-                          </>
-                        )}
+                        <StudentActionButtons
+                          isEditing={isEditing}
+                          isProcessing={isProcessing}
+                          isApproved={student.is_approved}
+                          userRole={userRole}
+                          onSave={saveEditing}
+                          onCancel={cancelEditing}
+                          onEdit={() => startEditing(student)}
+                          onToggleApproval={() => toggleStudentApproval(student.id, student.is_approved)}
+                          onDelete={() => deleteUser(student.id, student.email)}
+                        />
                       </div>
                     </div>
                   </div>
