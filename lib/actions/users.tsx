@@ -502,100 +502,65 @@ async function loadRevokeRestoreContext(userId: string) {
 
 function isHeadTeacherSchoolMismatch(
   callerProfile: { role?: string | null; school?: string | null } | null,
-  targetSchool: string | undefined | null
+  targetSchool = ""
 ): boolean {
   if (callerProfile?.role !== "Head Teacher") return false
   const callerSchool = callerProfile.school || ""
-  const tSchool = targetSchool || ""
-  return !callerSchool || !(tSchool === callerSchool || tSchool.startsWith(callerSchool + " "))
+  return !callerSchool || !(targetSchool === callerSchool || targetSchool.startsWith(callerSchool + " "))
+}
+
+async function toggleUserAccess(userId: string, revoke: boolean): Promise<{ success?: string; error?: string }> {
+  const action = revoke ? "revoke" : "restore"
+  try {
+    const { error: ctxError, ctx } = await loadRevokeRestoreContext(userId)
+    if (ctxError) return { error: ctxError }
+    if (!ctx) return { error: `Failed to ${action} user access` }
+
+    const { currentUser, callerProfile, targetUser, serviceSupabase } = ctx
+
+    if (isHeadTeacherSchoolMismatch(callerProfile, targetUser?.school ?? "")) {
+      return { error: `Cannot ${action} access for students from other schools` }
+    }
+
+    const updateData = revoke
+      ? { is_approved: false }
+      : { is_approved: true, approved_at: new Date().toISOString(), approved_by: currentUser.id }
+
+    const { error } = await serviceSupabase.from("users").update(updateData).eq("id", userId)
+
+    if (error) {
+      console.error(`Error ${action}ing user access:`, error)
+      return { error: `Failed to ${action} user access` }
+    }
+
+    try {
+      await logAuditEvent({
+        actor_id: currentUser.id,
+        actor_email: currentUser.email!,
+        action: `user_${action}`,
+        target_id: userId,
+        target_email: targetUser?.email || "",
+        additional_data: { target_name: targetUser?.full_name },
+      })
+    } catch (auditError) {
+      console.error(`Failed to log audit event for user_${action}:`, auditError)
+    }
+
+    revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
+    return { success: `User access ${action}d` }
+  } catch (error) {
+    console.error(`Error in ${action}UserAccess:`, error)
+    return { error: `Failed to ${action} user access` }
+  }
 }
 
 export async function revokeUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
-  try {
-    const { error: ctxError, ctx } = await loadRevokeRestoreContext(userId)
-    if (ctxError) return { error: ctxError }
-    if (!ctx) return { error: "Failed to revoke user access" }
-
-    const { currentUser, callerProfile, targetUser, serviceSupabase } = ctx
-
-    if (isHeadTeacherSchoolMismatch(callerProfile, targetUser?.school)) {
-      return { error: "Cannot revoke access for students from other schools" }
-    }
-
-    const { error } = await serviceSupabase
-      .from("users")
-      .update({ is_approved: false })
-      .eq("id", userId)
-
-    if (error) {
-      console.error("Error revoking user access:", error)
-      return { error: "Failed to revoke user access" }
-    }
-
-    try {
-      await logAuditEvent({
-        actor_id: currentUser.id,
-        actor_email: currentUser.email!,
-        action: "user_revoke",
-        target_id: userId,
-        target_email: targetUser?.email || "",
-        additional_data: { target_name: targetUser?.full_name },
-      })
-    } catch (auditError) {
-      console.error("Failed to log audit event for user_revoke:", auditError)
-    }
-
-    revalidateTag("admin-users", "max")
-    revalidateTag("students", "max")
-    return { success: "User access revoked" }
-  } catch (error) {
-    console.error("Error in revokeUserAccess:", error)
-    return { error: "Failed to revoke user access" }
-  }
+  return toggleUserAccess(userId, true)
 }
 
 export async function restoreUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
-  try {
-    const { error: ctxError, ctx } = await loadRevokeRestoreContext(userId)
-    if (ctxError) return { error: ctxError }
-    if (!ctx) return { error: "Failed to restore user access" }
-
-    const { currentUser, callerProfile, targetUser, serviceSupabase } = ctx
-
-    if (isHeadTeacherSchoolMismatch(callerProfile, targetUser?.school)) {
-      return { error: "Cannot restore access for students from other schools" }
-    }
-
-    const { error } = await serviceSupabase
-      .from("users")
-      .update({ is_approved: true, approved_at: new Date().toISOString(), approved_by: currentUser.id })
-      .eq("id", userId)
-
-    if (error) {
-      console.error("Error restoring user access:", error)
-      return { error: "Failed to restore user access" }
-    }
-
-    try {
-      await logAuditEvent({
-        actor_id: currentUser.id,
-        actor_email: currentUser.email!,
-        action: "user_restore",
-        target_id: userId,
-        target_email: targetUser?.email || "",
-        additional_data: { target_name: targetUser?.full_name },
-      })
-    } catch (auditError) {
-      console.error("Failed to log audit event for user_restore:", auditError)
-    }
-
-    revalidateTag("admin-users", "max")
-    revalidateTag("students", "max")
-    return { success: "User access restored" }
-  } catch (error) {
-    console.error("Error in restoreUserAccess:", error)
-    return { error: "Failed to restore user access" }
-  }
+  return toggleUserAccess(userId, false)
 }
 
 export async function updateProfile(params: {
