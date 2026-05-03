@@ -29,6 +29,7 @@ import {
   UserCheck,
 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { deleteUserCompletely, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
@@ -958,44 +959,65 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                         ) : (
                           <>
                             {userRole === "Head Teacher" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => startEditing(student)}
-                                disabled={isProcessing}
-                                className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white p-1 h-6 w-6"
-                                aria-label="Edit user"
-                              >
-                                <Edit2 className="w-3 h-3" />
-                              </Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => startEditing(student)}
+                                      disabled={isProcessing}
+                                      className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white p-1 h-6 w-6"
+                                      aria-label="Edit user"
+                                    >
+                                      <Edit2 className="w-3 h-3" />
+                                    </Button>
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>Edit student</TooltipContent>
+                              </Tooltip>
                             )}
                             {userRole === "Head Teacher" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => toggleStudentApproval(student.id, student.is_approved)}
-                                disabled={isProcessing}
-                                className={
-                                  student.is_approved
-                                    ? "border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
-                                    : "border-green-600 text-green-400 hover:bg-green-600 hover:text-white p-1 h-6 w-6"
-                                }
-                                aria-label={student.is_approved ? "Revoke access" : "Restore access"}
-                              >
-                                {student.is_approved ? <UserX className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
-                              </Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => toggleStudentApproval(student.id, student.is_approved)}
+                                      disabled={isProcessing}
+                                      className={
+                                        student.is_approved
+                                          ? "border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
+                                          : "border-green-600 text-green-400 hover:bg-green-600 hover:text-white p-1 h-6 w-6"
+                                      }
+                                      aria-label={student.is_approved ? "Revoke access" : "Restore access"}
+                                    >
+                                      {student.is_approved ? <UserX className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
+                                    </Button>
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>{student.is_approved ? "Revoke access" : "Restore access"}</TooltipContent>
+                              </Tooltip>
                             )}
                             {userRole === "Head Teacher" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => deleteUser(student.id, student.email)}
-                                disabled={isProcessing}
-                                className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
-                                aria-label="Delete user"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => deleteUser(student.id, student.email)}
+                                      disabled={isProcessing}
+                                      className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
+                                      aria-label="Delete user"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>Delete student</TooltipContent>
+                              </Tooltip>
                             )}
                           </>
                         )}

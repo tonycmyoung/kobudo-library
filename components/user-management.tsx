@@ -30,6 +30,7 @@ import {
   EyeOff,
 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { createClient } from "@/lib/supabase/client"
 import { deleteUserCompletely, updateUserFields, adminResetUserPassword, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
@@ -326,11 +327,16 @@ const PasswordResetDialog = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose() }}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
-          <Key className={STYLES.iconSmall} />
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
+              <Key className={STYLES.iconSmall} />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Reset password</TooltipContent>
+      </Tooltip>
       <DialogContent className="bg-gray-900 border-gray-700 text-white">
         <DialogHeader>
           <DialogTitle className="text-white">Reset Password for {user.full_name}</DialogTitle>
@@ -480,7 +486,12 @@ const ViewModeButtons = ({
   
   return (
     <>
-      <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
+        </TooltipTrigger>
+        <TooltipContent>Edit user</TooltipContent>
+      </Tooltip>
       <PasswordResetDialog
         user={user}
         isOpen={resetPasswordUser === user.id}
@@ -495,15 +506,25 @@ const ViewModeButtons = ({
         generateRandomPassword={generateRandomPassword}
         handleResetPassword={handleResetPassword}
       />
-      <IconButton
-        onClick={() => toggleUserApproval(user.id, user.is_approved)}
-        disabled={isProcessing}
-        className={approvalStyle}
-        ariaLabel={user.is_approved ? "Revoke approval" : "Approve user"}
-        icon={user.is_approved ? UserX : UserCheck}
-        variant={user.is_approved ? "outline" : "default"}
-      />
-      <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <IconButton
+            onClick={() => toggleUserApproval(user.id, user.is_approved)}
+            disabled={isProcessing}
+            className={approvalStyle}
+            ariaLabel={user.is_approved ? "Revoke approval" : "Approve user"}
+            icon={user.is_approved ? UserX : UserCheck}
+            variant={user.is_approved ? "outline" : "default"}
+          />
+        </TooltipTrigger>
+        <TooltipContent>{user.is_approved ? "Revoke access" : "Restore access"}</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
+        </TooltipTrigger>
+        <TooltipContent>Delete user</TooltipContent>
+      </Tooltip>
     </>
   )
 }
