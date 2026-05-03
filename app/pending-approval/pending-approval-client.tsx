@@ -233,11 +233,7 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
                   <p className="font-medium mb-2">Access on Hold</p>
                   <p className="text-sm text-red-300">
                     Your access has been put on hold by a Head Teacher or admin. Please reach out to your Head Teacher,
-                    or{" "}
-                    <a href={`mailto:${adminEmail}`} className="underline hover:text-red-200">
-                      {adminEmail}
-                    </a>
-                    , for more information.
+                    or the site admin (see contact below), for more information.
                   </p>
                 </div>
               </div>
@@ -300,13 +296,15 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
           {/* Action buttons */}
           {!fromSignup && (
             <div className="flex flex-col space-y-3">
-              <Button
-                asChild
-                variant="outline"
-                className="w-full border-gray-600 text-gray-300 hover:bg-gray-600 bg-transparent"
-              >
-                <Link href={`${process.env.NEXT_PUBLIC_FULL_SITE_URL || ""}/auth/login`}>Sign In</Link>
-              </Button>
+              {!(userStatus && userStatus.approved_at && !userStatus.is_approved) && (
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-600 bg-transparent"
+                >
+                  <Link href={`${process.env.NEXT_PUBLIC_FULL_SITE_URL || ""}/auth/login`}>Sign In</Link>
+                </Button>
+              )}
               {(!userStatus || error) && (
                 <Button
                   asChild

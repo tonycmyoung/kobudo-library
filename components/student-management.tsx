@@ -755,6 +755,16 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                       <Badge variant="default" className={roleBadgeClass}>
                         {student.role || "Student"}
                       </Badge>
+                      <Badge
+                        variant={student.is_approved ? "default" : "outline"}
+                        className={
+                          student.is_approved
+                            ? "bg-green-600 text-white flex-shrink-0"
+                            : "border-yellow-600 text-yellow-400 bg-transparent flex-shrink-0"
+                        }
+                      >
+                        {student.is_approved ? "Approved" : "Pending"}
+                      </Badge>
 
                       <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded flex-shrink-0">
                         <Clock className="w-3 h-3 flex-shrink-0" />

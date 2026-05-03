@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import UserManagement from "@/components/user-management"
 import { createClient } from "@/lib/supabase/client"
-import { deleteUserCompletely, updateUserFields, adminResetUserPassword, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
+import { deleteUserCompletely, updateUserFields, adminResetUserPassword, revokeUserAccess as _revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { useRouter, useSearchParams } from "next/navigation"
 
 vi.mock("@/lib/supabase/client", () => ({
@@ -250,7 +250,7 @@ describe("UserManagement", () => {
       expect(screen.getByText("Jane Smith")).toBeInTheDocument()
     })
 
-    const approveButtons = screen.getAllByLabelText("Approve user")
+    const approveButtons = screen.getAllByLabelText("Restore access")
     await user.click(approveButtons[0])
 
     await waitFor(() => {
@@ -1074,7 +1074,7 @@ describe("UserManagement", () => {
       // Set up mock to fail on approval toggle after initial render
       vi.mocked(restoreUserAccess).mockRejectedValueOnce(new Error("Approval failed"))
 
-      const approveButtons = screen.getAllByLabelText("Approve user")
+      const approveButtons = screen.getAllByLabelText("Restore access")
       await user.click(approveButtons[0])
 
       // After clicking approve, even with error, Jane Smith should still be visible

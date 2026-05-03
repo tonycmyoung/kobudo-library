@@ -329,11 +329,13 @@ const PasswordResetDialog = ({
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose() }}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
-              <Key className={STYLES.iconSmall} />
-            </Button>
-          </DialogTrigger>
+          <span>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
+                <Key className={STYLES.iconSmall} />
+              </Button>
+            </DialogTrigger>
+          </span>
         </TooltipTrigger>
         <TooltipContent>Reset password</TooltipContent>
       </Tooltip>
@@ -488,7 +490,9 @@ const ViewModeButtons = ({
     <>
       <Tooltip>
         <TooltipTrigger asChild>
-          <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
+          <span>
+            <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
+          </span>
         </TooltipTrigger>
         <TooltipContent>Edit user</TooltipContent>
       </Tooltip>
@@ -508,20 +512,24 @@ const ViewModeButtons = ({
       />
       <Tooltip>
         <TooltipTrigger asChild>
-          <IconButton
-            onClick={() => toggleUserApproval(user.id, user.is_approved)}
-            disabled={isProcessing}
-            className={approvalStyle}
-            ariaLabel={user.is_approved ? "Revoke approval" : "Approve user"}
-            icon={user.is_approved ? UserX : UserCheck}
-            variant={user.is_approved ? "outline" : "default"}
-          />
+          <span>
+            <IconButton
+              onClick={() => toggleUserApproval(user.id, user.is_approved)}
+              disabled={isProcessing}
+              className={approvalStyle}
+              ariaLabel={user.is_approved ? "Revoke access" : "Restore access"}
+              icon={user.is_approved ? UserX : UserCheck}
+              variant={user.is_approved ? "outline" : "default"}
+            />
+          </span>
         </TooltipTrigger>
         <TooltipContent>{user.is_approved ? "Revoke access" : "Restore access"}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
-          <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
+          <span>
+            <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
+          </span>
         </TooltipTrigger>
         <TooltipContent>Delete user</TooltipContent>
       </Tooltip>

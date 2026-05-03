@@ -840,7 +840,6 @@ export async function fetchStudentsForHeadTeacher(headTeacherSchool: string, hea
           current_belt:curriculums!current_belt_id(id, name, color, display_order),
           curriculum_set:curriculum_sets!curriculum_set_id(id, name)
         `)
-        .eq("is_approved", true)
         .or(`school.eq.${headTeacherSchool},school.ilike.${headTeacherSchool} %`)
         .neq("id", headTeacherId)
         .order("full_name", { ascending: true }),

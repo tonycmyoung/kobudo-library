@@ -84,7 +84,7 @@ describe("PendingApprovalClient", () => {
     })
   })
 
-  it("shows admin email in 'Account on Hold' message", async () => {
+  it("shows 'see contact below' in on-hold card and admin email in footer", async () => {
     const { createBrowserClient } = await import("@supabase/ssr")
     vi.mocked(createBrowserClient).mockReturnValue({
       auth: {
@@ -112,7 +112,41 @@ describe("PendingApprovalClient", () => {
 
     renderComponent("headteacher@dojo.com")
     await waitFor(() => {
-      expect(screen.getByText(/headteacher@dojo\.com/)).toBeInTheDocument()
+      expect(screen.getByText(/see contact below/)).toBeInTheDocument()
+      expect(screen.getAllByText(/headteacher@dojo\.com/).length).toBeGreaterThan(0)
+    })
+  })
+
+  it("does not show Sign In button on 'Account on Hold' card", async () => {
+    const { createBrowserClient } = await import("@supabase/ssr")
+    vi.mocked(createBrowserClient).mockReturnValue({
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: {
+            session: {
+              user: {
+                id: "user-123",
+                email: "user@test.com",
+                email_confirmed_at: "2024-01-01T00:00:00Z",
+              },
+            },
+          },
+        }),
+      },
+      from: vi.fn(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: { is_approved: false, approved_at: "2024-06-01T00:00:00Z", full_name: "Test User" },
+          error: null,
+        }),
+      })),
+    } as never)
+
+    renderComponent()
+    await waitFor(() => {
+      expect(screen.getByText("Account on Hold")).toBeInTheDocument()
+      expect(screen.queryByRole("link", { name: /sign in/i })).not.toBeInTheDocument()
     })
   })
 
