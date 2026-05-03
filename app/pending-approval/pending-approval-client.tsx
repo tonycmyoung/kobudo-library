@@ -40,14 +40,9 @@ export default function PendingApprovalClient({ adminEmail }: Props) {
         } = await supabase.auth.getSession()
 
         if (!session?.user) {
-          if (fromSignup) {
-            if (cancelled) return
-            setUserStatus(null)
-            setLoading(false)
-            return
+          if (!fromSignup) {
+            await supabase.auth.signOut()
           }
-          // No session - sign out and show generic message
-          await supabase.auth.signOut()
           if (cancelled) return
           setUserStatus(null)
           setLoading(false)

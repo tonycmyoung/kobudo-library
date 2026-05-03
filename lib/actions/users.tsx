@@ -475,37 +475,51 @@ export async function deleteUserCompletely(userId: string) {
   }
 }
 
+async function loadRevokeRestoreContext(userId: string) {
+  const supabase = await createServerClient()
+  const { data: currentUser } = await supabase.auth.getUser()
+  if (!currentUser.user) return { error: "Not authenticated" as const, ctx: null }
+
+  const { data: callerProfile } = await supabase
+    .from("users")
+    .select("role, school")
+    .eq("id", currentUser.user.id)
+    .single()
+
+  if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
+    return { error: "Unauthorized" as const, ctx: null }
+  }
+
+  const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data: targetUser } = await serviceSupabase
+    .from("users")
+    .select("email, full_name, school")
+    .eq("id", userId)
+    .single()
+
+  return { error: null, ctx: { currentUser: currentUser.user, callerProfile, targetUser, serviceSupabase } }
+}
+
+function isHeadTeacherSchoolMismatch(
+  callerProfile: { role?: string | null; school?: string | null } | null,
+  targetSchool: string | undefined | null
+): boolean {
+  if (callerProfile?.role !== "Head Teacher") return false
+  const callerSchool = callerProfile.school || ""
+  const tSchool = targetSchool || ""
+  return !callerSchool || !(tSchool === callerSchool || tSchool.startsWith(callerSchool + " "))
+}
+
 export async function revokeUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
   try {
-    const supabase = await createServerClient()
-    const { data: currentUser } = await supabase.auth.getUser()
-    if (!currentUser.user) return { error: "Not authenticated" }
+    const { error: ctxError, ctx } = await loadRevokeRestoreContext(userId)
+    if (ctxError) return { error: ctxError }
+    if (!ctx) return { error: "Failed to revoke user access" }
 
-    const { data: callerProfile } = await supabase
-      .from("users")
-      .select("role, school")
-      .eq("id", currentUser.user.id)
-      .single()
+    const { currentUser, callerProfile, targetUser, serviceSupabase } = ctx
 
-    if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
-      return { error: "Unauthorized" }
-    }
-
-    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
-    const { data: targetUser } = await serviceSupabase
-      .from("users")
-      .select("email, full_name, school")
-      .eq("id", userId)
-      .single()
-
-    if (callerProfile?.role === "Head Teacher") {
-      const callerSchool = callerProfile.school || ""
-      const targetSchool = targetUser?.school || ""
-      const isInSchool = targetSchool === callerSchool || targetSchool.startsWith(callerSchool + " ")
-      if (!callerSchool || !isInSchool) {
-        return { error: "Cannot revoke access for students from other schools" }
-      }
+    if (isHeadTeacherSchoolMismatch(callerProfile, targetUser?.school)) {
+      return { error: "Cannot revoke access for students from other schools" }
     }
 
     const { error } = await serviceSupabase
@@ -520,8 +534,8 @@ export async function revokeUserAccess(userId: string): Promise<{ success?: stri
 
     try {
       await logAuditEvent({
-        actor_id: currentUser.user.id,
-        actor_email: currentUser.user.email!,
+        actor_id: currentUser.id,
+        actor_email: currentUser.email!,
         action: "user_revoke",
         target_id: userId,
         target_email: targetUser?.email || "",
@@ -542,40 +556,19 @@ export async function revokeUserAccess(userId: string): Promise<{ success?: stri
 
 export async function restoreUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
   try {
-    const supabase = await createServerClient()
-    const { data: currentUser } = await supabase.auth.getUser()
-    if (!currentUser.user) return { error: "Not authenticated" }
+    const { error: ctxError, ctx } = await loadRevokeRestoreContext(userId)
+    if (ctxError) return { error: ctxError }
+    if (!ctx) return { error: "Failed to restore user access" }
 
-    const { data: callerProfile } = await supabase
-      .from("users")
-      .select("role, school")
-      .eq("id", currentUser.user.id)
-      .single()
+    const { currentUser, callerProfile, targetUser, serviceSupabase } = ctx
 
-    if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
-      return { error: "Unauthorized" }
-    }
-
-    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
-    const { data: targetUser } = await serviceSupabase
-      .from("users")
-      .select("email, full_name, school")
-      .eq("id", userId)
-      .single()
-
-    if (callerProfile?.role === "Head Teacher") {
-      const callerSchool = callerProfile.school || ""
-      const targetSchool = targetUser?.school || ""
-      const isInSchool = targetSchool === callerSchool || targetSchool.startsWith(callerSchool + " ")
-      if (!callerSchool || !isInSchool) {
-        return { error: "Cannot restore access for students from other schools" }
-      }
+    if (isHeadTeacherSchoolMismatch(callerProfile, targetUser?.school)) {
+      return { error: "Cannot restore access for students from other schools" }
     }
 
     const { error } = await serviceSupabase
       .from("users")
-      .update({ is_approved: true, approved_at: new Date().toISOString(), approved_by: currentUser.user.id })
+      .update({ is_approved: true, approved_at: new Date().toISOString(), approved_by: currentUser.id })
       .eq("id", userId)
 
     if (error) {
@@ -585,8 +578,8 @@ export async function restoreUserAccess(userId: string): Promise<{ success?: str
 
     try {
       await logAuditEvent({
-        actor_id: currentUser.user.id,
-        actor_email: currentUser.user.email!,
+        actor_id: currentUser.id,
+        actor_email: currentUser.email!,
         action: "user_restore",
         target_id: userId,
         target_email: targetUser?.email || "",

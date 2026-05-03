@@ -2124,6 +2124,24 @@ describe("User Actions", () => {
       const result = await revokeUserAccess("user-123")
       expect(result).toEqual({ error: "Failed to revoke user access" })
     })
+
+    it("returns error when Head Teacher targets a student from a different school", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Head Teacher", school: "SchoolA" } }),
+      })
+      mockServiceClient.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User", school: "SchoolB" } }),
+      })
+      const result = await revokeUserAccess("user-123")
+      expect(result).toEqual({ error: "Cannot revoke access for students from other schools" })
+    })
   })
 
   describe("restoreUserAccess", () => {
