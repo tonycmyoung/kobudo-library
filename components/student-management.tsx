@@ -25,10 +25,12 @@ import {
   Play,
   UserPlus,
   User,
+  UserX,
+  UserCheck,
 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { createClient as createBrowserClient } from "@/lib/supabase/client"
-import { deleteUserCompletely } from "@/lib/actions"
+import { deleteUserCompletely, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
 import { matchesSearch } from "@/lib/utils/search"
 import UserSortControl from "@/components/user-sort-control"
@@ -361,6 +363,40 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
     } catch (error) {
       console.error("Error deleting user:", error)
       toast.error("Failed to delete user. Please try again.")
+    } finally {
+      setProcessingUsers((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(userId)
+        return newSet
+      })
+    }
+  }
+
+  const toggleStudentApproval = async (userId: string, currentStatus: boolean) => {
+    setProcessingUsers((prev) => new Set(prev).add(userId))
+
+    try {
+      const result = currentStatus
+        ? await revokeUserAccess(userId)
+        : await restoreUserAccess(userId)
+
+      if (!result.success) throw new Error(result.error || "Failed to update approval")
+
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId
+            ? {
+                ...user,
+                is_approved: !currentStatus,
+                approved_at: !currentStatus ? new Date().toISOString() : user.approved_at,
+              }
+            : user,
+        ),
+      )
+      toast.success(currentStatus ? "User access revoked" : "User access restored")
+    } catch (error) {
+      console.error("Error updating student approval:", error)
+      toast.error("Failed to update user access. Please try again.")
     } finally {
       setProcessingUsers((prev) => {
         const newSet = new Set(prev)
@@ -931,6 +967,22 @@ export default function StudentManagement({ headTeacherSchool, headTeacherId, us
                                 aria-label="Edit user"
                               >
                                 <Edit2 className="w-3 h-3" />
+                              </Button>
+                            )}
+                            {userRole === "Head Teacher" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => toggleStudentApproval(student.id, student.is_approved)}
+                                disabled={isProcessing}
+                                className={
+                                  student.is_approved
+                                    ? "border-red-600 text-red-400 hover:bg-red-600 hover:text-white p-1 h-6 w-6"
+                                    : "border-green-600 text-green-400 hover:bg-green-600 hover:text-white p-1 h-6 w-6"
+                                }
+                                aria-label={student.is_approved ? "Revoke access" : "Restore access"}
+                              >
+                                {student.is_approved ? <UserX className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
                               </Button>
                             )}
                             {userRole === "Head Teacher" && (
