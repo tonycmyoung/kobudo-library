@@ -2170,7 +2170,7 @@ describe("User Actions", () => {
 
       expect(result).toEqual({ success: "User access restored" })
       expect(updateMock).toHaveBeenCalledWith(
-        expect.objectContaining({ is_approved: true, approved_at: expect.any(String) }),
+        expect.objectContaining({ is_approved: true, approved_at: expect.any(String), approved_by: expect.any(String) }),
       )
     })
 

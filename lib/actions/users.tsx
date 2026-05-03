@@ -519,6 +519,7 @@ export async function revokeUserAccess(userId: string) {
     })
 
     revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
     return { success: "User access revoked" }
   } catch (error) {
     console.error("Error in revokeUserAccess:", error)
@@ -552,7 +553,7 @@ export async function restoreUserAccess(userId: string) {
 
     const { error } = await serviceSupabase
       .from("users")
-      .update({ is_approved: true, approved_at: new Date().toISOString() })
+      .update({ is_approved: true, approved_at: new Date().toISOString(), approved_by: currentUser.user.id })
       .eq("id", userId)
 
     if (error) {
@@ -570,6 +571,7 @@ export async function restoreUserAccess(userId: string) {
     })
 
     revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
     return { success: "User access restored" }
   } catch (error) {
     console.error("Error in restoreUserAccess:", error)
