@@ -475,6 +475,108 @@ export async function deleteUserCompletely(userId: string) {
   }
 }
 
+export async function revokeUserAccess(userId: string) {
+  try {
+    const supabase = await createServerClient()
+    const { data: currentUser } = await supabase.auth.getUser()
+    if (!currentUser.user) return { error: "Not authenticated" }
+
+    const { data: callerProfile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", currentUser.user.id)
+      .single()
+
+    if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
+      return { error: "Unauthorized" }
+    }
+
+    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+    const { data: targetUser } = await serviceSupabase
+      .from("users")
+      .select("email, full_name")
+      .eq("id", userId)
+      .single()
+
+    const { error } = await serviceSupabase
+      .from("users")
+      .update({ is_approved: false })
+      .eq("id", userId)
+
+    if (error) {
+      console.error("Error revoking user access:", error)
+      return { error: "Failed to revoke user access" }
+    }
+
+    await logAuditEvent({
+      actor_id: currentUser.user.id,
+      actor_email: currentUser.user.email!,
+      action: "user_revoke",
+      target_id: userId,
+      target_email: targetUser?.email || "",
+      additional_data: { target_name: targetUser?.full_name },
+    })
+
+    revalidateTag("admin-users", "max")
+    return { success: "User access revoked" }
+  } catch (error) {
+    console.error("Error in revokeUserAccess:", error)
+    return { error: "Failed to revoke user access" }
+  }
+}
+
+export async function restoreUserAccess(userId: string) {
+  try {
+    const supabase = await createServerClient()
+    const { data: currentUser } = await supabase.auth.getUser()
+    if (!currentUser.user) return { error: "Not authenticated" }
+
+    const { data: callerProfile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", currentUser.user.id)
+      .single()
+
+    if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
+      return { error: "Unauthorized" }
+    }
+
+    const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+    const { data: targetUser } = await serviceSupabase
+      .from("users")
+      .select("email, full_name")
+      .eq("id", userId)
+      .single()
+
+    const { error } = await serviceSupabase
+      .from("users")
+      .update({ is_approved: true, approved_at: new Date().toISOString() })
+      .eq("id", userId)
+
+    if (error) {
+      console.error("Error restoring user access:", error)
+      return { error: "Failed to restore user access" }
+    }
+
+    await logAuditEvent({
+      actor_id: currentUser.user.id,
+      actor_email: currentUser.user.email!,
+      action: "user_restore",
+      target_id: userId,
+      target_email: targetUser?.email || "",
+      additional_data: { target_name: targetUser?.full_name },
+    })
+
+    revalidateTag("admin-users", "max")
+    return { success: "User access restored" }
+  } catch (error) {
+    console.error("Error in restoreUserAccess:", error)
+    return { error: "Failed to restore user access" }
+  }
+}
+
 export async function updateProfile(params: {
   userId: string
   email: string
