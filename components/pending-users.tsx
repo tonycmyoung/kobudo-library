@@ -13,6 +13,7 @@ import {
   updatePendingUserFields,
   fetchPendingUsers,
 } from "@/lib/actions"
+import { createClient as createBrowserClient } from "@/lib/supabase/client"
 import { formatDate } from "@/lib/utils/date"
 import { traceError } from "@/lib/trace-logger"
 
@@ -22,6 +23,7 @@ interface PendingUser {
   full_name: string | null
   teacher: string | null
   school: string | null
+  role: string | null
   created_at: string
   inviter?: { full_name: string } | null
 }
@@ -52,7 +54,7 @@ export default function PendingUsers() {
 
       const initialRoles: Record<string, string> = {}
       users.forEach((user) => {
-        initialRoles[user.id] = "Student"
+        initialRoles[user.id] = user.role || "Student"
       })
       setSelectedRoles(initialRoles)
     } catch (error) {
@@ -135,11 +137,25 @@ export default function PendingUsers() {
     }
   }
 
-  const handleRoleChange = (userId: string, role: string) => {
-    setSelectedRoles((prev) => ({
-      ...prev,
-      [userId]: role,
-    }))
+  const updateUserRole = async (userId: string, newRole: string) => {
+    setSelectedRoles((prev) => ({ ...prev, [userId]: newRole }))
+    setProcessingUsers((prev) => new Set(prev).add(userId))
+
+    try {
+      const supabase = createBrowserClient()
+      const { error } = await supabase.from("users").update({ role: newRole }).eq("id", userId)
+
+      if (error) throw error
+    } catch (error) {
+      traceError("Error updating user role", { category: "admin", payload: { error: String(error), userId } })
+      alert("Failed to update user role. Please try again.")
+    } finally {
+      setProcessingUsers((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(userId)
+        return newSet
+      })
+    }
   }
 
   const startEditing = (user: PendingUser) => {
@@ -357,8 +373,8 @@ export default function PendingUsers() {
                     <div className="lg:hidden text-xs text-gray-400 mb-1">Role:</div>
                     <select
                       value={selectedRoles[user.id] || "Student"}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      disabled={isProcessing || isEditing}
+                      onChange={(e) => updateUserRole(user.id, e.target.value)}
+                      disabled={isProcessing}
                       className="px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-xs focus:border-purple-500 focus:outline-none min-w-[90px]"
                     >
                       <option value="Student">Student</option>
