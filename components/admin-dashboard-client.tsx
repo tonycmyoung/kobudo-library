@@ -46,7 +46,7 @@ export default function AdminDashboardClient() {
       </div>
 
       <AdminStats />
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="flex flex-col gap-8">
         <PendingUsers />
         <UnconfirmedEmailUsers />
       </div>
