@@ -118,7 +118,10 @@ Tests live in `/tests` mirroring source structure. Mocks for Supabase and Next.j
 ## Workflow
 
 ### Git context check (before anything else)
-At the start of every session: note the current branch (`git branch --show-current`) and open PRs (`gh pr list --state open`). All work goes on the active feature branch — never on main directly. "Merge the PR" means the open feature PR, not any utility PR created during the session.
+Run `git branch --show-current` and `gh pr list --state open` before touching any files.
+- If on main with no open PR: create a feature branch first — `git fetch origin main && git checkout -b <branch> origin/main`
+- If a feature branch or open PR already exists: all changes go on that branch, no exceptions
+- Only one PR open at a time. Never create a second PR while one is active.
 
 ### Planning & Execution (Superpowers)
 Use Superpowers for all planning and execution:
