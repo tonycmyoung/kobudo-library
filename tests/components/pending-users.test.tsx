@@ -18,6 +18,7 @@ vi.mock("@/lib/trace-logger", () => ({
 describe("PendingUsers", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(window, "alert").mockImplementation(() => {})
   })
 
   afterEach(() => {
