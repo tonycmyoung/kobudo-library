@@ -127,9 +127,10 @@ TDD is mandatory throughout: RED-GREEN-REFACTOR, no exceptions.
 Do not use /ce-brainstorm, /ce-plan, or /ce-work.
 
 ### Review & Compounding (Compound Engineering)
-After implementation is complete and a PR exists:
-1. `/ce-code-review` — parallel specialist review of the PR
-2. `/ce-compound` — document the solved problem for future sessions
+These are user-initiated tools, not mandatory steps after every PR:
+
+- `/ce-code-review` — parallel specialist review. Worth running for PRs touching auth, permissions, data mutations, or external APIs. Skip for routine feature work that follows established patterns.
+- `/ce-compound` — documents a solved problem for future sessions. Worth running after non-obvious debugging or any session where the root cause took real investigation to find. Prefer Lightweight mode unless the problem is novel and likely to recur.
 
 The `docs/solutions/` folder is CE's knowledge store and will grow over time. It is organized by category (`test-failures/`, `runtime-errors/`, `logic-errors/`, etc.) with YAML frontmatter (`module`, `tags`, `problem_type`) for searchability. When implementing features or debugging in a documented area, check this folder first — learnings cover bugs, best practices, and workflow patterns.
 The `docs/superpowers/` folder is Superpowers' store — do not mix them.
