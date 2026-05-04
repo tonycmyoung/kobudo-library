@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { Suspense } from "react"
-import PendingApprovalClient from "@/app/pending-approval/pending-approval-client"
+import PendingApprovalClient from "@/components/pending-approval-client"
 import { useSearchParams } from "next/navigation"
 
 vi.mock("@/lib/supabase/client", () => ({
