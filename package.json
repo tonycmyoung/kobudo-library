@@ -87,6 +87,10 @@
     "vaul": "latest",
     "zod": "^3.23.8"
   },
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "^1.0.0-rc.18",
+    "@rolldown/binding-win32-x64-msvc": "^1.0.0-rc.18"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
     "@testing-library/dom": "^10.4.0",

@@ -16,6 +16,8 @@ import {
   updateUserBelt,
   assignCurriculumSetToUser,
   getUserWithCurriculumSet,
+  revokeUserAccess,
+  restoreUserAccess,
 } from "@/lib/actions/users"
 import { createServerClient } from "@supabase/ssr"
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
@@ -2055,6 +2057,185 @@ describe("User Actions", () => {
       const result = await assignCurriculumSetToUser("user-123", "set-456")
 
       expect(result.error).toBeDefined()
+    })
+  })
+
+  describe("revokeUserAccess", () => {
+    it("returns error when not authenticated", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({ data: { user: null } })
+      const result = await revokeUserAccess("user-123")
+      expect(result).toEqual({ error: "Not authenticated" })
+    })
+
+    it("returns error when caller is not admin or head teacher", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Student" } }),
+      })
+      const result = await revokeUserAccess("user-123")
+      expect(result).toEqual({ error: "Unauthorized" })
+    })
+
+    it("sets is_approved to false without touching approved_at", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" } }),
+      })
+      const updateMock = vi.fn().mockReturnThis()
+      mockServiceClient.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        update: updateMock,
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      })
+
+      const result = await revokeUserAccess("user-123")
+
+      expect(result).toEqual({ success: "User access revoked" })
+      expect(updateMock).toHaveBeenCalledWith({ is_approved: false })
+    })
+
+    it("returns error when database update fails", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: { message: "DB error" } }),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User" } }),
+      })
+      const result = await revokeUserAccess("user-123")
+      expect(result).toEqual({ error: "Failed to revoke user access" })
+    })
+
+    it("returns error when Head Teacher targets a student from a different school", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Head Teacher", school: "SchoolA" } }),
+      })
+      mockServiceClient.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User", school: "SchoolB" } }),
+      })
+      const result = await revokeUserAccess("user-123")
+      expect(result).toEqual({ error: "Cannot revoke access for students from other schools" })
+    })
+  })
+
+  describe("restoreUserAccess", () => {
+    it("returns error when not authenticated", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({ data: { user: null } })
+      const result = await restoreUserAccess("user-123")
+      expect(result).toEqual({ error: "Not authenticated" })
+    })
+
+    it("returns error when caller is not admin or head teacher", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Student" } }),
+      })
+      const result = await restoreUserAccess("user-123")
+      expect(result).toEqual({ error: "Unauthorized" })
+    })
+
+    it("sets is_approved to true and updates approved_at", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Head Teacher", school: "TestSchool" } }),
+      })
+      const updateMock = vi.fn().mockReturnThis()
+      mockServiceClient.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User", school: "TestSchool" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        update: updateMock,
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      })
+
+      const result = await restoreUserAccess("user-123")
+
+      expect(result).toEqual({ success: "User access restored" })
+      expect(updateMock).toHaveBeenCalledWith(
+        expect.objectContaining({ is_approved: true, approved_at: expect.any(String), approved_by: expect.any(String) }),
+      )
+    })
+
+    it("returns error when database update fails", async () => {
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: { message: "DB error" } }),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User" } }),
+      })
+      const result = await restoreUserAccess("user-123")
+      expect(result).toEqual({ error: "Failed to restore user access" })
+    })
+
+    it("succeeds even when logAuditEvent throws", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+      const { logAuditEvent } = await import("@/lib/actions/audit")
+      vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error("Audit failure"))
+
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" } }),
+      })
+      mockServiceClient.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User", school: "School" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      })
+
+      const result = await restoreUserAccess("user-123")
+      expect(result).toEqual({ success: "User access restored" })
     })
   })
 })

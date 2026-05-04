@@ -191,6 +191,30 @@ describe("AuditLogDashboard", () => {
     expect(screen.getByText("Password Reset")).toBeInTheDocument()
   })
 
+  it("should display 'Access Revoked' badge for user_revoke action", async () => {
+    vi.mocked(actions.fetchAuditLogs).mockResolvedValue([
+      { ...mockLogs[0], action: "user_revoke", id: "log-revoke" },
+    ])
+
+    render(<AuditLogDashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText("Access Revoked")).toBeInTheDocument()
+    })
+  })
+
+  it("should display 'Access Restored' badge for user_restore action", async () => {
+    vi.mocked(actions.fetchAuditLogs).mockResolvedValue([
+      { ...mockLogs[0], action: "user_restore", id: "log-restore" },
+    ])
+
+    render(<AuditLogDashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText("Access Restored")).toBeInTheDocument()
+    })
+  })
+
   it("should display actor and target names from additional data", async () => {
     vi.mocked(actions.fetchAuditLogs).mockResolvedValue(mockLogs)
 

@@ -70,6 +70,10 @@ export default function AuditLogDashboard() {
         return <UserPlus className="w-4 h-4 text-amber-500" />
       case "password_reset":
         return <AlertCircle className="w-4 h-4 text-purple-500" />
+      case "user_revoke":
+        return <UserX className="w-4 h-4 text-orange-500" />
+      case "user_restore":
+        return <UserCheck className="w-4 h-4 text-teal-500" />
       default:
         return <AlertCircle className="w-4 h-4 text-gray-500" />
     }
@@ -82,6 +86,8 @@ export default function AuditLogDashboard() {
       user_deletion: { label: "Deletion", className: "bg-red-500/20 text-red-400 border-red-500/30" },
       user_invitation: { label: "Invitation", className: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
       password_reset: { label: "Password Reset", className: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+      user_revoke: { label: "Access Revoked", className: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+      user_restore: { label: "Access Restored", className: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
     }
 
     const variant = variants[action] || { label: action, className: "bg-gray-500/20 text-gray-400 border-gray-500/30" }

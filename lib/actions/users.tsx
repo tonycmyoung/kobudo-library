@@ -475,6 +475,94 @@ export async function deleteUserCompletely(userId: string) {
   }
 }
 
+async function loadRevokeRestoreContext(userId: string) {
+  const supabase = await createServerClient()
+  const { data: currentUser } = await supabase.auth.getUser()
+  if (!currentUser.user) return { error: "Not authenticated" as const, ctx: null }
+
+  const { data: callerProfile } = await supabase
+    .from("users")
+    .select("role, school")
+    .eq("id", currentUser.user.id)
+    .single()
+
+  if (callerProfile?.role !== "Admin" && callerProfile?.role !== "Head Teacher") {
+    return { error: "Unauthorized" as const, ctx: null }
+  }
+
+  const serviceSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data: targetUser } = await serviceSupabase
+    .from("users")
+    .select("email, full_name, school")
+    .eq("id", userId)
+    .single()
+
+  return { error: null, ctx: { currentUser: currentUser.user, callerProfile, targetUser, serviceSupabase } }
+}
+
+function isHeadTeacherSchoolMismatch(
+  callerProfile: { role?: string | null; school?: string | null } | null,
+  targetSchool = ""
+): boolean {
+  if (callerProfile?.role !== "Head Teacher") return false
+  const callerSchool = callerProfile.school || ""
+  return !callerSchool || !(targetSchool === callerSchool || targetSchool.startsWith(callerSchool + " "))
+}
+
+async function toggleUserAccess(userId: string, revoke: boolean): Promise<{ success?: string; error?: string }> {
+  const action = revoke ? "revoke" : "restore"
+  try {
+    const { error: ctxError, ctx } = await loadRevokeRestoreContext(userId)
+    if (ctxError) return { error: ctxError }
+    if (!ctx) return { error: `Failed to ${action} user access` }
+
+    const { currentUser, callerProfile, targetUser, serviceSupabase } = ctx
+
+    if (isHeadTeacherSchoolMismatch(callerProfile, targetUser?.school ?? "")) {
+      return { error: `Cannot ${action} access for students from other schools` }
+    }
+
+    const updateData = revoke
+      ? { is_approved: false }
+      : { is_approved: true, approved_at: new Date().toISOString(), approved_by: currentUser.id }
+
+    const { error } = await serviceSupabase.from("users").update(updateData).eq("id", userId)
+
+    if (error) {
+      console.error(`Error ${action}ing user access:`, error)
+      return { error: `Failed to ${action} user access` }
+    }
+
+    try {
+      await logAuditEvent({
+        actor_id: currentUser.id,
+        actor_email: currentUser.email!,
+        action: `user_${action}`,
+        target_id: userId,
+        target_email: targetUser?.email || "",
+        additional_data: { target_name: targetUser?.full_name },
+      })
+    } catch (auditError) {
+      console.error(`Failed to log audit event for user_${action}:`, auditError)
+    }
+
+    revalidateTag("admin-users", "max")
+    revalidateTag("students", "max")
+    return { success: `User access ${action}d` }
+  } catch (error) {
+    console.error(`Error in ${action}UserAccess:`, error)
+    return { error: `Failed to ${action} user access` }
+  }
+}
+
+export async function revokeUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
+  return toggleUserAccess(userId, true)
+}
+
+export async function restoreUserAccess(userId: string): Promise<{ success?: string; error?: string }> {
+  return toggleUserAccess(userId, false)
+}
+
 export async function updateProfile(params: {
   userId: string
   email: string
@@ -736,7 +824,6 @@ export async function fetchStudentsForHeadTeacher(headTeacherSchool: string, hea
           current_belt:curriculums!current_belt_id(id, name, color, display_order),
           curriculum_set:curriculum_sets!curriculum_set_id(id, name)
         `)
-        .eq("is_approved", true)
         .or(`school.eq.${headTeacherSchool},school.ilike.${headTeacherSchool} %`)
         .neq("id", headTeacherId)
         .order("full_name", { ascending: true }),

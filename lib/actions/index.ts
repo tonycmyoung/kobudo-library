@@ -7,6 +7,8 @@ export {
   updateStudentForHeadTeacher,
   updatePendingUserFields,
   deleteUserCompletely,
+  revokeUserAccess,
+  restoreUserAccess,
   updateProfile,
   fetchPendingUsers,
   fetchUnconfirmedEmailUsers,

@@ -2,6 +2,14 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
 
+// Radix UI components (Tooltip, Popover, etc.) use ResizeObserver internally.
+// jsdom doesn't implement it, so provide a no-op stub.
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 import "@testing-library/jest-dom"
 import { afterEach, beforeEach, vi } from "vitest"
 import { cleanup } from "@testing-library/react"

@@ -30,8 +30,9 @@ import {
   EyeOff,
 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { createClient } from "@/lib/supabase/client"
-import { deleteUserCompletely, updateUserFields, adminResetUserPassword } from "@/lib/actions"
+import { deleteUserCompletely, updateUserFields, adminResetUserPassword, revokeUserAccess, restoreUserAccess } from "@/lib/actions"
 import { formatDate } from "@/lib/utils/date"
 import { matchesSearch } from "@/lib/utils/search"
 import UserSortControl from "@/components/user-sort-control"
@@ -326,11 +327,18 @@ const PasswordResetDialog = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose() }}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
-          <Key className={STYLES.iconSmall} />
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span tabIndex={-1}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user.id)} disabled={isProcessing} className={`border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white ${STYLES.btnIcon}`} aria-label="Reset password">
+                <Key className={STYLES.iconSmall} />
+              </Button>
+            </DialogTrigger>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Reset password</TooltipContent>
+      </Tooltip>
       <DialogContent className="bg-gray-900 border-gray-700 text-white">
         <DialogHeader>
           <DialogTitle className="text-white">Reset Password for {user.full_name}</DialogTitle>
@@ -480,7 +488,14 @@ const ViewModeButtons = ({
   
   return (
     <>
-      <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span tabIndex={-1}>
+            <IconButton onClick={() => startEditing(user)} disabled={isProcessing} className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" ariaLabel="Edit user" icon={Edit2} />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Edit user</TooltipContent>
+      </Tooltip>
       <PasswordResetDialog
         user={user}
         isOpen={resetPasswordUser === user.id}
@@ -495,15 +510,29 @@ const ViewModeButtons = ({
         generateRandomPassword={generateRandomPassword}
         handleResetPassword={handleResetPassword}
       />
-      <IconButton
-        onClick={() => toggleUserApproval(user.id, user.is_approved)}
-        disabled={isProcessing}
-        className={approvalStyle}
-        ariaLabel={user.is_approved ? "Revoke approval" : "Approve user"}
-        icon={user.is_approved ? UserX : UserCheck}
-        variant={user.is_approved ? "outline" : "default"}
-      />
-      <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span tabIndex={-1}>
+            <IconButton
+              onClick={() => toggleUserApproval(user.id, user.is_approved)}
+              disabled={isProcessing}
+              className={approvalStyle}
+              ariaLabel={user.is_approved ? "Revoke access" : "Restore access"}
+              icon={user.is_approved ? UserX : UserCheck}
+              variant={user.is_approved ? "outline" : "default"}
+            />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{user.is_approved ? "Revoke access" : "Restore access"}</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span tabIndex={-1}>
+            <IconButton onClick={() => deleteUser(user.id, user.email)} disabled={isProcessing} className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" ariaLabel="Delete user" icon={Trash2} />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Delete user</TooltipContent>
+      </Tooltip>
     </>
   )
 }
@@ -1054,15 +1083,11 @@ export default function UserManagement() {
     setProcessingUsers((prev) => new Set(prev).add(userId))
 
     try {
-      const updateData = {
-        is_approved: !currentStatus,
-        approved_at: !currentStatus ? new Date().toISOString() : null,
-      }
+      const result = currentStatus
+        ? await revokeUserAccess(userId)
+        : await restoreUserAccess(userId)
 
-      const supabase = createClient()
-      const { error } = await supabase.from("users").update(updateData).eq("id", userId).select()
-
-      if (error) throw error
+      if (result.error) throw new Error(result.error)
 
       setUsers((prev) =>
         prev.map((user) =>
@@ -1070,13 +1095,14 @@ export default function UserManagement() {
             ? {
                 ...user,
                 is_approved: !currentStatus,
-                approved_at: !currentStatus ? new Date().toISOString() : null,
+                approved_at: currentStatus ? user.approved_at : new Date().toISOString(),
               }
             : user,
         ),
       )
     } catch (error) {
       console.error("Error updating user approval:", error)
+      alert("Failed to update user access. Please try again.")
     } finally {
       setProcessingUsers((prev) => {
         const newSet = new Set(prev)

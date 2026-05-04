@@ -7,7 +7,7 @@ import { serverTrace } from "../trace-logger"
 interface AuditLogEntry {
   actor_id: string
   actor_email: string
-  action: "user_signup" | "user_approval" | "user_deletion" | "user_invitation" | "password_reset"
+  action: "user_signup" | "user_approval" | "user_deletion" | "user_invitation" | "password_reset" | "user_revoke" | "user_restore"
   target_id?: string
   target_email?: string
   additional_data?: Record<string, unknown>
