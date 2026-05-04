@@ -131,5 +131,5 @@ After implementation is complete and a PR exists:
 1. `/ce-code-review` — parallel specialist review of the PR
 2. `/ce-compound` — document the solved problem for future sessions
 
-The `docs/solutions/` folder is CE's knowledge store and will grow over time.
+The `docs/solutions/` folder is CE's knowledge store and will grow over time. It is organized by category (`test-failures/`, `runtime-errors/`, `logic-errors/`, etc.) with YAML frontmatter (`module`, `tags`, `problem_type`) for searchability. When implementing features or debugging in a documented area, check this folder first — learnings cover bugs, best practices, and workflow patterns.
 The `docs/superpowers/` folder is Superpowers' store — do not mix them.
