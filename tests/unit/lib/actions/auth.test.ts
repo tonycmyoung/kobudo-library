@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { signUp, createAdminUser, signOutServerAction, updatePassword, signIn } from "@/lib/actions/auth"
 import { createServerClient } from "@supabase/ssr"
+import { createServerClient as createSharedServerClient } from "@/lib/supabase/server"
 import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 
@@ -44,6 +45,10 @@ vi.mock("@/lib/actions/audit", () => ({
   logAuditEvent: vi.fn(),
 }))
 
+vi.mock("@/lib/supabase/server", () => ({
+  createServerClient: vi.fn(),
+}))
+
 describe("Auth Actions", () => {
   const mockSupabaseClient = {
     auth: {
@@ -51,6 +56,7 @@ describe("Auth Actions", () => {
       signInWithPassword: vi.fn(),
       updateUser: vi.fn(),
       getUser: vi.fn(),
+      signOut: vi.fn(),
     },
     from: vi.fn((_table: string) => ({
       insert: vi.fn().mockReturnThis(),
@@ -86,6 +92,7 @@ describe("Auth Actions", () => {
       set: vi.fn(),
     } as unknown as Awaited<ReturnType<typeof cookies>>)
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as ReturnType<typeof createServerClient>)
+    vi.mocked(createSharedServerClient).mockResolvedValue(mockSupabaseClient as never)
     vi.mocked(createClient).mockReturnValue(mockServiceClient as unknown as ReturnType<typeof createClient>)
   })
 
@@ -855,9 +862,12 @@ describe("Auth Actions", () => {
   })
 
   describe("signOutServerAction", () => {
-    it("should successfully clear auth cookies", async () => {
+    it("should sign out via supabase and return success", async () => {
+      mockSupabaseClient.auth.signOut.mockResolvedValue({})
+
       const result = await signOutServerAction()
 
+      expect(mockSupabaseClient.auth.signOut).toHaveBeenCalledOnce()
       expect(result).toEqual({ success: true })
     })
   })

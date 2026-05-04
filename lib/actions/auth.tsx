@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers"
 import { createServerClient } from "@supabase/ssr"
+import { createServerClient as createSharedServerClient } from "@/lib/supabase/server"
 import { createClient } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
@@ -499,19 +500,8 @@ export async function createAdminUser(prevState: { error?: string } | null, form
 }
 
 export async function signOutServerAction() {
-  const cookieStore = await cookies()
-  const authCookieNames = ["sb-access-token", "sb-refresh-token", "supabase-auth-token"]
-
-  authCookieNames.forEach((name) => {
-    cookieStore.set(name, "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      expires: new Date(0), // Expire immediately
-    })
-  })
-
+  const supabase = await createSharedServerClient()
+  await supabase.auth.signOut()
   return { success: true }
 }
 
