@@ -1,33 +1,18 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@supabase/ssr"
 import { signOutServerAction } from "@/lib/actions"
 
 export default function SignOutPage() {
   const router = useRouter()
+  const hasRun = useRef(false)
 
   useEffect(() => {
-    const handleSignOut = async () => {
-      try {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        )
+    if (hasRun.current) return
+    hasRun.current = true
 
-        await supabase.auth.signOut()
-
-        await signOutServerAction()
-
-        router.push("/")
-      } catch (error) {
-        console.error("Sign out error:", error)
-        router.push("/")
-      }
-    }
-
-    handleSignOut()
+    signOutServerAction().then(() => router.push("/"))
   }, [router])
 
   return (
