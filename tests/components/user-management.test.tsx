@@ -258,6 +258,22 @@ describe("UserManagement", () => {
     })
   })
 
+  it("should call revokeUserAccess when revoking an approved user", async () => {
+    const { revokeUserAccess } = await import("@/lib/actions")
+    render(<UserManagement />)
+
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
+    })
+
+    const revokeButton = screen.getByLabelText("Revoke access")
+    await user.click(revokeButton)
+
+    await waitFor(() => {
+      expect(revokeUserAccess).toHaveBeenCalledWith("user-1")
+    })
+  })
+
   it("should update user role when role select is changed", async () => {
     render(<UserManagement />)
 

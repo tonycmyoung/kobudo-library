@@ -2210,5 +2210,32 @@ describe("User Actions", () => {
       const result = await restoreUserAccess("user-123")
       expect(result).toEqual({ error: "Failed to restore user access" })
     })
+
+    it("succeeds even when logAuditEvent throws", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {})
+      const { logAuditEvent } = await import("@/lib/actions/audit")
+      vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error("Audit failure"))
+
+      mockSupabaseClient.auth.getUser.mockResolvedValue({
+        data: { user: { id: "caller-id", email: "caller@test.com" } },
+      })
+      mockSupabaseClient.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { role: "Admin" } }),
+      })
+      mockServiceClient.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { email: "user@test.com", full_name: "Test User", school: "School" } }),
+      })
+      mockServiceClient.from.mockReturnValue({
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      })
+
+      const result = await restoreUserAccess("user-123")
+      expect(result).toEqual({ success: "User access restored" })
+    })
   })
 })
